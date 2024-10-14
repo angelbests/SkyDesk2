@@ -1,0 +1,12 @@
+{
+  "AppVersion": "1.0.0.0",
+  "Title": "Matrix Rain Customizable",
+  "Thumbnail": "thumbnail.jpg",
+  "Preview": "preview2.gif",
+  "Desc": "Matrix like rain animation using HTML5 Canvas.",
+  "Author": "parambirs / khuong",
+  "License": "",
+  "Contact": "https://github.com/bad1dea/lively_matrix",
+  "Type": 1,
+  "FileName": "index.html"
+}

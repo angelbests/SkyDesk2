@@ -1,0 +1,14 @@
+{
+  "AppVersion": "0.9.6.0",
+  "Title": "The Hill",
+  "Thumbnail": "lively_t.jpg",
+  "Preview": "lively_p.gif",
+  "Desc": "Shader generated hill.",
+  "Author": "Yoichi Kobayashi",
+  "License": null,
+  "Contact": "https://codepen.io/ykob/pen/aBrjaR",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": null,
+  "IsAbsolutePath": false
+}

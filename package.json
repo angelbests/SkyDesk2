@@ -1,0 +1,43 @@
+{
+  "name": "skydesk2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.2",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-fs": "^2.0.0",
+    "@tauri-apps/plugin-process": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "@wangeditor-next/editor-for-vue": "^5.1.14",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^5.1.12",
+    "fabric": "^6.4.2",
+    "html2canvas": "^1.4.1",
+    "i": "^0.3.7",
+    "moment": "^2.30.1",
+    "npm": "^10.9.0",
+    "pinia": "^2.2.2",
+    "pinia-plugin-persistedstate": "^3.2.2",
+    "pinia-shared-state": "^0.5.1",
+    "vue": "^3.3.4",
+    "vue-draggable-plus": "^0.5.3",
+    "vue-router": "^4.4.3",
+    "vuetify": "^3.7.1"
+  },
+  "devDependencies": {
+    "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
+    "@tauri-apps/cli": "^2.0.2",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vue-tsc": "^2.0.22"
+  }
+}

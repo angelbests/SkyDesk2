@@ -1,0 +1,99 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["*","wallpaper-*"],
+  "remote":{
+    "urls": ["http://127.0.0.1:8000"]
+  },
+  "permissions": [
+    "core:default",
+    "shell:allow-open",
+    "core:webview:deny-create-webview",
+    "core:window:allow-set-ignore-cursor-events",
+    "core:webview:allow-create-webview-window", 
+    "core:window:allow-create",
+    "core:window:allow-set-shadow",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "core:window:allow-set-focus",
+    "core:window:allow-start-dragging",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-always-on-bottom",
+    "core:window:allow-set-position",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-size",
+    "core:window:allow-set-resizable",
+    "core:window:allow-set-maximizable",
+    "core:event:allow-listen",
+    "core:event:allow-emit",
+    "core:event:allow-emit-to",
+    "core:event:allow-unlisten",
+    "core:path:allow-resolve",
+    "process:allow-exit",
+    "process:allow-restart",
+    "core:tray:default",
+    "core:tray:allow-new",
+    "core:menu:allow-new",
+    "core:menu:default",
+    {
+      "identifier":"fs:write-files",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier":"fs:allow-mkdir",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier":"fs:read-dirs",
+      "allow": [{"path": "**"}]
+    },
+    {
+      "identifier":"fs:read-files",
+      "allow": [{"path": "**"}]
+    },
+    {
+      "identifier":"fs:allow-copy-file",
+      "allow": [{"path": "**"}]
+    },
+    {
+      "identifier":"fs:allow-read-text-file",
+      "allow": [{"path": "**"}]
+    },
+    "dialog:allow-open",
+    {
+      "identifier":"shell:allow-execute",
+      "allow": [
+        {
+          "name": "getlnkinfo",
+          "cmd": "powershell",
+          "args":true
+        },
+        {
+          "name":"bin/ResourcesExtract",
+          "args":true,
+          "sidecar": true
+        },
+        {
+          "name":"bin/shman",
+          "args":true,
+          "sidecar": true
+        },
+        {
+          "name":"systemPath",
+          "cmd":"cmd",
+          "args":true
+        },
+        {
+          "name":"exec",
+          "cmd":"powershell",
+          "args":true
+        }
+      ]
+    }
+  ]
+}

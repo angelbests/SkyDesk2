@@ -1,0 +1,14 @@
+{
+  "AppVersion": "0.9.6.0",
+  "Title": "Parallax.js",
+  "Thumbnail": "lively_t.jpg",
+  "Preview": "lively_p.gif",
+  "Desc": "Parallax.js engine github page.",
+  "Author": "Matthew Wagerfield",
+  "License": null,
+  "Contact": "https://github.com/wagerfield/parallax",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": null,
+  "IsAbsolutePath": false
+}

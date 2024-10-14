@@ -1,0 +1,474 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { setIcon } from '../../functions/peIcon';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { shortcutStore } from '../../stores/window';
+import { VueDraggable } from 'vue-draggable-plus'
+import { createWindow } from '../../functions/window';
+import { uuid } from '../../functions';
+import { open } from '@tauri-apps/plugin-dialog';
+import { Command } from '@tauri-apps/plugin-shell';
+onMounted(() => {
+    document.getElementById("shortcut")?.addEventListener("select", (e) => {
+        e.preventDefault()
+    })
+})
+
+const shortcutstore = shortcutStore()
+const scanbtn = ref<boolean>(true)
+const scanbar = ref(false)
+const scanProgram = async function () {
+    if (scanbtn.value) {
+        scanbtn.value = false
+        if (!scanbar.value) {
+            scanbar.value = true;
+            let res = await setIcon();
+            const map = new Map();
+            const res2 = res.filter(v => !map.has(v.name) && map.set(v.name, v))
+            shortcutstore.shortcutsTemp = res2
+            scanbar.value = false
+        }
+    } else {
+        scanbtn.value = true
+    }
+}
+
+const setting = ref(false);
+const settingbtn = function () {
+    setting.value = !setting.value
+}
+
+const delSshorcut = function (item: any) {
+    let index = shortcutstore.shortcuts.indexOf(item);
+    shortcutstore.shortcuts.splice(index, 1)
+}
+
+const createDocker = async function () {
+    let label = "shortcut-" + uuid();
+    let data = {
+        label: label,
+        setting: {
+            w: 160,
+            h: 160,
+            c: 2,
+            r: 2,
+            background: 'white',
+            blur: 0,
+            font: false,
+            alwaysOnTop: false,
+            alwaysOnBottom: false
+        },
+        shortcuts: []
+    }
+    localStorage.setItem(label, JSON.stringify(data))
+    await createWindow(label, {
+        x: 100,
+        y: 200,
+        width: 160,
+        height: 160,
+        decorations: false,
+        transparent: true,
+        dragDropEnabled: false,
+        shadow: false,
+        alwaysOnBottom: true,
+        maximizable: false,
+        resizable: false,
+        skipTaskbar:true,
+        url: "/#/pages/desktop/shortcut?label=" + label,
+    })
+}
+
+const setdata = function (d: DataTransfer, h: HTMLElement) {
+    if (h.dataset.lnk) {
+        d.setData("lnk", h.dataset.lnk)
+    }
+}
+
+const getlnk = async function () {
+    let res = await open({
+        "filters": [
+            {
+                "extensions": ['lnk'],
+                name: "lnk"
+            }
+        ]
+    })
+    if (res) {
+        shortcut.value.lnkPath = res
+    }
+}
+
+const getexe = async function () {
+    let res = await open({
+        "filters": [
+            {
+                "extensions": ['exe'],
+                name: "exe"
+            }
+        ]
+    })
+    if (res) {
+        shortcut.value.targetPath = res
+    }
+}
+
+const getico = async function () {
+    let res = await open({
+        "filters": [
+            {
+                "extensions": ['ico', 'png'],
+                name: "Image"
+            }
+        ]
+    })
+    if (res) {
+        shortcut.value.icoPath = res
+    }
+}
+
+const shortcut = ref({
+    targetPath: "",
+    lnkPath: "",
+    icoPath: "",
+    name: ""
+})
+
+// 修改shortcut
+const dialog = ref(false)
+const index = ref(0);
+const editshortcut = function (i: any) {
+    dialog.value = true
+    index.value = i
+    shortcut.value = {
+        ...shortcutstore.shortcuts[index.value]
+    }
+}
+
+const submitshortcut = function () {
+    shortcutstore.shortcuts[index.value].icoPath = shortcut.value.icoPath
+    shortcutstore.shortcuts[index.value].lnkPath = shortcut.value.lnkPath
+    shortcutstore.shortcuts[index.value].targetPath = shortcut.value.targetPath
+    shortcutstore.shortcuts[index.value].name = shortcut.value.name
+    dialog.value = false
+    shortcut.value = {
+        targetPath: "",
+        lnkPath: "",
+        icoPath: "",
+        name: ""
+    }
+}
+
+// 程序执行
+const exec = async function (item: any) {
+    if (item.lnkPath) {
+        console.log(item)
+        let res = await Command.create("exec", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
+        console.log(res)
+    } else {
+        await Command.create("exec", item.targetPath).execute()
+    }
+}
+
+const dialog2 = ref(false)
+
+const submitshortcut2 = function () {
+    shortcutstore.shortcuts.push({
+        targetPath: shortcut.value.targetPath,
+        iconLocationPeFile: "",
+        iconLocation: "",
+        lnkPath: shortcut.value.lnkPath,
+        icoPath: shortcut.value.icoPath,
+        name: shortcut.value.name,
+    })
+    dialog2.value = false
+    shortcut.value = {
+        targetPath: "",
+        lnkPath: "",
+        icoPath: "",
+        name: ""
+    }
+}
+
+const mouseenter = function (i: number) {
+    let el = document.getElementById('img' + i);
+    if (el) {
+        el.style.width = '50px'
+        el.style.height = '50px'
+    }
+}
+
+const mouseleave = function (i: number) {
+    let el = document.getElementById('img' + i);
+    if (el) {
+        el.style.width = '45px'
+        el.style.height = '45px'
+    }
+}
+
+const onAdd = function () {
+    let map = new Map();
+    shortcutstore.shortcuts = shortcutstore.shortcuts.filter(v => !map.has(v.name) && map.set(v.name, v))
+    shortcutstore.shortcutsTemp = shortcutstore.shortcutsTemp.filter(v => !map.has(v.name) && map.set(v.name, v))
+}
+
+const onAdd0 = function () {
+    let map = new Map();
+    shortcutstore.shortcutsTemp = shortcutstore.shortcutsTemp.filter(v => !map.has(v.name) && map.set(v.name, v))
+}
+
+const clone0 = function (element: any) {
+    return {
+        ...element
+    }
+}
+
+const onAdd1 = function () {
+    let map = new Map();
+    shortcutstore.wheels = shortcutstore.wheels.filter(v => !map.has(v.name) && map.set(v.name, v))
+}
+
+const clone = function (element: any) {
+    console.log(element)
+    if(shortcutstore.wheels.length<8){
+        return {
+            ...element
+        }
+    }
+}
+
+</script>
+
+<template>
+    <div id="shortcut" style="width: 100%;height: 100%;position: relative;">
+        <v-dialog max-width="500" v-model="dialog">
+            <v-list>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+                        @click="getlnk" label="快捷路径"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.targetPath" density="compact" hide-details="auto" :readonly="true"
+                        @click="getexe" label="程序路径"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
+                        @click="getico" label="图标路径"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.name" density="compact" hide-details="auto"
+                        label="快捷名称"></v-text-field>
+                </v-list-item>
+            </v-list>
+            <div
+                style="background: white;box-sizing: border-box;padding: 10px;display: flex;justify-content: flex-end;">
+                <v-btn style="margin-right: 10px;" @click="dialog = false">取消</v-btn>
+                <v-btn style="margin-right: 10px;" @click="submitshortcut">确认</v-btn>
+            </div>
+        </v-dialog>
+        <v-dialog max-width="500" v-model="dialog2">
+            <v-list>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+                        @click="getlnk" label="快捷路径"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.targetPath" density="compact" hide-details="auto" :readonly="true"
+                        @click="getexe" label="程序路径"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
+                        @click="getico" label="图标路径"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="shortcut.name" density="compact" hide-details="auto"
+                        label="快捷名称"></v-text-field>
+                </v-list-item>
+            </v-list>
+            <div
+                style="background: white;box-sizing: border-box;padding: 10px;display: flex;justify-content: flex-end;">
+                <v-btn style="margin-right: 10px;" @click="dialog2 = false">取消</v-btn>
+                <v-btn style="margin-right: 10px;" @click="submitshortcut2">确认</v-btn>
+            </div>
+        </v-dialog>
+        <v-card
+            style="width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)">
+            <v-btn style="margin-right: 20px;" @click="scanProgram">
+                <template v-slot:prepend>
+                    <v-icon>mdi-magnify-scan</v-icon>
+                </template>
+                {{ scanbtn ? "扫描程序" : "关闭扫描" }}
+            </v-btn>
+            <v-btn @click="dialog2 = true" style="margin-right: 20px;">
+                <template v-slot:prepend>
+                    <v-icon>mdi-view-grid-plus-outline</v-icon>
+                </template>
+                添加快捷
+            </v-btn>
+            <v-btn @click="settingbtn" style="margin-right: 20px;">
+                <template v-slot:prepend>
+                    <v-icon>mdi-cog-outline</v-icon>
+                </template>
+                设置快捷
+            </v-btn>
+            <v-btn @click="createDocker" style="margin-right: 20px;">
+                <template v-slot:prepend>
+                    <v-icon>mdi-shape-rectangle-plus</v-icon>
+                </template>
+                添加桌面合集
+            </v-btn>
+        </v-card>
+        <v-progress-linear color="black" :indeterminate="scanbar"></v-progress-linear>
+        <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;">
+            <div v-show="!scanbtn" class="scan-container">
+                <VueDraggable class="VueDraggable" v-model="shortcutstore.shortcutsTemp" :animation="150" :group="{
+                    name: 'shortcut',
+                    pull:'clone'
+                }"
+                :onAdd="onAdd0"
+                :clone="clone0"
+                >
+                    <v-sheet v-for="item in shortcutstore.shortcutsTemp" :key="item.lnkPath" class="shortcut-container">
+                        <div class="icon-div">
+                            <img class="icon"
+                                :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                        </div>
+                        <div
+                            style="font-size: 12px;width:70px;height: 30px;
+                            text-wrap:balance;text-align: center;
+                            text-overflow: clip;overflow: hidden;line-height: 15px;filter:drop-shadow(0px 5px 5px gray)">
+                            {{ item.name }}
+                        </div>
+                    </v-sheet>
+                </VueDraggable>
+            </div>
+            <v-sheet :width="scanbtn ? '100%' : '50%'" class="shorcuts-container">
+                <VueDraggable class="VueDraggable" v-model="shortcutstore.shortcuts" :animation="150"
+                    :group="{ name: 'shortcut', pull: 'clone' }" :setData="setdata" :onAdd="onAdd" :clone="clone">
+                    <v-sheet v-for="(item, i) in shortcutstore.shortcuts" :data-lnk="JSON.stringify(item)"
+                        :height="setting ? '120px' : '100px'" class="shortcut-container">
+                        <div class="icon-div" @click="exec(item)">
+                            <img @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i"
+                                 class="icon"
+                                :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                        </div>
+                        <div style="font-size: 12px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
+                                text-wrap:balance;text-align: center;
+                                text-overflow: clip;overflow: hidden;line-height: 15px;">
+                            {{ item.name }}
+                        </div>
+                        <div v-show="setting" style="width: 80px;height: 20px;display: flex;
+                            justify-content:space-around;align-items: flex-end;">
+                            <v-btn @click="delSshorcut(item)"
+                                style="font-size: 12px;box-shadow: none;background: none;color: gray;" size="mini">
+                                <template v-slot:prepend>
+                                    <v-icon>mdi-delete-outline</v-icon>
+                                </template>
+                                删
+                            </v-btn>
+                            <v-btn @click="editshortcut(i)"
+                                style="font-size: 12px;box-shadow: none;background: none;color: gray;" size="mini">
+                                <template v-slot:prepend>
+                                    <v-icon>mdi-pencil-box-outline</v-icon>
+                                </template>
+                                改
+                            </v-btn>
+                        </div>
+                    </v-sheet>
+                </VueDraggable>
+            </v-sheet>
+        </div>
+        <VueDraggable :onAdd="onAdd1" v-model="shortcutstore.wheels" :group="{ name: 'shortcut' }"
+            class="VueDraggable-wheel">
+            <v-sheet v-for="item in shortcutstore.wheels" :data-lnk="JSON.stringify(item)"
+                class="shortcut-container">
+                <div class="icon-div">
+                    <img class="icon"
+                        :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                </div>
+                <div style="font-size: 12px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
+                        text-wrap:balance;text-align: center;
+                        text-overflow: clip;overflow: hidden;line-height: 15px;">
+                    {{ item.name }}
+                </div>
+            </v-sheet>
+        </VueDraggable>
+    </div>
+</template>
+
+<style>
+.window {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.scan-container {
+    width: 50%;
+    height: calc(100% - 120px);
+    display: flex;
+    flex-wrap: wrap;
+    overflow: scroll;
+    box-sizing: border-box;
+    padding: 10px;
+    transition: all 0.1s linear;
+}
+.shorcuts-container {
+    height: calc(100% - 120px);
+    display: flex;
+    flex-wrap: wrap;
+    overflow: scroll;
+    box-sizing: border-box;
+    padding: 10px;
+    transition: all 0.1s linear;
+    position: relative;
+}
+.VueDraggable {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+}
+
+.VueDraggable-wheel {
+    width: 100%;
+    height: 120px;
+    position: absolute;
+    z-index: 1000;
+    left: 0px;
+    bottom: 0px;
+    background: rgba(123, 123, 123, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-div {
+    width: 55px;
+    height: 55px;
+    display: flex;
+    justify-content: center;
+    filter: drop-shadow(0px 5px 5px gray)
+}
+
+.icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+    transition: all 0.1s linear;
+}
+
+.shortcut-container {
+    width: 100px;
+    margin: 5px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px gray;
+    background-color: rgba(220, 250, 250, 0.8);
+    transition: height 0.2s linear;
+}
+</style>

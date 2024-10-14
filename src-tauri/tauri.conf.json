@@ -1,0 +1,135 @@
+{
+  "productName": "skydesk2",
+  "version": "0.0.0",
+  "identifier": "com.tauri.skydesk2",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:2422",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "SkyDesk2",
+        "width": 1490, 
+        "height": 1024,
+        "shadow": false,
+        "decorations": false,
+        "label": "main",
+        "fullscreen": false, 
+        "transparent":true,
+        "center": true,
+        "dragDropEnabled": false,
+        "alwaysOnTop": false
+      },
+      {
+        "title": "server",
+        "width": 0, 
+        "height": 0,
+        "shadow": false,
+        "decorations": false,
+        "label": "server",
+        "fullscreen": false, 
+        "transparent":true,
+        "visible": false,
+        "url": "/#/pages/server"
+      }, 
+      {
+        "x":0,
+        "y":0,
+        "width": 300,
+        "height": 300,
+        "shadow": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "url": "/#/pages/desktop/captureWindow",
+        "title": "captureWindow",
+        "label": "captureWindow",
+        "skipTaskbar":true,
+        "visible": false
+      },
+      {
+        "x":0,
+        "y":0,
+        "width": 50,
+        "height": 30,
+        "shadow": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "url": "/#/pages/desktop/captureBtn",
+        "title": "captureBtn",
+        "label": "captureBtn",
+        "skipTaskbar":true,
+        "visible": false,
+        "resizable": false,
+        "minimizable": false,
+        "maximizable": false
+      },
+      {
+        "x":0,
+        "y":0,
+        "width": 240,
+        "height": 240,
+        "shadow": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "url": "/#/pages/desktop/wheel",
+        "title": "wheel",
+        "label": "wheel",
+        "skipTaskbar":true,
+        "resizable": false,
+        "minimizable": false,
+        "maximizable": false,
+        "visible": false
+      },
+      {
+        "x":0,
+        "y":0,
+        "width": 100,
+        "height": 30,
+        "shadow": true,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "url": "/#/pages/desktop/tray",
+        "title": "tray",
+        "label": "tray",
+        "skipTaskbar":true,
+        "resizable": false,
+        "minimizable": false,
+        "maximizable": false,
+        "visible": false
+      }
+    ], 
+    "security": { 
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**","http://127.0.0.1:8000"]
+      }
+    },
+    "withGlobalTauri": true
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "bin/ResourcesExtract",
+      "bin/shman"
+    ],
+    "resources":[
+      "icons/icon.ico"
+    ]
+  }
+}

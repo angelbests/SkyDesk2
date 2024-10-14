@@ -1,0 +1,46 @@
+{
+  //div by 100
+  "hillOpacityFac": {
+    "max": 1000,
+    "min": 0,
+    "tick": 1001,
+    "text": "Hill Opacity",
+    "type": "slider",
+    "value": 50
+  },
+  "bgColor": {
+    "text": "Background",
+    "type": "color",
+    "value": "#0e0e0e"
+  },
+  "hillColor": {
+    "text": "Hill",
+    "type": "color",
+    "value": "#ffffff"
+  },
+  "fontColor": {
+    "text": "Font",
+    "type": "color",
+    "value": "#ffffff"
+  },
+  "timeToggle": {
+    "type": "checkbox",
+    "value": true,
+    "text": "Time"
+  },
+  "dateToggle": {
+    "type": "checkbox",
+    "value": true,
+    "text": "Date"
+  },
+  "_12hour": {
+    "type": "checkbox",
+    "value": true,
+    "text": "12 Hour"
+  },
+  "mmddyy": {
+    "type": "checkbox",
+    "value": false,
+    "text": "Month/Day Format"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "AppVersion": "0.9.6.0",
+  "Title": "Periodic Table",
+  "Thumbnail": "lively_t.jpg",
+  "Preview": "lively_p.gif",
+  "Desc": "Interactive periodic table of elements.",
+  "Author": "Mike Golus",
+  "License": null,
+  "Contact": "https://codepen.io/mikegolus/pen/OwrPgB",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": null,
+  "IsAbsolutePath": false
+}
