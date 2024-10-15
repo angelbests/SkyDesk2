@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import { invoke } from '@tauri-apps/api/core';
-
-
 // localStorage.clear()
-invoke("capture",{label:"main"})
 </script>
 
 <template>

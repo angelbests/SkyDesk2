@@ -7,7 +7,9 @@ import { wallpaperStore, windowStore } from '../stores/window';
 import { Monitor } from '@tauri-apps/api/window';
 import { shortcutStore } from '../stores/window';
 import { createtray } from '../functions/tray';
+import { isEnabled,enable } from '@tauri-apps/plugin-autostart';
 createtray()
+
 const monitors = ref<{
     title:string,
     value:string,
@@ -16,6 +18,11 @@ const monitors = ref<{
 }[]>([])
 const windowstore = windowStore()
 onMounted(async ()=>{
+    if(await isEnabled()){
+        enable()
+    }else{
+        
+    }
     // 初始化窗口
     await initWindow()
     // 设置窗口拖拽

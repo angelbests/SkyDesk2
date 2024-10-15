@@ -191,6 +191,20 @@ const addWallpaper =async function(){
     }
     addWallpaperShow.value = false
 }
+
+const closewallpaper =async function(){
+    let all = await getAllWebviewWindows()
+    all.filter(item=>{
+        if(item.label.indexOf("wallpaper")>=0){
+            item.close()
+            wallpapers.config.filter((item1,index)=>{
+                if(item.label == item1.label){
+                    wallpapers.config.splice(index,1)
+                }
+            })
+        }
+    })
+}
 </script>
 
 <template>
@@ -235,13 +249,19 @@ const addWallpaper =async function(){
                 </template>
                 添加壁纸
             </v-btn>
+            <v-btn style="margin-right: 20px;" @click="closewallpaper">
+                <template v-slot:prepend>
+                    <v-icon>mdi-close</v-icon>
+                </template>
+                关闭壁纸
+            </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
         <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
             <div class="wallpaper" id="wallpaper" ref="wallpaperref">
                 <div class="wallpaper-list" :style="{ height: wallpaperListHeight, minHeight: '100%' }">
                     <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10"
-                        v-for="item in wallpapers.wallpaperList">
+                        v-for="(item,index) in wallpapers.wallpaperList">
                         <v-card-text style="position: relative;">
                             <v-img :src="convertFileSrc(item.preview)" cover :height="220"></v-img>
                             <div style="width: 100%;position: absolute;left: 15px;top: 240px;z-index: 50;color: gray;">
@@ -250,6 +270,7 @@ const addWallpaper =async function(){
                         </v-card-text>
                         <v-card-actions>
                             <v-btn v-for="(monitor,i) in windowstore.monitors" @click="textwallpaper(item,monitor)">{{ "屏幕"+(i+1) }}</v-btn>
+                            <v-btn @click="wallpapers.wallpaperList.splice(index,1)">删除</v-btn>
                         </v-card-actions>
                     </v-card>
                 </div>

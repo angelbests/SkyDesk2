@@ -22,6 +22,7 @@ const editorData = reactive({
     color:'213,213,213',
     opacity:100,
     label:appWindow.label,
+    always:"normal"
 });
 const show = ref(true)
 onMounted(()=>{
@@ -34,25 +35,11 @@ onMounted(()=>{
             editorData.value = data.value
             editorData.color = data.color
             editorData.opacity = data.opacity
-
-            let doc = document.getElementsByTagName('body')[0];
-            doc.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-            let tool:any = document.getElementsByClassName('w-e-toolbar')[0];
-            tool.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-            let text:any = document.getElementById('w-e-textarea-1');
-            text.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-            let con:any = document.getElementsByClassName('w-e-text-container')[0]
-            con.style.background = 'transparent'
+            editorData.always = data.always
+            setconfig()
         }else{
             localStorage.setItem(appWindow.label,JSON.stringify(editorData))
-            let doc = document.getElementsByTagName('body')[0];
-            doc.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-            let tool:any = document.getElementsByClassName('w-e-toolbar')[0];
-            tool.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-            let text:any = document.getElementById('w-e-textarea-1');
-            text.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-            let con:any = document.getElementsByClassName('w-e-text-container')[0]
-            con.style.background = 'transparent'
+            setconfig()
             emit("note",editorData)
         }
     },1)
@@ -68,6 +55,27 @@ onMounted(()=>{
         show.value = true
     })
 })
+
+const setconfig =async function(){
+    let doc = document.getElementsByTagName('body')[0];
+    doc.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
+    let tool:any = document.getElementsByClassName('w-e-toolbar')[0];
+    tool.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
+    let text:any = document.getElementById('w-e-textarea-1');
+    text.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
+    let con:any = document.getElementsByClassName('w-e-text-container')[0]
+    con.style.background = 'transparent'
+    if(editorData.always == "top"){
+        await getCurrentWebviewWindow().setAlwaysOnBottom(false)
+        await getCurrentWebviewWindow().setAlwaysOnTop(true)
+    }else if(editorData.always == "bottom"){
+        await getCurrentWebviewWindow().setAlwaysOnTop(false)
+        await getCurrentWebviewWindow().setAlwaysOnBottom(true)
+    }else if(editorData.always == "normal"){
+        await getCurrentWebviewWindow().setAlwaysOnBottom(false)
+        await getCurrentWebviewWindow().setAlwaysOnTop(false)
+    }
+}
 
 //#region 监听图片文件的拖拽
 const filedrop = async function(){
@@ -292,14 +300,7 @@ const colorInput = function(e:any){
     editorData.color = red+','+green+','+blue
     localStorage.setItem(appWindow.label,JSON.stringify(editorData))
     emit("note",editorData)
-    let doc = document.getElementsByTagName('body')[0];
-    doc.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-    let tool:any = document.getElementsByClassName('w-e-toolbar')[0];
-    tool.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-    let text:any = document.getElementById('w-e-textarea-1');
-    text.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-    let con:any = document.getElementsByClassName('w-e-text-container')[0]
-    con.style.background = 'transparent'
+    setconfig()
 }
 // 16进制color转10进制
 function hexToRgba(hex:string, opacity:number|string) {
@@ -318,14 +319,23 @@ const rangeChange = function(e:any){
     editorData.opacity = e.srcElement.value
     localStorage.setItem(appWindow.label,JSON.stringify(editorData))
     emit("note",editorData)
-    let doc = document.getElementsByTagName('body')[0];
-    doc.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-    let tool:any = document.getElementsByClassName('w-e-toolbar')[0];
-    tool.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-    let text:any = document.getElementById('w-e-textarea-1');
-    text.style.background = `rgba(${editorData.color},${editorData.opacity/100})`
-    let con:any = document.getElementsByClassName('w-e-text-container')[0]
-    con.style.background = 'transparent'
+    setconfig()
+}
+
+// 设置层级
+const alwaysicon = ref("mdi-rectangle")
+const setalways = function(){
+    if(editorData.always == "top"){
+        editorData.always = "bottom"
+        alwaysicon.value = "mdi-arrange-send-backward"
+    }else if(editorData.always == "bottom"){
+        editorData.always = "normal"
+        alwaysicon.value = "mdi-rectangle"
+    }else if(editorData.always == "normal"){
+        editorData.always = "top"
+        alwaysicon.value = "mdi-arrange-bring-forward"   
+    }
+    setconfig()
 }
 
 // 关闭
@@ -358,6 +368,7 @@ const rightClick = function(){
         <div style="display: flex;justify-content: space-evenly;align-items: center;width: 100%;height: 100%;" data-tauri-drag-region>
             <v-btn icon="mdi-opacity" size="small"  @click="transparentbool = !transparentbool"></v-btn>
             <v-btn icon="mdi-palette" size="small" @click="colorChange"></v-btn>
+            <v-btn :icon="alwaysicon" size="small" @click="setalways"></v-btn>
             <v-btn icon="mdi-close" size="small"  @click="close()"></v-btn>
         </div>
     </right-bar>
