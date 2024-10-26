@@ -6,6 +6,7 @@ await mkdir("wallpapers\\image",{baseDir:BaseDirectory.AppData,"recursive":true}
 await mkdir("wallpapers\\html",{baseDir:BaseDirectory.AppData,"recursive":true})
 await mkdir("wallpapers\\video",{baseDir:BaseDirectory.AppData,"recursive":true})
 await mkdir("note",{baseDir:BaseDirectory.AppData,"recursive":true})
+await mkdir("ollama",{baseDir:BaseDirectory.AppData,"recursive":true})
 
 import { createApp } from "vue";
 import App from "./App.vue";
@@ -25,10 +26,11 @@ const vuetify = createVuetify({
       defaultSet: 'mdi'
     }
 })
+// import "./highlightjs.css"
+
 const app = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
-
 app.use(pinia)
 app.use(router)
 app.use(vuetify)

@@ -6,6 +6,7 @@
     "linux"
   ],
   "permissions": [
-    "autostart:default"
+    "autostart:default",
+    "global-shortcut:default"
   ]
 }

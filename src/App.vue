@@ -1,5 +1,8 @@
 <script setup lang="ts">
-// localStorage.clear()
+document.addEventListener("contextmenu",(e)=>{
+  e.preventDefault()
+})
+
 </script>
 
 <template>

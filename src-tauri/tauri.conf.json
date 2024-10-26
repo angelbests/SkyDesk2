@@ -109,7 +109,7 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": ["**","http://127.0.0.1:8000"]
+        "scope": ["**"]
       }
     },
     "withGlobalTauri": true

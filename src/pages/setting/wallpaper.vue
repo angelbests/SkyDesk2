@@ -205,6 +205,8 @@ const closewallpaper =async function(){
         }
     })
 }
+
+
 </script>
 
 <template>

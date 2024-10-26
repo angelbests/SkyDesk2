@@ -36,7 +36,7 @@ export const getlnks =async function(){
         };
         $results | ConvertTo-Json
     `;
-    let outputtarget = await Command.create('getlnkinfo', [
+    let outputtarget = await Command.create('powershell', [
         `${forstr}`,
     ],{
         "encoding":"GBK"

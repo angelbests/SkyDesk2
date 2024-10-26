@@ -6,7 +6,7 @@ import RightBar from '../../components/RightBar.vue';
 import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { LogicalSize } from '@tauri-apps/api/dpi';
 import { listen } from '@tauri-apps/api/event';
-import { open } from '@tauri-apps/plugin-shell';
+import { Command } from '@tauri-apps/plugin-shell';
 const app = getCurrentWebviewWindow()
 const show = ref(false)
 const shortcutWindows = ref(JSON.parse(localStorage.getItem(app.label) || "{}"));
@@ -103,8 +103,16 @@ const deleteicon = function(){
     localStorage.setItem(app.label,JSON.stringify(shortcutWindows.value))
 }
 
-const openshorcut = function(item: { lnkPath: string; }){
-    open(item.lnkPath)
+const openshorcut =async function(item: {
+    targetPath: any; lnkPath: string; 
+}){
+    if (item.lnkPath) {
+        console.log(item)
+        let res = await Command.create("powershell", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
+        console.log(res)
+    } else {
+        await Command.create("powershell", item.targetPath).execute()
+    }
 }
 
 const mouseenter = function(i:number){

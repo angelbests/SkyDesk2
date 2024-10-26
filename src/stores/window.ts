@@ -1,4 +1,4 @@
-import { acceptHMRUpdate, defineStore } from "pinia";
+import { defineStore } from "pinia";
 import { WindowOptions } from "@tauri-apps/api/window";
 import { WebviewOptions } from "@tauri-apps/api/webview";
 import { availableMonitors,Monitor} from '@tauri-apps/api/window';
@@ -16,6 +16,14 @@ const windowStore = defineStore("window",{
     },
     "persist":{
         paths:["windows"]
+    }
+})
+
+const systemStore = defineStore("system",{
+    "state":function(){
+        return {
+            autostart:false as boolean
+        }
     }
 })
 
@@ -101,13 +109,4 @@ const shortcutStore = defineStore("shortcut",{
     "persist":true,
 })
 
-
-if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(windowStore, import.meta.hot))
-    import.meta.hot.accept(acceptHMRUpdate(noteStore, import.meta.hot))
-    import.meta.hot.accept(acceptHMRUpdate(wallpaperStore, import.meta.hot))
-    import.meta.hot.accept(acceptHMRUpdate(captureStore, import.meta.hot))
-    import.meta.hot.accept(acceptHMRUpdate(shortcutStore, import.meta.hot))
-}
-
-export {windowStore,noteStore,wallpaperStore,captureStore,shortcutStore}
+export {windowStore,noteStore,wallpaperStore,captureStore,shortcutStore,systemStore}

@@ -37,7 +37,7 @@ const updateElementHeight = function () {
 }
 
 const noteListHeight = computed(() => {
-    return Math.ceil((notestore.note.length / Math.trunc(noteWidth.value / 420))) * 320 + 'px';
+    return Math.ceil((notestore.note.length / Math.trunc(noteWidth.value / 420))) * 320+10 + 'px';
 })
 
 const createnote = function () {
@@ -108,6 +108,7 @@ const delnote = function (item: { label: string }) {
                 添加便签
             </v-btn>
         </v-card>
+        <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
         <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
             <div class="note" id="note" ref="noteref">
                 <div class="note-list" :style="{ height: noteListHeight, minHeight: '100%' }">

@@ -65,6 +65,7 @@ onMounted(async () => {
         if (e.payload.message == "ButtonRelease(Middle)") {
             await app.hide()
         } else if (e.payload.message == "ButtonPress(Middle)") {
+            await app.setFocus()
             await app.setPosition(new PhysicalPosition(Math.trunc(position.x - 120 * scaleFactor), Math.trunc(position.y - 120 * scaleFactor)))
             await app.show()
         }
@@ -86,15 +87,13 @@ const exec = async function (item: any, i: number) {
     app.hide()
     if (item.lnkPath) {
         console.log(item)
-        let res = await Command.create("exec", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
+        let res = await Command.create("powershell", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
         console.log(res)
-    } else if(item.targetPath) {
-        await Command.create("exec", item.targetPath).execute()
+    } else {
+        await Command.create("powershell", item.targetPath).execute()
     }
     index.value = -2
 }
-
-
 
 </script>
 

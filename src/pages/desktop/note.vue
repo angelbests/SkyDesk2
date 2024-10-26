@@ -127,11 +127,15 @@ const onChange = function(){
 const mode = ref<string>('default');
 const toolbarConfig:Partial<IToolbarConfig> = {}
 toolbarConfig.toolbarKeys = [
-    'todo','numberedList','codeBlock','bold','italic','underline','through','upimage','color',
+    'todo','numberedList','codeBlock','bold','italic','underline','through','upimage','color','lineHeight'
 ]
 
 const editorConfig:Partial<IEditorConfig> = { 
-    MENU_CONF: {},
+    MENU_CONF: {
+        "lineHeight":{
+            lineHeightList: ['1', '1.5', '2', '2.5']
+        }
+    },
     placeholder: '请输入内容...' ,
     hoverbarKeys:{
         'text':{
@@ -154,7 +158,8 @@ const editorConfig:Partial<IEditorConfig> = {
         },
         "table":{
             menuKeys:[]
-        }
+        },
+        
     }
 }
 
@@ -342,6 +347,7 @@ const setalways = function(){
 
 const close = async function(){
     const windowstore = windowStore()
+    console.log(windowstore.windows)
     let res = windowstore.windows.filter(item=>{
         return item.label == getCurrentWebviewWindow().label
     })
@@ -349,6 +355,7 @@ const close = async function(){
     let index = notestore.note.findIndex(item=>{
         return item.label == getCurrentWebviewWindow().label
     })
+    console.log(res)
     if(index>=0){
         notestore.note[index].option = res[0].option
     }
@@ -394,7 +401,6 @@ const rightClick = function(){
         @customPaste = "customPaste"
         @onChange="onChange"
       />
-
     </div>
 </template>
 <style>
@@ -428,6 +434,11 @@ const rightClick = function(){
 /* editor */
 .editor{
     width: 100vw;
+}
+
+p {
+    margin-block-start: 0em !important;
+    margin-block-end: 0em !important;
 }
 
 ::-webkit-scrollbar{

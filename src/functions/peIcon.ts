@@ -176,8 +176,9 @@ const getUrlInfo = async function(path:string){
 
 // 获取系统环境变量对应的路径
 const getSystemPath =async function(systemPara:string){
-    let res = await Command.create("systemPath",["/c",`echo ${systemPara}`]).execute()
+    let res = await Command.create("systemPath",["/c","echo",`${systemPara}`]).execute()
     if(res.code == 0){
+        console.log(res.stdout)
         return res.stdout.split("\r\n")[0]
     }else{
         return ""

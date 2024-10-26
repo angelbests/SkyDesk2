@@ -162,10 +162,10 @@ const submitshortcut = function () {
 const exec = async function (item: any) {
     if (item.lnkPath) {
         console.log(item)
-        let res = await Command.create("exec", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
+        let res = await Command.create("powershell", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
         console.log(res)
     } else {
-        await Command.create("exec", item.targetPath).execute()
+        await Command.create("powershell", item.targetPath).execute()
     }
 }
 

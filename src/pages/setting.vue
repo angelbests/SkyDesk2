@@ -7,7 +7,9 @@ import { wallpaperStore, windowStore } from '../stores/window';
 import { Monitor } from '@tauri-apps/api/window';
 import { shortcutStore } from '../stores/window';
 import { createtray } from '../functions/tray';
-import { isEnabled,enable } from '@tauri-apps/plugin-autostart';
+import { setautostart } from '../functions/autostart';
+import { Command } from '@tauri-apps/plugin-shell';
+import { emit } from '@tauri-apps/api/event';
 createtray()
 
 const monitors = ref<{
@@ -18,11 +20,11 @@ const monitors = ref<{
 }[]>([])
 const windowstore = windowStore()
 onMounted(async ()=>{
-    if(await isEnabled()){
-        enable()
-    }else{
-        
-    }
+
+    setInterval(async() => {
+        await netspeed() 
+    }, 1000);
+    setautostart()
     // 初始化窗口
     await initWindow()
     // 设置窗口拖拽
@@ -58,7 +60,50 @@ onMounted(async ()=>{
     })
 })
 
-
+const net = ref({
+    last_r:0,
+    last_s:0,
+    speed_r:0,
+    speed_s:0
+})
+const netspeed =async function(){
+    let total = {
+        r:0,s:0
+    }
+    let str = `
+        $r = Get-NetAdapterStatistics;
+        $a = @();
+        $a += [PSCustomObject]@{ 
+            name = "null"; 
+            r=0; 
+            s=0; 
+        } 
+        foreach ($s in $r) { 
+            $a += [PSCustomObject]@{ 
+                name = $s.name; 
+                r=$s.ReceivedBytes; 
+                s=$s.SentBytes 
+            } 
+        };
+        $a | ConvertTo-Json
+    `;
+    let res =await Command.create("powershell",str,{
+        "encoding":"GBK"
+    }).execute()
+    if(res.code == 0){
+        console.log(res)
+        let arr:any[] = JSON.parse(res.stdout);
+        arr.filter((item: { r: number; s: number; })=>{
+            total.r = total.r +  item.r
+            total.s = total.s +  item.s
+        })
+    }
+    net.value.speed_r = total.r - net.value.last_r
+    net.value.speed_s = total.s - net.value.last_s
+    net.value.last_r = total.r;
+    net.value.last_s = total.s;
+    await emit("netspeed",{speed_r:net.value.speed_r,speed_s:net.value.speed_s})
+}
 
 const toggleMaximizeBool = ref(false)
 const toggleMaximize =async function(){
@@ -107,6 +152,12 @@ const reset = async function(){
             <template v-slot:prepend>
                 <v-app-bar-nav-icon @click="drawer=!drawer"></v-app-bar-nav-icon>
             </template>
+            <div style="width: 100px;display: flex;align-items: center;">
+                <v-icon>mdi-arrow-down-thin</v-icon>{{ Math.trunc(net.speed_r/1024)<1024?Math.trunc(net.speed_r/1024)+'KB/s':Math.trunc(net.speed_r/1024/1024*10)/10+'MB/s' }}
+            </div>
+            <div style="width: 100px;display: flex;align-items: center;">
+                <v-icon>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
+            </div>
             <v-btn icon @click="reset">
                 <v-icon>mdi-reload</v-icon>
             </v-btn>
@@ -130,7 +181,11 @@ const reset = async function(){
                     <v-list-item prepend-icon="mdi-apps" title="快捷" :href="'/#/pages/setting/shortcut'"></v-list-item>
                     <v-list-item prepend-icon="mdi-wallpaper" title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
                     <v-list-item prepend-icon="mdi-note-outline" title="笔记" :href="'/#/pages/setting/note'"></v-list-item>
-                    <!-- <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item> -->
+                    <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item>
+                    <v-list-item prepend-icon="mdi-note-outline" title="日程" :href="''"></v-list-item> -->
+                    <v-list-item prepend-icon="mdi-robot-outline" title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
+                    <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
+                    <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
                     <!-- <v-list-item prepend-icon="mdi-application-outline" title="窗口" :href="'/#/pages/setting/window'"></v-list-item>
                     <v-list-group value="显示器">
                         <template v-slot:activator="{ props }">

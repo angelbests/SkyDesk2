@@ -34,10 +34,20 @@ lazy_static! {
     static ref CAPTURE_STATUS: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("")));
 }
 use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_network;
+use tauri_plugin_system_info;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-    .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![""])))
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec![""]),
+        ))
+        .plugin(tauri_plugin_system_info::init())
+        .plugin(tauri_plugin_network::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init())
@@ -54,11 +64,13 @@ pub fn run() {
             get_display_capture,
             start_capture,
             wheelclick,
-            get_window_capture,
+            get_window_capture
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+    
 }
+
 
 fn show_window(app: &AppHandle) {
     let main = app.get_webview_window("main").unwrap();

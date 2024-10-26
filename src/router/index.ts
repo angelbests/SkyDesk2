@@ -37,6 +37,10 @@ const routes:RouteRecordRaw[] = [
             {
                 path:"note",
                 component:()=>import("./../pages/setting/note.vue")   
+            },
+            {
+                path:"ollama",
+                component:()=>import("./../pages/setting/ollama.vue")   
             }
         ]
     },

@@ -20,7 +20,7 @@ onMounted(async ()=>{
 <template>
     <div class="window" >
         <img v-if="type=='image'" :src="convertFileSrc(path)" class="image"/>
-        <video v-else class="video" id="video" ref="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
+        <video muted v-else class="video" id="video" ref="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
     </div>
 </template>
 

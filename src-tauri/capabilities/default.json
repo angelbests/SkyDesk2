@@ -43,6 +43,12 @@
     "autostart:allow-disable",
     "autostart:allow-enable",
     "autostart:allow-is-enabled",
+    "clipboard-manager:allow-clear",
+    "clipboard-manager:allow-read-image",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-write-html",
+    "clipboard-manager:allow-write-image",
+    "clipboard-manager:allow-write-text",
     {
       "identifier":"fs:write-files",
       "allow": [{ "path": "**" }]
@@ -72,9 +78,25 @@
       "identifier":"shell:allow-execute",
       "allow": [
         {
-          "name": "getlnkinfo",
+          "name": "powershell",
           "cmd": "powershell",
           "args":true
+        },
+        {
+          "name":"ollama",
+          "cmd":"ollama",
+          "args":true
+        },
+        {
+          "name":"systemPath",
+          "cmd":"cmd",
+          "args":[
+            "/c",
+            "echo",
+            {
+              "validator": "\\S+"
+            }
+          ]
         },
         {
           "name":"bin/ResourcesExtract",
@@ -85,18 +107,61 @@
           "name":"bin/shman",
           "args":true,
           "sidecar": true
-        },
+        }
+      ]
+    },
+    {
+      "identifier":"shell:allow-spawn",
+      "allow": [
         {
-          "name":"systemPath",
+          "name":"cmd",
           "cmd":"cmd",
-          "args":true
-        },
-        {
-          "name":"exec",
-          "cmd":"powershell",
           "args":true
         }
       ]
-    }
+    },
+    "shell:allow-stdin-write",
+    {
+      "identifier":"http:allow-fetch",
+      "allow": [
+        {
+          "url":"http://127.0.0.1:11434/"
+        },{
+          "url": "https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe"
+        }
+      ]
+    },
+    {
+      "identifier":"http:allow-fetch-send",
+      "allow": [
+        {
+          "url":"http://127.0.0.1:11434/"
+        },{
+          "url": "https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe"
+        }
+      ]
+    },
+    {
+      "identifier":"http:allow-fetch-read-body",
+      "allow": [
+        {
+          "url":"http://127.0.0.1:11434/"
+        },{
+          "url": "https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe"
+        }
+      ]
+    },
+    {
+      "identifier":"http:allow-fetch-cancel",
+      "allow": [
+        {
+          "url":"http://127.0.0.1:11434/"
+        },{
+          "url": "https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe"
+        }
+      ]
+    },
+    "network:allow-all",
+    "system-info:allow-all"
   ]
 }
