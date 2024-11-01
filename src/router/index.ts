@@ -15,6 +15,10 @@ const routes:RouteRecordRaw[] = [
                 component:()=>import("./../pages/setting/wallpaper.vue")
             },
             {
+                path:"date",
+                component:()=>import("./../pages/setting/date.vue")
+            },
+            {
                 path:"monitor",
                 component:()=>import("./../pages/setting/monitor.vue")
             },

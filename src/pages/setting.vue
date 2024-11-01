@@ -2,16 +2,18 @@
 import { onMounted, ref } from 'vue';
 import { initWindow } from '../functions/window';
 import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { exit } from '@tauri-apps/plugin-process';
-import { wallpaperStore, windowStore } from '../stores/window';
+import { exit, relaunch } from '@tauri-apps/plugin-process';
+import { windowStore } from '../stores/window';
 import { Monitor } from '@tauri-apps/api/window';
-import { shortcutStore } from '../stores/window';
 import { createtray } from '../functions/tray';
-import { setautostart } from '../functions/autostart';
 import { Command } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
 createtray()
-
+import { invoke } from '@tauri-apps/api/core';
+setTimeout(() => {
+    let a = invoke("tauri_capture")
+    console.log(a)
+}, 2000);
 const monitors = ref<{
     title:string,
     value:string,
@@ -24,7 +26,6 @@ onMounted(async ()=>{
     setInterval(async() => {
         await netspeed() 
     }, 1000);
-    setautostart()
     // 初始化窗口
     await initWindow()
     // 设置窗口拖拽
@@ -91,7 +92,7 @@ const netspeed =async function(){
         "encoding":"GBK"
     }).execute()
     if(res.code == 0){
-        console.log(res)
+        // console.log(res)
         let arr:any[] = JSON.parse(res.stdout);
         arr.filter((item: { r: number; s: number; })=>{
             total.r = total.r +  item.r
@@ -124,25 +125,22 @@ const closeApp = async function() {
 }
 
 const drawer = ref(true)
+import { systemStore } from '../stores/window';
+import { disable, enable } from '@tauri-apps/plugin-autostart';
+const systemstore= systemStore()
+const settingshow = ref(false)
 
-const listClick = function(e:{ id: unknown; value: boolean; path: unknown[]; }){
-    console.log(e)
+const autostartsetting = function(e: any){
+    if(e){
+        enable()
+    }else{
+        disable()
+    }
 }
 
-const  shortcutstore =  shortcutStore()
-const reset = async function(){
-    wallpaperStore().wallpaperList = []
-    wallpaperStore().config = []
-    shortcutstore.shortcutsTemp = []
-    shortcutstore.shortcuts = []
-    windowstore.windows = []
-    let res = await getAllWebviewWindows()
-    for(let i = 0 ;i<res.length;i++){
-        if(res[i].label != 'main' && res[i].label != 'wheel'){
-            res[i].destroy()
-        }
-    }
-    // relaunch()
+const refresh = function(){
+    localStorage.clear()
+    relaunch()
 }
 </script>
 
@@ -158,8 +156,8 @@ const reset = async function(){
             <div style="width: 100px;display: flex;align-items: center;">
                 <v-icon>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
             </div>
-            <v-btn icon @click="reset">
-                <v-icon>mdi-reload</v-icon>
+            <v-btn icon @click="settingshow = true">
+                <v-icon>mdi-cog-outline</v-icon>
             </v-btn>
             <v-btn icon @click="minus">
                 <v-icon>mdi-window-minimize</v-icon>
@@ -175,36 +173,15 @@ const reset = async function(){
 
         <v-main style="height:calc(100vh);background-color: wheat;overflow-y: auto;width: 100%;">
             <v-navigation-drawer :style="{boxShadow:drawer?'5px 0px 5px rgba(123,123,123,0.5)':'none'}" width="200" temporary v-model="drawer" :permanent="true" expand-on-hover>
-                <v-list style="height: 100%;" :items="monitors" @click:select="listClick">
-                    <!-- <v-list-item prepend-icon="mdi-cog-outline" title="设置" :href="'/#/pages/setting/system'"></v-list-item> -->
-
+                <v-list style="height: 100%;" :items="monitors">
                     <v-list-item prepend-icon="mdi-apps" title="快捷" :href="'/#/pages/setting/shortcut'"></v-list-item>
                     <v-list-item prepend-icon="mdi-wallpaper" title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
-                    <v-list-item prepend-icon="mdi-note-outline" title="笔记" :href="'/#/pages/setting/note'"></v-list-item>
-                    <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item>
-                    <v-list-item prepend-icon="mdi-note-outline" title="日程" :href="''"></v-list-item> -->
+                    <v-list-item prepend-icon="mdi-note-outline" title="便签" :href="'/#/pages/setting/note'"></v-list-item>
                     <v-list-item prepend-icon="mdi-robot-outline" title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
                     <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
+                    <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item> -->
+                    <!-- <v-list-item prepend-icon="mdi-calendar-range" title="日程" :href="'/#/pages/setting/date'"></v-list-item> -->
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
-                    <!-- <v-list-item prepend-icon="mdi-application-outline" title="窗口" :href="'/#/pages/setting/window'"></v-list-item>
-                    <v-list-group value="显示器">
-                        <template v-slot:activator="{ props }">
-                            <v-list-item
-                                v-bind="props"
-                                prepend-icon="mdi-monitor"
-                                title="显示器"
-                            ></v-list-item>
-                        </template>
-                        <v-list-item
-                            v-for="(item, i) in monitors"
-                            :key="i"
-                            :prepend-icon="item.icon"
-                            :title="item.title as string"
-                            :value="item.value"
-                            :href="'/#/pages/setting/monitor?name='+(item.monitor?.name as string)"
-                        >
-                        </v-list-item>
-                    </v-list-group> -->
                 </v-list>
             </v-navigation-drawer>
             <router-view v-slot="{ Component }" :key="$route.fullPath" style="width: auto;height: 100%;box-sizing: border-box;padding: 10px;">
@@ -213,6 +190,49 @@ const reset = async function(){
                 </keep-alive>
             </router-view>
         </v-main>
+
+        <v-dialog v-model="settingshow" >
+            <div style="display: flex;justify-content: center" @click.self="settingshow = false">
+                <v-card style="width: 400px;">
+                    <v-card-title>
+                        <div style="display: flex;flex-direction: row;">
+                            <div style="width: 50%;text-align: left;">
+                                设置
+                            </div>
+                            <div style="width: 50%;text-align: right;">
+                                <v-icon icon="mdi-window-close" @click="settingshow = false"></v-icon>
+                            </div>
+                        </div>
+                    </v-card-title>
+                    <v-card-item>
+                        <v-list lines="one" select-strategy="classic">
+                            <v-list-item >
+                                <template v-slot:append>
+                                    <v-switch color="info" v-model="systemstore.autostart" @update:model-value="autostartsetting" hide-details></v-switch>
+                                </template>
+                                <v-list-item-title>开机自启</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                        <v-list lines="one" select-strategy="classic" >
+                            <v-list-item>
+                                <template v-slot:append>
+                                    <v-btn @click="refresh">
+                                        <template v-slot:prepend>
+                                            <v-icon>mdi-refresh</v-icon>
+                                        </template>
+                                        清除
+                                    </v-btn>
+                                </template>
+                                <v-list-item-title>清除用户信息</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-card-item>
+                    <v-card-actions>
+                        
+                    </v-card-actions>
+                </v-card>
+            </div>
+        </v-dialog>
     </v-layout>
 </template>
 

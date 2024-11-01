@@ -21,6 +21,7 @@ export const createtray = async function(){
                             item.setPosition(e.position)
                             item.show()
                             item.setFocus()
+                            
                         }
                     })
                 }
