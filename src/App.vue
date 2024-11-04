@@ -1,9 +1,7 @@
 <script setup lang="ts">
-
 document.addEventListener("contextmenu",(e)=>{
   e.preventDefault()
 })
-
 </script>
 
 <template>

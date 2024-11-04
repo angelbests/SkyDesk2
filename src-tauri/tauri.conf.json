@@ -21,7 +21,10 @@
         "transparent":true,
         "center": true,
         "dragDropEnabled": false,
-        "alwaysOnTop": false
+        "alwaysOnTop": false,
+        "minHeight": 767,
+        "minWidth": 1134,
+        "visible": false
       },
       {
         "title": "server",

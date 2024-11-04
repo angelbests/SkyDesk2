@@ -22,8 +22,12 @@ const windowStore = defineStore("window",{
 const systemStore = defineStore("system",{
     "state":function(){
         return {
-            autostart:false as boolean
+            autostart:false as boolean,
+            traystart:false as boolean
         }
+    },
+    "persist":{
+        paths:["autostart","traystart"]
     }
 })
 

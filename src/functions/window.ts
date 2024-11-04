@@ -13,9 +13,11 @@ export const createWindow = async function(label:string,option:Omit<WebviewOptio
             option
         })
         const w = new WebviewWindow(label,option)
-        listenMove(w)
-        listenSize(w)
-        listenClose(w)
+        if(w.label.indexOf("wallpaper-")<0){
+            listenMove(w)
+            listenSize(w)
+            listenClose(w)
+        }
         return w;
     }else{
         return null;
@@ -26,9 +28,11 @@ export const initWindow = async function(){
     const windowstore = windowStore();
     windowstore.windows.forEach(e => {
         let w = new WebviewWindow(e.label,e.option);
-        listenMove(w)
-        listenSize(w)
-        listenClose(w)
+        if(w.label.indexOf("wallpaper-")<0){
+            listenMove(w)
+            listenSize(w)
+            listenClose(w)
+        }
     });
 }
 
@@ -67,7 +71,6 @@ export const listenSize = async function(w:WebviewWindow) {
         let index = windowstore.windows.findIndex((item)=>{
             return item.label === label
         })
-        
         windowstore.windows[index].option.width = event.payload.width/factor
         windowstore.windows[index].option.height = event.payload.height/factor
         console.log(event.payload)

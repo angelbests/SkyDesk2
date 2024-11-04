@@ -24,23 +24,16 @@
             </div>
         </div>
         <div class="month">
-            <div class="day" v-for="item in lastmonth()">
+            <div class="day" v-for="day in days">
                 <div style="text-align: center;background-color: rgba(233,233,233,1);">
-                    {{ item<10?'0'+item:item }} 
-                </div>
-            </div>
-            <div class="day" v-for="item in getMonthDays(year, month)">
-                <div style="text-align: center;background-color: rgba(233,233,233,1);">
-                    {{ item<10?'0'+item:item }} 
-                    {{ getFestival(year,month,item).festival }}
-                    {{ getFestival(year,month,item).lunarFestival }}
-                    {{ getFestival(year,month,item).IMonthCn }}
-                    {{ getFestival(year,month,item).IDayCn }}
-                </div>
-            </div>
-            <div class="day" v-for="item in nextmonth()">
-                <div style="text-align: center;background-color: rgba(233,233,233,1);">
-                    {{ item<10?'0'+item:item }} 
+                    {{ day.cDay }}
+                    {{ day.IMonthCn }}
+                    {{ day.IDayCn }}
+                    <span style="color: blue;">
+                        {{ day.lunarFestival }}
+                        {{ day.festival }}
+                        {{ day.Term }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -49,24 +42,37 @@
 
 <script setup>
 import calendar from  "js-calendar-converter"
-
+import { onMounted, ref } from "vue";
+const days = ref([])
 const month = defineModel('month',{
-    "default":10,
+    "default":1,
     "type":Number
 })
 const year = defineModel('year',{
-    "default":2024,
+    "default":2025,
     "type":Number
 })
-
+onMounted(()=>{
+    lastmonth();
+})
 const lastmonth = function(){
-    let days = getWeekday(year.value,month.value,1)-1
-    return days
-}
 
-const nextmonth = function(){
-    let days = getWeekday(year.value,month.value,getMonthDays(year.value,month.value))
-    return 7-days
+    let now =new Date();
+    now.setFullYear(year.value)
+    now.setMonth(month.value - 1)
+    now.setDate(1);
+    console.log(now)
+    let week = getWeekday(year.value,month.value-1,1);
+    now.setDate(now.getDate()-week);
+    let nowdays = getMonthDays(year.value, month.value);
+    let nextweek = getWeekday(year.value,month.value-1,nowdays)
+    console.log(week,nowdays,nextweek)
+    for(let i=0;i<(week+nowdays+(6-nextweek)+7);i++){
+        now.setDate(now.getDate()+1)
+        let fes = getFestival(now.getFullYear(),now.getMonth()+1,now.getDate())
+        days.value.push(fes)
+    }
+    console.log(days.value)
 }
 
 const getMonthDays = function (year, month) {
@@ -78,10 +84,12 @@ const getFestival = function(year,month,day){
 }
 
 const getWeekday = function (year, month,day) {
-    return new Date(year, month-1, day).getDay()
+    let week = new Date(year, month, day).getDay()
+    if(week == 0){
+        week = 7
+    }
+    return week
 }
-
-
 </script>
 
 <style>
@@ -89,7 +97,7 @@ const getWeekday = function (year, month,day) {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-rows: repeat(6, 1fr);
     grid-template-columns: repeat(7, 1fr);
 }
 .day:nth-child(7n+1){

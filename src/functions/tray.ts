@@ -1,6 +1,7 @@
 import { resourceDir } from '@tauri-apps/api/path';
 import { TrayIcon, TrayIconEvent } from '@tauri-apps/api/tray';
 import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { systemStore } from './../stores/window';
 export const createtray = async function(){
     let icodir =await resourceDir();
     console.log(icodir)
@@ -21,11 +22,22 @@ export const createtray = async function(){
                             item.setPosition(e.position)
                             item.show()
                             item.setFocus()
-                            
+                            item.listen("tauri://blur",(_e)=>{
+                                item.hide()
+                            })
                         }
                     })
                 }
             }
         }
     });
+}
+
+export const traystart = async function(){
+    // 启动到托盘
+    const systemstore= systemStore()
+    const appWindow = getCurrentWebviewWindow()
+    if((!systemstore.traystart)&&(appWindow.label =='main')){
+        await appWindow.show()
+    }
 }

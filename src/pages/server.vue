@@ -6,7 +6,6 @@ import { setWindowToMonitor } from "../functions/monitor";
 
 const wallpapers = wallpaperStore()
 onMounted(async ()=>{
-    
     await openserver()
     setTimeout(async() => {
         wallpapers.config.forEach(async item=>{

@@ -4,14 +4,13 @@ use windows::{
         Foundation::{BOOL, HWND, LPARAM, POINT, WPARAM},
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
-            self, GWL_EXSTYLE, GWL_STYLE, HWND_BOTTOM, SMTO_NORMAL, SWP_NOOWNERZORDER,
-            WS_EX_ACCEPTFILES, WS_EX_APPWINDOW, WS_EX_LAYERED, WS_EX_TOPMOST, WS_EX_TRANSPARENT,
-            WS_EX_WINDOWEDGE, WS_TILEDWINDOW,
+            self, GWL_EXSTYLE, GWL_STYLE, HWND_BOTTOM, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_ACCEPTFILES, WS_EX_APPWINDOW, WS_EX_LAYERED, WS_EX_TOPMOST, WS_EX_TRANSPARENT, WS_EX_WINDOWEDGE, WS_TILEDWINDOW
         },
     },
 };
 use tauri::{AppHandle, Manager};
-
+use std::time::Duration;
+use std::thread;
 #[tauri::command]
 pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32) {
     tauri::async_runtime::spawn(async move {
@@ -96,16 +95,16 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
         let _ = Gdi::ClientToScreen(worker_w, p);
         let p = *p;
         // let _ = WindowsAndMessaging::MoveWindow(hwnd, 0-p.x+x, 0-p.y+y, w, h, true);
+        // 修改tauri的窗口样式 防止窗口被强行关闭导致出现异常window框
         let _ = WindowsAndMessaging::SetWindowPos(
             hwnd,
             HWND_BOTTOM,
-            0 - p.x + x,
-            0 - p.y + y,
+            99999999,
+            99999999,
             w,
             h,
-            SWP_NOOWNERZORDER,
+            SWP_HIDEWINDOW,
         );
-        // 修改tauri的窗口样式 防止窗口被强行关闭导致出现异常window框
         WindowsAndMessaging::SetWindowLongPtrA(
             hwnd,
             GWL_STYLE,
@@ -124,6 +123,16 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
         );
         println!("{},{},{},{}", x, y, w, h);
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
+        thread::sleep(Duration::from_millis(300));
+        let _ = WindowsAndMessaging::SetWindowPos(
+            hwnd,
+            HWND_BOTTOM,
+            0 - p.x + x,
+            0 - p.y + y,
+            w,
+            h,
+            SWP_SHOWWINDOW,
+        );
     };
 }
 

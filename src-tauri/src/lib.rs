@@ -1,13 +1,12 @@
-
+use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_network;
 use tauri_plugin_system_info;
-use tauri::Manager;
-mod wallpaper;
 mod capture;
-mod wheel;
-mod server;
 mod icotopng;
+mod server;
+mod wallpaper;
+mod wheel;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -41,8 +40,4 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-    
 }
-
-
-

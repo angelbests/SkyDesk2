@@ -8,8 +8,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { appDataDir, basename, resolve } from '@tauri-apps/api/path'
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { copyFile, mkdir } from "@tauri-apps/plugin-fs";
-import { LogicalSize } from "@tauri-apps/api/dpi";
-import { Monitor } from "@tauri-apps/api/window";
+import { LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 const wallpaperWidth = ref(0);
 const wallpaperref = ref<HTMLDivElement>();
@@ -50,8 +49,8 @@ const textwallpaper = async function (item:any,monitor:Monitor) {
         url = "/#/pages/desktop/wallpaper?type="+item.type+"&path="+item.path
     }
     let w = await createWindow(label, {
-        x: 0,
-        y: 0,
+        x: 99999999,
+        y: 99999999,
         width: 100,
         height: 100,
         decorations: false,
@@ -59,15 +58,18 @@ const textwallpaper = async function (item:any,monitor:Monitor) {
         fullscreen: false,
         dragDropEnabled: true,
         shadow: false,
-        url:url
+        alwaysOnBottom:true,
+        skipTaskbar:true,
+        url:url,
     })
+    console.log(w)
+    w?.setSize(new LogicalSize(0,0));
     wallpapers.config.push({
         label:label,
         monitor:monitor,
         type:item.type,
         url:url,
     })
-    w?.setSize(new LogicalSize(0,0))
     await setWindowToMonitor(
         label, monitor.position.x as number,
         monitor.position.y as number,
@@ -194,16 +196,18 @@ const addWallpaper =async function(){
 
 const closewallpaper =async function(){
     let all = await getAllWebviewWindows()
+    wallpapers.config = []
     all.filter(item=>{
-        if(item.label.indexOf("wallpaper")>=0){
+        if(item.label.indexOf("wallpaper-")>=0){
             item.close()
-            wallpapers.config.filter((item1,index)=>{
-                if(item.label == item1.label){
-                    wallpapers.config.splice(index,1)
-                }
-            })
         }
     })
+    for(let i=0;i<windowstore.windows.length;i++){
+        if(windowstore.windows[i].label.indexOf("wallpaper-")>=0){
+            windowstore.windows.splice(i,1)
+            i = 0;
+        }
+    }
 }
 
 

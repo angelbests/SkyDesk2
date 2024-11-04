@@ -1,31 +1,38 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { initWindow } from '../functions/window';
-import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { exit, relaunch } from '@tauri-apps/plugin-process';
 import { windowStore } from '../stores/window';
 import { Monitor } from '@tauri-apps/api/window';
-import { createtray } from '../functions/tray';
+import { createtray,traystart } from '../functions/tray';
 import { Command } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
-createtray()
-import { invoke } from '@tauri-apps/api/core';
-setTimeout(() => {
-    let a = invoke("tauri_capture")
-    console.log(a)
-}, 2000);
-const monitors = ref<{
-    title:string,
+import { systemStore } from '../stores/window';
+import { disable, enable } from '@tauri-apps/plugin-autostart';
+const systemstore= systemStore()
+const monitors = ref<{  
+    title:string, 
     value:string,
-    icon:string
+    icon:string 
     monitor?: Monitor
 }[]>([])
 const windowstore = windowStore()
-onMounted(async ()=>{
-
+const drawer = ref(true)
+const settingshow = ref(false)
+const net = ref({
+    last_r:0,
+    last_s:0,
+    speed_r:0,
+    speed_s:0
+})
+const toggleMaximizeBool = ref(false)
+onMounted(async ()=>{ 
     setInterval(async() => {
         await netspeed() 
     }, 1000);
+    await createtray()
+    await traystart()
     // 初始化窗口
     await initWindow()
     // 设置窗口拖拽
@@ -50,23 +57,8 @@ onMounted(async ()=>{
             icon: 'mdi-monitor'
         })
     }
-    
-    let all =await getAllWebviewWindows();
-    all.filter(item=>{
-        if(item.label == "tray"){
-            item.listen("tauri://blur",(_e)=>{
-                item.hide()
-            })
-        }
-    })
 })
 
-const net = ref({
-    last_r:0,
-    last_s:0,
-    speed_r:0,
-    speed_s:0
-})
 const netspeed =async function(){
     let total = {
         r:0,s:0
@@ -91,7 +83,7 @@ const netspeed =async function(){
     let res =await Command.create("powershell",str,{
         "encoding":"GBK"
     }).execute()
-    if(res.code == 0){
+    if(res.code == 0){  
         // console.log(res)
         let arr:any[] = JSON.parse(res.stdout);
         arr.filter((item: { r: number; s: number; })=>{
@@ -106,7 +98,6 @@ const netspeed =async function(){
     await emit("netspeed",{speed_r:net.value.speed_r,speed_s:net.value.speed_s})
 }
 
-const toggleMaximizeBool = ref(false)
 const toggleMaximize =async function(){
     await getCurrentWebviewWindow().toggleMaximize()
     toggleMaximizeBool.value = await getCurrentWebviewWindow().isMaximized()
@@ -123,12 +114,6 @@ const closeApp = async function() {
         getCurrentWebviewWindow().destroy()
     }
 }
-
-const drawer = ref(true)
-import { systemStore } from '../stores/window';
-import { disable, enable } from '@tauri-apps/plugin-autostart';
-const systemstore= systemStore()
-const settingshow = ref(false)
 
 const autostartsetting = function(e: any){
     if(e){
@@ -180,7 +165,7 @@ const refresh = function(){
                     <v-list-item prepend-icon="mdi-robot-outline" title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
                     <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item> -->
-                    <!-- <v-list-item prepend-icon="mdi-calendar-range" title="日程" :href="'/#/pages/setting/date'"></v-list-item> -->
+                    <v-list-item prepend-icon="mdi-calendar-range" title="日程" :href="'/#/pages/setting/date'"></v-list-item>
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
                 </v-list>
             </v-navigation-drawer>
@@ -211,6 +196,14 @@ const refresh = function(){
                                     <v-switch color="info" v-model="systemstore.autostart" @update:model-value="autostartsetting" hide-details></v-switch>
                                 </template>
                                 <v-list-item-title>开机自启</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                        <v-list lines="one" select-strategy="classic">
+                            <v-list-item >
+                                <template v-slot:append>
+                                    <v-switch color="info" v-model="systemstore.traystart" hide-details></v-switch>
+                                </template>
+                                <v-list-item-title>启动到托盘</v-list-item-title>
                             </v-list-item>
                         </v-list>
                         <v-list lines="one" select-strategy="classic" >
