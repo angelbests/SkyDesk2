@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { VNumberInput } from 'vuetify/labs/VNumberInput'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useRoute } from 'vue-router';
 import { emit } from '@tauri-apps/api/event';

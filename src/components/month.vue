@@ -25,7 +25,7 @@
         </div>
         <div class="month">
             <div class="day" v-for="day in days">
-                <div style="text-align: center;background-color: rgba(233,233,233,1);">
+                <div :style="{textAlign: 'center',background:(new Date().getFullYear() == day.cYear)&&(new Date().getMonth()+1 == day.cMonth)&&(new Date().getDate() == day.cDay)?'rgba(133,133,133,1)':'rgba(233,233,233,1)'}" >
                     {{ day.cDay }}
                     {{ day.IMonthCn }}
                     {{ day.IDayCn }}
@@ -42,37 +42,42 @@
 
 <script setup>
 import calendar from  "js-calendar-converter"
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 const days = ref([])
-const month = defineModel('month',{
-    "default":1,
-    "type":Number
+const date = defineModel('date',{
+    "default":{
+        year:new Date().getFullYear(),
+        month:new Date().getMonth()
+    },
+    "type":{
+        year:Number,
+        month:Number
+    }
 })
-const year = defineModel('year',{
-    "default":2025,
-    "type":Number
-})
-onMounted(()=>{
-    lastmonth();
-})
-const lastmonth = function(){
 
+onMounted(()=>{
+    days.value = monthdays(date.value.year,date.value.month)
+})
+
+watch(date.value,()=>{
+   days.value = monthdays(date.value.year,date.value.month)
+   console.log(days.value)
+})
+
+const monthdays = function(year,month){
+    let days = []
     let now =new Date();
-    now.setFullYear(year.value)
-    now.setMonth(month.value - 1)
+    now.setFullYear(year)
+    now.setMonth(month - 1)
     now.setDate(1);
-    console.log(now)
-    let week = getWeekday(year.value,month.value-1,1);
+    let week = getWeekday(year,month-1,1);
     now.setDate(now.getDate()-week);
-    let nowdays = getMonthDays(year.value, month.value);
-    let nextweek = getWeekday(year.value,month.value-1,nowdays)
-    console.log(week,nowdays,nextweek)
-    for(let i=0;i<(week+nowdays+(6-nextweek)+7);i++){
+    for(let i=0;i<42;i++){
         now.setDate(now.getDate()+1)
         let fes = getFestival(now.getFullYear(),now.getMonth()+1,now.getDate())
-        days.value.push(fes)
+        days.push(fes)
     }
-    console.log(days.value)
+    return days;
 }
 
 const getMonthDays = function (year, month) {

@@ -26,11 +26,15 @@ const net = ref({
     speed_r:0,
     speed_s:0
 })
+const netspeedshow = ref(false)
 const toggleMaximizeBool = ref(false)
 onMounted(async ()=>{ 
     setInterval(async() => {
         await netspeed() 
     }, 1000);
+    setTimeout(()=>{
+        netspeedshow.value = true
+    },3000)
     await createtray()
     await traystart()
     // 初始化窗口
@@ -135,10 +139,10 @@ const refresh = function(){
             <template v-slot:prepend>
                 <v-app-bar-nav-icon @click="drawer=!drawer"></v-app-bar-nav-icon>
             </template>
-            <div style="width: 100px;display: flex;align-items: center;">
+            <div v-show="netspeedshow" style="width: 100px;display: flex;align-items: center;">
                 <v-icon>mdi-arrow-down-thin</v-icon>{{ Math.trunc(net.speed_r/1024)<1024?Math.trunc(net.speed_r/1024)+'KB/s':Math.trunc(net.speed_r/1024/1024*10)/10+'MB/s' }}
             </div>
-            <div style="width: 100px;display: flex;align-items: center;">
+            <div v-show="netspeedshow" style="width: 100px;display: flex;align-items: center;">
                 <v-icon>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
             </div>
             <v-btn icon @click="settingshow = true">
@@ -163,9 +167,9 @@ const refresh = function(){
                     <v-list-item prepend-icon="mdi-wallpaper" title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
                     <v-list-item prepend-icon="mdi-note-outline" title="便签" :href="'/#/pages/setting/note'"></v-list-item>
                     <v-list-item prepend-icon="mdi-robot-outline" title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
-                    <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
+                    <!-- <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item> -->
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item> -->
-                    <v-list-item prepend-icon="mdi-calendar-range" title="日程" :href="'/#/pages/setting/date'"></v-list-item>
+                    <v-list-item prepend-icon="mdi-calendar-range" title="日程" :href="'/#/pages/setting/datenote'"></v-list-item>
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
                 </v-list>
             </v-navigation-drawer>
@@ -204,6 +208,14 @@ const refresh = function(){
                                     <v-switch color="info" v-model="systemstore.traystart" hide-details></v-switch>
                                 </template>
                                 <v-list-item-title>启动到托盘</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                        <v-list lines="one" select-strategy="classic">
+                            <v-list-item >
+                                <template v-slot:append>
+                                    <v-switch color="info" v-model="systemstore.netspeed.show" hide-details></v-switch>
+                                </template>
+                                <v-list-item-title>网速控件</v-list-item-title>
                             </v-list-item>
                         </v-list>
                         <v-list lines="one" select-strategy="classic" >

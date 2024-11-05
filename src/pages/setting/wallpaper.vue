@@ -202,12 +202,10 @@ const closewallpaper =async function(){
             item.close()
         }
     })
-    for(let i=0;i<windowstore.windows.length;i++){
-        if(windowstore.windows[i].label.indexOf("wallpaper-")>=0){
-            windowstore.windows.splice(i,1)
-            i = 0;
-        }
-    }
+
+    windowstore.windows = windowstore.windows.filter(item=>{
+        return item.label.indexOf('wallpaper')<0
+    })
 }
 
 
@@ -230,7 +228,7 @@ const closewallpaper =async function(){
                 </v-list-item>
                 <v-list-item>
                     <v-text-field v-model="addWallPaperData.path" @click="getpath" density="compact" hide-details="auto" :readonly="true"
-                        label="壁纸路径"></v-text-field>
+                        :label="addWallPaperData.type=='video'?'视频路径':addWallPaperData.type=='image'?'图片路径':'网页路径'"></v-text-field>
                 </v-list-item>
                 <v-list-item>
                     <v-text-field v-model="addWallPaperData.preview" @click="getpreview" density="compact" hide-details="auto" :readonly="true"
@@ -275,6 +273,7 @@ const closewallpaper =async function(){
                             </div>
                         </v-card-text>
                         <v-card-actions>
+                            <v-btn :disabled="true">{{ item.type == 'video'?'视频':item.type=='image'?'图片':'网页' }}</v-btn>
                             <v-btn v-for="(monitor,i) in windowstore.monitors" @click="textwallpaper(item,monitor)">{{ "屏幕"+(i+1) }}</v-btn>
                             <v-btn @click="wallpapers.wallpaperList.splice(index,1)">删除</v-btn>
                         </v-card-actions>

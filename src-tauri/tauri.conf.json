@@ -106,6 +106,24 @@
         "minimizable": false,
         "maximizable": false,
         "visible": false
+      },
+      {
+        "x":0,
+        "y":0,
+        "width": 80,
+        "height": 45,
+        "shadow": true,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "url": "/#/pages/desktop/netspeed",
+        "title": "netspeed",
+        "label": "netspeed",
+        "skipTaskbar":true,
+        "resizable": false,
+        "minimizable": false,
+        "maximizable": false,
+        "visible": false
       }
     ], 
     "security": { 

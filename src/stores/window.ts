@@ -23,11 +23,16 @@ const systemStore = defineStore("system",{
     "state":function(){
         return {
             autostart:false as boolean,
-            traystart:false as boolean
+            traystart:false as boolean,
+            netspeed:{
+                show:false as boolean,
+                x:0,
+                y:0
+            },
         }
     },
     "persist":{
-        paths:["autostart","traystart"]
+        paths:["autostart","traystart","netspeed"]
     }
 })
 

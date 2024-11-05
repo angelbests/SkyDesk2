@@ -16,8 +16,8 @@ export const createWindow = async function(label:string,option:Omit<WebviewOptio
         if(w.label.indexOf("wallpaper-")<0){
             listenMove(w)
             listenSize(w)
-            listenClose(w)
         }
+        listenClose(w)
         return w;
     }else{
         return null;
@@ -31,8 +31,8 @@ export const initWindow = async function(){
         if(w.label.indexOf("wallpaper-")<0){
             listenMove(w)
             listenSize(w)
-            listenClose(w)
         }
+        listenClose(w)
     });
 }
 
@@ -50,7 +50,7 @@ const listenMove = async function(w:WebviewWindow){
     })
 }
 
-export const listenClose =async function(w:WebviewWindow){
+const listenClose =async function(w:WebviewWindow){
     let label = w.label
     await w.listen("tauri://close-requested",(event)=>{
         const windowstore = windowStore()
@@ -63,7 +63,7 @@ export const listenClose =async function(w:WebviewWindow){
     })
 }
 
-export const listenSize = async function(w:WebviewWindow) {
+const listenSize = async function(w:WebviewWindow) {
     let label = w.label
     const factor = await getCurrentWebviewWindow().scaleFactor()
     await w.listen("tauri://resize",(event:any)=>{

@@ -15,8 +15,8 @@ const routes:RouteRecordRaw[] = [
                 component:()=>import("./../pages/setting/wallpaper.vue")
             },
             {
-                path:"date",
-                component:()=>import("./../pages/setting/date.vue")
+                path:"datenote",
+                component:()=>import("./../pages/setting/datenote.vue")
             },
             {
                 path:"monitor",
@@ -99,6 +99,10 @@ const routes:RouteRecordRaw[] = [
             {
                 path:'tray',
                 component:()=>import('./../pages/desktop/tray.vue')
+            },
+            {
+                path:'netspeed',
+                component:()=>import('./../pages/desktop/netspeed.vue')
             }
         ]
     },
