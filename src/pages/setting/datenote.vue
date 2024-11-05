@@ -46,7 +46,7 @@ const wheelmonth = function(e:WheelEvent){
 
 <template>
     <div class="window">
-        <v-card @wheel="wheelmonth"
+        <v-card @wheel.self="wheelmonth"
             style="width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)">
             <div style="display: flex;flex-direction: row;justify-content: center;align-items: center;font-size: 20px;height:100%;margin-right: 20px;width: 150px;">
                 <div @wheel="wheelyear" style="height: 100%;line-height: 300%;">
