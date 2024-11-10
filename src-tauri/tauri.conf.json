@@ -150,7 +150,8 @@
       "bin/shman"
     ],
     "resources":[
-      "icons/icon.ico"
+      "icons/icon.ico",
+      "resources/*"
     ]
   }
 }

@@ -152,7 +152,7 @@ const mouseleave = function(i:number){
                             @mouseleave="mouseleave(i)"
                             :id="'img'+i"
                             :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 30) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 60 : 30)) + 'px' }"
-                            :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                            :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                     </div>
                     <div v-show="shortcutWindows.setting.font"
                         :style="{

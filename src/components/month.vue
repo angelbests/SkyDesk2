@@ -23,17 +23,16 @@
                 星期日
             </div>
         </div>
-        <div class="month">
-            <div class="day" v-for="day in days">
-                <div :style="{textAlign: 'center',background:(new Date().getFullYear() == day.cYear)&&(new Date().getMonth()+1 == day.cMonth)&&(new Date().getDate() == day.cDay)?'rgba(133,133,133,1)':'rgba(233,233,233,1)'}" >
-                    {{ day.cDay }}
-                    {{ day.IMonthCn }}
-                    {{ day.IDayCn }}
-                    <span style="color: blue;">
-                        {{ day.lunarFestival }}
-                        {{ day.festival }}
-                        {{ day.Term }}
-                    </span>
+        <div style="width: 100%;height: 100%;position: relative;">
+            <div class="month">
+                <div class="day" v-for="day in days">
+                        <slot :day="day"></slot>
+                </div>
+            </div>
+            <div class="monthz">
+                <!-- :style="{background:(item%2==0)?'gray':'black',opacity:0.5}" -->
+                <div class="dayz" v-for="item in 6" >
+                    <slot name='z' :z="item"></slot>
                 </div>
             </div>
         </div>
@@ -48,8 +47,7 @@ const date = defineModel('date',{
     "default":{
         year:new Date().getFullYear(),
         month:new Date().getMonth()
-    },
-    "type":{
+    },type:{
         year:Number,
         month:Number
     }
@@ -104,6 +102,18 @@ const getWeekday = function (year, month,day) {
     display: grid;
     grid-template-rows: repeat(6, 1fr);
     grid-template-columns: repeat(7, 1fr);
+    position: relative;
+}
+.monthz{
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows:repeat(6,1fr);
+    grid-template-columns: 1r;
 }
 .day:nth-child(7n+1){
     border-left: 1px solid gray;
@@ -115,5 +125,10 @@ const getWeekday = function (year, month,day) {
     font-size: 13px;
     border-right: 1px solid gray;
     border-bottom: 1px solid gray;
+}
+.dayz {
+    width: 100%;
+    height: 100%;
+    font-size: 13px;
 }
 </style>

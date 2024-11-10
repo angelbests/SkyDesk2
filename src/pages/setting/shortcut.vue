@@ -8,10 +8,65 @@ import { createWindow } from '../../functions/window';
 import { uuid } from '../../functions';
 import { open } from '@tauri-apps/plugin-dialog';
 import { Command } from '@tauri-apps/plugin-shell';
-onMounted(() => {
+import { resourceDir } from '@tauri-apps/api/path';
+const systemprogram = ref<any[]>([])
+onMounted(async () => {
     document.getElementById("shortcut")?.addEventListener("select", (e) => {
         e.preventDefault()
     })
+
+    let respath = await resourceDir()
+
+    systemprogram.value = [
+    {
+        icoPath: respath + '/resources/notepad.png',
+        iconLocation: "0",
+        iconLocationPeFile: "",
+        lnkPath: "",
+        name: '记事本',
+        targetPath: 'C:/Windows/notepad.exe',
+    },
+    {
+        icoPath: respath + '/resources/resource-manager.png',
+        iconLocation: "0",
+        iconLocationPeFile: "",
+        lnkPath: "",
+        name: '文件资源管理器',
+        targetPath: 'C:/Windows/explorer.exe',
+    },
+    {
+        icoPath: respath + '/resources/calc.png',
+        iconLocation: "0",
+        iconLocationPeFile: "",
+        lnkPath: "",
+        name: '计算器',
+        targetPath: 'C:/Windows/system32/calc.exe',
+    },
+    {
+        icoPath: respath + '/resources/disk.png',
+        iconLocation: "0",
+        iconLocationPeFile: "",
+        targetPath: 'C:/Windows/system32/diskmgmt.msc',
+        name: '磁盘管理',
+        lnkPath: "",
+    },
+    {
+        icoPath: respath + '/resources/keyboard.png',
+        iconLocation: "0",
+        iconLocationPeFile: "",
+        targetPath: 'C:/Windows/system32/osk.exe',
+        name: '屏幕键盘',
+        lnkPath: "",
+    },
+    {
+        icoPath: respath + '/resources/Volume.png',
+        iconLocation: "0",
+        iconLocationPeFile: "",
+        targetPath: 'C:/Windows/system32/SndVol.exe',
+        name: '音量合成器',
+        lnkPath: "",
+    }
+]
 })
 
 const shortcutstore = shortcutStore()
@@ -25,7 +80,8 @@ const scanProgram = async function () {
             let res = await setIcon();
             const map = new Map();
             const res2 = res.filter(v => !map.has(v.name) && map.set(v.name, v))
-            shortcutstore.shortcutsTemp = res2
+            shortcutstore.shortcutsTemp = [...res2, ...systemprogram.value]
+            console.log(shortcutstore.shortcutsTemp)
             scanbar.value = false
         }
     } else {
@@ -73,7 +129,7 @@ const createDocker = async function () {
         alwaysOnBottom: true,
         maximizable: false,
         resizable: false,
-        skipTaskbar:true,
+        skipTaskbar: true,
         url: "/#/pages/desktop/shortcut?label=" + label,
     })
 }
@@ -229,7 +285,7 @@ const onAdd1 = function () {
 
 const clone = function (element: any) {
     console.log(element)
-    if(shortcutstore.wheels.length<8){
+    if (shortcutstore.wheels.length < 8) {
         return {
             ...element
         }
@@ -322,15 +378,12 @@ const clone = function (element: any) {
             <div v-show="!scanbtn" class="scan-container">
                 <VueDraggable class="VueDraggable" v-model="shortcutstore.shortcutsTemp" :animation="150" :group="{
                     name: 'shortcut',
-                    pull:'clone'
-                }"
-                :onAdd="onAdd0"
-                :clone="clone0"
-                >
+                    pull: 'clone'
+                }" :onAdd="onAdd0" :clone="clone0">
                     <v-sheet v-for="item in shortcutstore.shortcutsTemp" :key="item.lnkPath" class="shortcut-container">
                         <div class="icon-div">
                             <img class="icon"
-                                :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                                :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                         </div>
                         <div
                             style="font-size: 12px;width:70px;height: 30px;
@@ -347,9 +400,8 @@ const clone = function (element: any) {
                     <v-sheet v-for="(item, i) in shortcutstore.shortcuts" :data-lnk="JSON.stringify(item)"
                         :height="setting ? '120px' : '100px'" class="shortcut-container">
                         <div class="icon-div" @click="exec(item)">
-                            <img @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i"
-                                 class="icon"
-                                :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                            <img @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i" class="icon"
+                                :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                         </div>
                         <div style="font-size: 12px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
                                 text-wrap:balance;text-align: center;
@@ -379,11 +431,9 @@ const clone = function (element: any) {
         </div>
         <VueDraggable :onAdd="onAdd1" v-model="shortcutstore.wheels" :group="{ name: 'shortcut' }"
             class="VueDraggable-wheel">
-            <v-sheet v-for="item in shortcutstore.wheels" :data-lnk="JSON.stringify(item)"
-                class="shortcut-container">
+            <v-sheet v-for="item in shortcutstore.wheels" :data-lnk="JSON.stringify(item)" class="shortcut-container">
                 <div class="icon-div">
-                    <img class="icon"
-                        :src="item.icoPath == '' ? '/icons/ToggleMaximize1.png' : convertFileSrc(item.icoPath)" />
+                    <img class="icon" :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                 </div>
                 <div style="font-size: 12px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
                         text-wrap:balance;text-align: center;
@@ -412,6 +462,7 @@ const clone = function (element: any) {
     padding: 10px;
     transition: all 0.1s linear;
 }
+
 .shorcuts-container {
     height: calc(100% - 120px);
     display: flex;
@@ -422,6 +473,7 @@ const clone = function (element: any) {
     transition: all 0.1s linear;
     position: relative;
 }
+
 .VueDraggable {
     width: 100%;
     display: flex;

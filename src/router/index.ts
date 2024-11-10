@@ -19,6 +19,10 @@ const routes:RouteRecordRaw[] = [
                 component:()=>import("./../pages/setting/datenote.vue")
             },
             {
+                path:"calendar",
+                component:()=>import("./../pages/setting/calendar.vue")
+            },
+            {
                 path:"monitor",
                 component:()=>import("./../pages/setting/monitor.vue")
             },
