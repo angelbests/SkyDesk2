@@ -346,7 +346,7 @@ const endupdate = function(e:any){
                 </v-btn> -->
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
+        <div @wheel="wheelmonth" style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
             <v-month v-model:date="date">
                 <template v-slot:default="{day}">
                     <div

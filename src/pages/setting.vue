@@ -3,12 +3,11 @@ import { onMounted, ref } from 'vue';
 import { initWindow } from '../functions/window';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { exit, relaunch } from '@tauri-apps/plugin-process';
-import { windowStore } from '../stores/window';
 import { Monitor } from '@tauri-apps/api/window';
 import { createtray,traystart } from '../functions/tray';
 import { Command } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
-import { systemStore } from '../stores/window';
+import { systemStore,windowStore,noteStore,wallpaperStore,shortcutStore  } from '../stores/window';
 import { disable, enable } from '@tauri-apps/plugin-autostart';
 const systemstore= systemStore()
 const monitors = ref<{  
@@ -138,7 +137,23 @@ const autostartsetting = function(e: any){
 }
 
 const refresh = function(){
+    const system = systemStore()
+    system.autostart = false
+    system.traystart = false
     localStorage.clear()
+    const window = windowStore()
+    window.windows = []
+    window.monitors = []
+    const note = noteStore()
+    note.note = []
+    const wallpaper = wallpaperStore()
+    wallpaper.config = []
+    wallpaper.wallpaperList = []
+    wallpaper.status = false
+    const shortcut = shortcutStore()
+    shortcut.shortcutsTemp = []
+    shortcut.shortcuts = []
+    shortcut.wheels = []
     relaunch()
 }
 </script>

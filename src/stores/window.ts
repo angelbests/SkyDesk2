@@ -74,18 +74,6 @@ const wallpaperStore = defineStore("wallpaper",{
     persist:true
 })
 
-const captureStore = defineStore("capture",{
-    "state":function(){
-        return {
-            captureList: [] as {
-                name:string,
-                time:string,
-                path:string
-            }[]
-        }
-    }
-})
-
 const shortcutStore = defineStore("shortcut",{
     "state":function(){
         return {
@@ -118,4 +106,4 @@ const shortcutStore = defineStore("shortcut",{
     "persist":true,
 })
 
-export {windowStore,noteStore,wallpaperStore,captureStore,shortcutStore,systemStore}
+export {windowStore,noteStore,wallpaperStore,shortcutStore,systemStore}

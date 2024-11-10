@@ -17,9 +17,6 @@ const position = reactive({
     y: 0,
 })
 onMounted(async () => {
-    document.addEventListener("contextmenu", (e) => {
-        e.preventDefault()
-    })
     document.addEventListener("selectstart", (e) => {
         e.preventDefault()
     })
