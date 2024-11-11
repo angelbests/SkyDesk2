@@ -701,6 +701,11 @@
   resolved "https://registry.npmjs.org/@vue/shared/-/shared-3.4.38.tgz"
   integrity sha512-q0xCiLkuWWQLzVrecPb0RMsNWyxICOjPrcrwxTUEHb1fsnvni4dcuyG7RT/Ie7VPTvnjzIaWzRMUBsrqNj/hhw==
 
+"@wangeditor-next/editor-for-vue@^5.1.12":
+  version "5.1.12"
+  resolved "https://registry.npmmirror.com/@wangeditor-next/editor-for-vue/-/editor-for-vue-5.1.12.tgz"
+  integrity sha512-kwLgKMWvKh86vedGzUvS9wwVKmpAvzLnGrpSwiLdU7WHrcOsa+nqsdP7XDxeYZ6wnpDcodGBDspwW0yKWWrzwg==
+
 "@wangeditor/basic-modules@^1.1.7", "@wangeditor/basic-modules@1.x":
   version "1.1.7"
   resolved "https://registry.npmmirror.com/@wangeditor/basic-modules/-/basic-modules-1.1.7.tgz"

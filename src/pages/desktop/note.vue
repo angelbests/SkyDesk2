@@ -10,7 +10,7 @@ import { writeFile,BaseDirectory, copyFile } from '@tauri-apps/plugin-fs';
 import { appDataDir, basename } from '@tauri-apps/api/path';
 
 import '@wangeditor/editor/dist/css/style.css'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
+import { Editor, Toolbar } from '@wangeditor-next/editor-for-vue';
 import { IToolbarConfig,Boot,IButtonMenu, IDomEditor,IEditorConfig } from '@wangeditor/editor'
 import { emit } from '@tauri-apps/api/event';
 import { windowStore,noteStore } from '../../stores/window';
