@@ -28,6 +28,7 @@ const net = ref({
 const netspeedshow = ref(false)
 const toggleMaximizeBool = ref(false)
 onMounted(async ()=>{    
+    
     setInterval(async() => {
         await netspeed() 
     }, 1000);

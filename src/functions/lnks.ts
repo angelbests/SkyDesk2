@@ -1,10 +1,10 @@
 import { Command } from '@tauri-apps/plugin-shell';
 import { mkdir, readDir, readFile } from "@tauri-apps/plugin-fs";
-import { appDataDir, BaseDirectory, basename, extname, resolve } from "@tauri-apps/api/path";
+import { appDataDir, BaseDirectory, basename, extname, homeDir, resolve } from "@tauri-apps/api/path";
 const lnkPath = [
-    "C:\\Users\\angel\\Desktop",
+    await homeDir() + "\\Desktop",
     "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-    "C:\\Users\\angel\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs"
+    await homeDir() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs"
 ]
 
 export const getlnks =async function(){
