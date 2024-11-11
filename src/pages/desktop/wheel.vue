@@ -68,13 +68,10 @@ onMounted(async () => {
         }
     })
 
-    await listen('mouse-move', (event: any) => {
-        let str = event.payload.message.substring(11, event.payload.message.length - 1)
-        let arr = str.split(',')
-        let x = arr[0].split(":")[1]
-        let y = arr[1].split(":")[1]
-        position.x = parseInt(x)
-        position.y = parseInt(y)
+    await listen('mouse-move', (e:{payload:{message:string}}) => {
+        let mouse= JSON.parse(e.payload.message as string)
+        position.x = mouse.x
+        position.y = mouse.y
     });
 })
 

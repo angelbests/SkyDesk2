@@ -27,17 +27,7 @@ const net = ref({
 })
 const netspeedshow = ref(false)
 const toggleMaximizeBool = ref(false)
-onMounted(async ()=>{ 
-    // let timer:NodeJS.Timeout
-    // getCurrentWebviewWindow().listen("tauri://resize",(_e)=>{
-    //     getCurrentWebviewWindow().setShadow(false)
-    //     if(timer){
-    //         clearTimeout(timer)
-    //     }
-    //     timer = setTimeout(()=>{
-    //         getCurrentWebviewWindow().setShadow(true)
-    //     },300);
-    // })
+onMounted(async ()=>{    
     setInterval(async() => {
         await netspeed() 
     }, 1000);
