@@ -1,16 +1,10 @@
 import { Command } from '@tauri-apps/plugin-shell';
-import { mkdir, readDir, readFile } from "@tauri-apps/plugin-fs";
-import { appDataDir, BaseDirectory, basename, extname, homeDir, resolve } from "@tauri-apps/api/path";
-const lnkPath = [
-    await homeDir() + "\\Desktop",
-    "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-    await homeDir() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs"
-]
+import { readDir } from "@tauri-apps/plugin-fs";
+import { basename, extname, homeDir, resolve } from "@tauri-apps/api/path";
 
 export const getlnks =async function(){
     let lnks = [];
     let lnkFiles = await getLnkFile();
-
     // 拼接shell脚本
     let lnkFilesstr = "$lnkFiles = @("
     for(let i=0;i<lnkFiles.length;i++){
@@ -57,6 +51,7 @@ export const getlnks =async function(){
             
         })
     }
+    console.log(`lnks：${lnks}`)
     return lnks;
 }
 
@@ -64,6 +59,18 @@ export const getlnks =async function(){
 const getLnkFile =async function(){
     let lnkFiles = [];
     let files = [];
+    const lnkPath = [
+        "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+        await homeDir() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs"
+    ]
+
+    let desktop = await readDir(await homeDir() + "\\desktop");
+    for(let i=0;i<desktop.length;i++){
+        if(desktop[i].isFile){
+            files.push(await resolve(await homeDir() + "\\desktop",desktop[i].name))
+        }
+    }
+
     for(let i=0;i<lnkPath.length;i++){
         files.push(...await scanFiles(lnkPath[i]))
     }
@@ -89,6 +96,7 @@ const getLnkFile =async function(){
             return true
         }
     })
+    console.log(lnkFiles)
     return lnkFiles;
 }
 
@@ -110,28 +118,28 @@ const scanFiles = async function(dir:string){
 }
 
 // 使用shman 获取lnk文件的信息
-export const getLnkInfo2 =async function(){
-    let lnks = [];
-    await mkdir("lnk",{"baseDir":BaseDirectory.AppData,"recursive":true})
-    let path = await resolve(await appDataDir(),"lnk","lnk.txt")
-    let res = await Command.sidecar(
-        "bin/shman",
-        [
-            "/stab",
-            path
-        ]
-    ).execute();
-    if(res.code == 0){
-        let unit8buffer= await readFile(path); 
-        let txt = new TextDecoder("GBK").decode(unit8buffer)
-        let arr = txt.split("\r\n");
-        for(let i=0;i<txt.length;i++){
-            if(arr[i]){
-                let str = arr[i].split("\t")
-                lnks.push(
-                    str
-                )
-            }
-        }
-    }
-}
+// export const getLnkInfo2 =async function(){
+//     let lnks = [];
+//     await mkdir("lnk",{"baseDir":BaseDirectory.AppData,"recursive":true})
+//     let path = await resolve(await appDataDir(),"lnk","lnk.txt")
+//     let res = await Command.sidecar(
+//         "bin/shman",
+//         [
+//             "/stab",
+//             path
+//         ]
+//     ).execute();
+//     if(res.code == 0){
+//         let unit8buffer= await readFile(path); 
+//         let txt = new TextDecoder("GBK").decode(unit8buffer)
+//         let arr = txt.split("\r\n");
+//         for(let i=0;i<txt.length;i++){
+//             if(arr[i]){
+//                 let str = arr[i].split("\t")
+//                 lnks.push(
+//                     str
+//                 )
+//             }
+//         }
+//     }
+// }
