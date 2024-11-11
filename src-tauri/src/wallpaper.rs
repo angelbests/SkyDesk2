@@ -122,6 +122,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
                 | WS_EX_LAYERED.0 as isize,
         );
         println!("{},{},{},{}", x, y, w, h);
+        println!("{},{}",p.x,p.y);
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
         thread::sleep(Duration::from_millis(300));
         let _ = WindowsAndMessaging::SetWindowPos(
