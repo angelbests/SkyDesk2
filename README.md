@@ -3,9 +3,9 @@ tauriv2 + VUE + TS + RSUT + ollamaAPI + wangeditor5
 
 ### 安装启动
 此项目需要安装rust环境
-npm install  安装js包
-npm run tauri dev 启动测试
-npm run tauri build 打包软件
+##### npm install  安装js包
+##### npm run tauri dev 启动测试
+##### npm run tauri build 打包软件
 ###
 #### 快捷
 使用方法：
