@@ -116,30 +116,3 @@ const scanFiles = async function(dir:string){
     }
     return rdirs;
 }
-
-// 使用shman 获取lnk文件的信息
-// export const getLnkInfo2 =async function(){
-//     let lnks = [];
-//     await mkdir("lnk",{"baseDir":BaseDirectory.AppData,"recursive":true})
-//     let path = await resolve(await appDataDir(),"lnk","lnk.txt")
-//     let res = await Command.sidecar(
-//         "bin/shman",
-//         [
-//             "/stab",
-//             path
-//         ]
-//     ).execute();
-//     if(res.code == 0){
-//         let unit8buffer= await readFile(path); 
-//         let txt = new TextDecoder("GBK").decode(unit8buffer)
-//         let arr = txt.split("\r\n");
-//         for(let i=0;i<txt.length;i++){
-//             if(arr[i]){
-//                 let str = arr[i].split("\t")
-//                 lnks.push(
-//                     str
-//                 )
-//             }
-//         }
-//     }
-// }
