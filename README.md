@@ -1,5 +1,6 @@
 ### 技术
-tauriv2 + VUE + TS + RSUT + ollamaAPI + wangeditor5
+#### tauriv2 + VUE + TS + RSUT + ollamaAPI + wangeditor5
+#### sidecar 使用 https://www.nirsoft.net/utils/resources_extract.html
 
 ### 安装启动
 此项目需要安装rust环境
