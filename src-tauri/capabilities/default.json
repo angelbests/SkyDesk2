@@ -147,8 +147,6 @@
       "allow": [
         {
           "url":"http://127.0.0.1:11434/"
-        },{
-          "url": "https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe"
         }
       ]
     },
@@ -157,12 +155,8 @@
       "allow": [
         {
           "url":"http://127.0.0.1:11434/"
-        },{
-          "url": "https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe"
         }
       ]
-    },
-    "network:allow-all",
-    "system-info:allow-all"
+    }
   ]
 }

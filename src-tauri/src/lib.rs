@@ -1,13 +1,12 @@
 use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
-use tauri_plugin_network;
-use tauri_plugin_system_info;
 mod capture;
 mod icotopng;
 mod server;
 mod wallpaper;
 mod wheel;
 mod taskbar;
+mod netspeed;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -18,8 +17,6 @@ pub fn run() {
             MacosLauncher::LaunchAgent,
             Some(vec![""]),
         ))
-        .plugin(tauri_plugin_system_info::init())
-        .plugin(tauri_plugin_network::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init())
@@ -37,8 +34,10 @@ pub fn run() {
             wheel::wheelclick,
             capture::get_display_capture,
             capture::get_window_capture,
-            capture::start_capture
+            capture::start_capture,
+            netspeed::netspeed
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+

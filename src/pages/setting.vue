@@ -5,10 +5,10 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { exit, relaunch } from '@tauri-apps/plugin-process';
 import { Monitor } from '@tauri-apps/api/window';
 import { createtray,traystart } from '../functions/tray';
-import { Command } from '@tauri-apps/plugin-shell';
-import { emit } from '@tauri-apps/api/event';
+import { listen } from '@tauri-apps/api/event';
 import { systemStore,windowStore,noteStore,wallpaperStore,shortcutStore  } from '../stores/window';
 import { disable, enable } from '@tauri-apps/plugin-autostart';
+import { invoke } from '@tauri-apps/api/core';
 const systemstore= systemStore()
 const monitors = ref<{  
     title:string, 
@@ -20,18 +20,20 @@ const windowstore = windowStore()
 const drawer = ref(true)
 const settingshow = ref(false)
 const net = ref({
-    last_r:0,
-    last_s:0,
     speed_r:0,
     speed_s:0
 })
 const netspeedshow = ref(false)
 const toggleMaximizeBool = ref(false)
-onMounted(async ()=>{    
-    
-    setInterval(async() => {
-        await netspeed() 
-    }, 1000);
+onMounted(async ()=>{       
+    invoke("netspeed")
+    listen("netspeed",(e)=>{
+        console.log(e.payload)
+        let res = JSON.parse(e.payload as string)
+        console.log(res)
+        net.value.speed_r = res.speed_r;
+        net.value.speed_s = res.speed_s;
+    })
     setTimeout(()=>{
         netspeedshow.value = true
     },3000)
@@ -62,45 +64,6 @@ onMounted(async ()=>{
         })
     }
 })
-
-const netspeed =async function(){
-    let total = {
-        r:0,s:0
-    }
-    let str = `
-        $r = Get-NetAdapterStatistics;
-        $a = @();
-        $a += [PSCustomObject]@{ 
-            name = "null"; 
-            r=0; 
-            s=0; 
-        } 
-        foreach ($s in $r) { 
-            $a += [PSCustomObject]@{ 
-                name = $s.name; 
-                r=$s.ReceivedBytes; 
-                s=$s.SentBytes 
-            } 
-        };
-        $a | ConvertTo-Json
-    `;
-    let res =await Command.create("powershell",str,{
-        "encoding":"GBK"
-    }).execute()
-    if(res.code == 0){  
-        // console.log(res)
-        let arr:any[] = JSON.parse(res.stdout);
-        arr.filter((item: { r: number; s: number; })=>{
-            total.r = total.r +  item.r
-            total.s = total.s +  item.s
-        })
-    }
-    net.value.speed_r = total.r - net.value.last_r
-    net.value.speed_s = total.s - net.value.last_s
-    net.value.last_r = total.r;
-    net.value.last_s = total.s;
-    await emit("netspeed",{speed_r:net.value.speed_r,speed_s:net.value.speed_s})
-}
 
 const toggleMaximize =async function(){
     await getCurrentWebviewWindow().toggleMaximize()
@@ -187,7 +150,7 @@ const refresh = function(){
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item> -->
                     <!-- <v-list-item prepend-icon="mdi-calendar-range" title="calendar" :href="'/#/pages/setting/calendar'"></v-list-item> -->
                     <v-list-item prepend-icon="mdi-calendar-range" title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
-                    <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
+                    <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item>
                 </v-list>
             </v-navigation-drawer>
             <router-view v-slot="{ Component }" :key="$route.fullPath" style="width: auto;height: 100%;box-sizing: border-box;padding: 10px;">
