@@ -13,13 +13,13 @@ const selectcapture = function(){
             new WebviewWindow(label,{
                 x:item.position.x/item.scaleFactor,
                 y:item.position.y/item.scaleFactor,
-                fullscreen:true,
+                width:item.size.width/item.scaleFactor,
+                height:item.size.height/item.scaleFactor,
                 shadow:false,
                 decorations:false,
                 transparent:true,
                 alwaysOnTop:true,
                 url:"/#/pages/desktop/capture",
-                title:"",
             })
         )
     })

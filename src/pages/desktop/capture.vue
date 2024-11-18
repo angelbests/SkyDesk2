@@ -5,6 +5,7 @@ import { onMounted, ref } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import { currentMonitor, LogicalPosition, LogicalSize, Monitor } from '@tauri-apps/api/window';
 import { resolve, videoDir } from '@tauri-apps/api/path';
+import moment from 'moment';
 let app = getCurrentWebviewWindow();
 let c: Canvas
 let rect: Rect
@@ -143,7 +144,7 @@ const start_capture = async function () {
         captureBtn.value?.setSize(new LogicalSize(80, 30))
         captureBtn.value?.setPosition(new LogicalPosition(
             window_size.x + monitor.value.position.x / monitor.value.scaleFactor + window_size.width / 2 - 40,
-            window_size.y + monitor.value.position.y / monitor.value.scaleFactor,
+            window_size.y + monitor.value.position.y / monitor.value.scaleFactor - 30,
         ));
         let path = await resolve(await videoDir(), moment().format("YYMMDDhhmmss") + '.mp4')
         await invoke("start_capture", {
@@ -160,7 +161,6 @@ const start_capture = async function () {
         close()
     }
 }
-import moment from 'moment';
 
 </script>
 
