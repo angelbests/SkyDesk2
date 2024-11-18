@@ -150,7 +150,7 @@ const refresh = function(){
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item> -->
                     <!-- <v-list-item prepend-icon="mdi-calendar-range" title="calendar" :href="'/#/pages/setting/calendar'"></v-list-item> -->
                     <v-list-item prepend-icon="mdi-calendar-range" title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
-                    <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item>
+                    <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
                 </v-list>
             </v-navigation-drawer>
             <router-view v-slot="{ Component }" :key="$route.fullPath" style="width: auto;height: 100%;box-sizing: border-box;padding: 10px;">
