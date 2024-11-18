@@ -12,8 +12,10 @@
     "windows": [
       {
         "title": "SkyDesk2",
-        "width": 1490, 
-        "height": 1024,
+        "width": 1134, 
+        "minWidth": 1134,
+        "height": 767,
+        "minHeight": 767,
         "shadow": false,
         "decorations": false,
         "label": "main",
@@ -22,8 +24,6 @@
         "center": true,
         "dragDropEnabled": false,
         "alwaysOnTop": false,
-        "minHeight": 767,
-        "minWidth": 1134,
         "visible": false
       },
       {
@@ -146,8 +146,7 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "bin/ResourcesExtract",
-      "bin/shman"
+      "bin/ResourcesExtract"
     ],
     "resources":[
       "icons/icon.ico",
