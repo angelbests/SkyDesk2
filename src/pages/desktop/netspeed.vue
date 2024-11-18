@@ -22,9 +22,10 @@ onMounted(()=>{
             systemstore.$hydrate();
         }
     })
-    listen("netspeed",(e:{payload:{speed_r:number,speed_s:number}})=>{
-        net.value.speed_r = e.payload.speed_r;
-        net.value.speed_s = e.payload.speed_s
+    listen("netspeed",(e)=>{
+        let res = JSON.parse(e.payload as string)
+        net.value.speed_r = res.speed_r;
+        net.value.speed_s = res.speed_s
     })
     document.addEventListener("selectstart",(e)=>{
         e.preventDefault()
