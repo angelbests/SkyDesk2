@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { wallpaperStore, windowStore } from "../../stores/window";
+import { ref, onMounted, computed, watch, toRefs } from "vue";
+import { wallpaperStore, weatherStore, windowStore } from "../../stores/window";
 import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
@@ -12,6 +12,7 @@ import { LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { downloadload } from "../../api/download";
 import wallpaperfall from "../../components/wallpaperfall.vue";
+import  { getpoi } from "./../../api/weather"
 const wallpaperWidth = ref(0);
 const wallpaperref = ref<HTMLDivElement>();
 const wallpapers = wallpaperStore()
@@ -238,10 +239,59 @@ const downloadwallpaper =async (src:string):Promise<string>=>{
   return "";
 }
 
+const weatherstore = weatherStore()
+const weathershow = ref(false)
+let { city,query,pois,apikey,citycode }  = toRefs(weatherstore)
+let timer:any;
+watch(query,()=>{
+    if(query.value){
+        timer =setTimeout(async() => {
+            clearTimeout(timer)
+            let res:any[] = await getpoi(query.value)
+            if(!res) return;
+            pois.value = []
+            res.forEach((element:any) => {
+                pois.value.push({
+                    title:element.country + " " + element.adm1 + " " + element.adm2 + " " +element.name,
+                    value:element.id,
+                    city:element.name
+                })
+            });
+        }, 300);
+    }else{
+        pois.value = []
+    }
+})
+
+const selectcity =async function(e:string){
+    citycode.value = e
+    let index = pois.value.findIndex(item=>{
+        return item.value == e
+    })
+    city.value = pois.value[index].city
+}
 </script>
 
 <template>
     <div class="window">
+        <v-dialog max-width="500" v-model="weathershow">
+            <v-list>
+                <v-list-item>
+                    <v-text-field v-model="apikey" density="compact" hide-details="auto" placeholder="填入和风天气key" label="和风天气apikey"</v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-text-field v-model="query" density="compact" hide-details="auto" placeholder="查询城市名称" label="查询城市名称"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                    <v-select :items="pois" density="compact" hide-details="auto" placeholder="选择城市" label="选择城市" @update:model-value="selectcity"></v-select> 
+                </v-list-item>
+            </v-list>
+            <div
+                style="background: white;box-sizing: border-box;padding: 10px;display: flex;justify-content: flex-end;">
+                <v-btn style="margin-right: 10px;" @click="weathershow = false">取消</v-btn>
+                <v-btn style="margin-right: 10px;" @click="weathershow = false">确认</v-btn>
+            </div>
+        </v-dialog>
         <v-dialog v-model="waterfallshow" persistent>
             <div style="width: 100%;height: 100vh;background: wheat;border-radius: 10px;">
                 <v-btn style="height: 30px;width: 100%;" @click="waterfallshow = false">
@@ -305,6 +355,12 @@ const downloadwallpaper =async (src:string):Promise<string>=>{
                     <v-icon>mdi-image</v-icon>
                 </template>
                 在线壁纸
+            </v-btn>
+            <v-btn style="margin-right: 20px;" @click="weathershow = true">
+                <template v-slot:prepend>
+                    <v-icon>mdi-image</v-icon>
+                </template>
+                设置天气
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>

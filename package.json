@@ -40,6 +40,7 @@
     "ollama": "^0.5.9",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^3.2.2",
+    "qweather-icons": "^1.6.0",
     "vue": "^3.3.4",
     "vue-draggable-plus": "^0.5.3",
     "vue-router": "^4.4.3",

@@ -106,4 +106,17 @@ const shortcutStore = defineStore("shortcut",{
     "persist":true,
 })
 
-export {windowStore,noteStore,wallpaperStore,shortcutStore,systemStore}
+const weatherStore = defineStore("weather",{
+    state() {
+        return {
+            apikey:"9cda7ed49a914d5eb6987706d642da65" as string,
+            city:"" as string,
+            citycode:"" as string,
+            query:"" as string,
+            pois:[] as any[]
+        }
+    },
+    "persist":true,
+})
+
+export {windowStore,noteStore,wallpaperStore,shortcutStore,systemStore,weatherStore}
