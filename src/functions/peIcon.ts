@@ -17,7 +17,12 @@ export const setIcon =async function(){
         if(ext == 'lnk'){
             if(lnks[i].iconLocationPeFile == ""){
                 // 无图标路径
-                ext = await extname(lnks[i].targetPath);
+                try{
+                    ext = await extname(lnks[i].targetPath);
+                }catch(error){
+                    console.log(error,1,lnks[i])
+                    continue;
+                }
                 if(ext == "exe" || ext == "dll" || ext == "ocx" || ext == 'cpl' ){
                     let icodir = await getIcon(await resolve(lnks[i].targetPath),path)
                     if(icodir){
@@ -55,7 +60,12 @@ export const setIcon =async function(){
                                     lnks[i].icoPath = icodir + res[Number(lnks[i].iconLocation)].name
                                 }else if(Number(lnks[i].iconLocation)<0){
                                     let name = await basename(pePath)
-                                    name = name.replace("."+await extname(name),"")
+                                    try {
+                                        name = name.replace("."+await extname(name),"")
+                                    } catch (error) {
+                                        console.log(error,2,lnks[i])
+                                        continue;
+                                    }
                                     lnks[i].icoPath = icodir + name + "_" + Math.abs(Number(lnks[i].iconLocation)) + '.ico'
                                 }else{
                                     // 非数字结果
@@ -68,7 +78,12 @@ export const setIcon =async function(){
                 }else{
                     try {
                         // 有图标路径
-                        ext = await extname(await basename(lnks[i].iconLocationPeFile))
+                        try {
+                            ext = await extname(await basename(lnks[i].iconLocationPeFile))
+                        } catch (error) {
+                            console.log(error,3,lnks[i])
+                            continue;
+                        }
                         if(ext =='ico' || ext == 'png'){
                             // 图标路径指向ico路径
                             if(await exists(lnks[i].iconLocationPeFile)){
@@ -93,7 +108,12 @@ export const setIcon =async function(){
                                     lnks[i].icoPath = icodir + res[Number(lnks[i].iconLocation)].name
                                 }else if(Number(lnks[i].iconLocation)<0){
                                     let name = await basename(lnks[i].iconLocationPeFile)
-                                    name = name.replace("."+await extname(name),"")
+                                    try {
+                                        name = name.replace("."+await extname(name),"")
+                                    } catch (error) {
+                                        console.log(error,4,lnks[i])
+                                        continue;
+                                    }
                                     lnks[i].icoPath = icodir + name + "_" + Math.abs(Number(lnks[i].iconLocation)) + '.ico'
                                 }else{
                                     // 非数字结果
@@ -113,7 +133,7 @@ export const setIcon =async function(){
         }else if(ext == 'url'){
             // url快捷方式
             let urlico = await getUrlInfo(lnks[i].lnkPath)
-            if(urlico){
+            if(await exists(urlico)){
                 let icoPath = await resolve(path,"other") + '\\'+uuid()+'.ico'
                 let res = await readFile(urlico);
                 await writeFile(icoPath,res)
