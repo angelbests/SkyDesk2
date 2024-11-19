@@ -9,6 +9,7 @@ import { listen } from '@tauri-apps/api/event';
 import { systemStore,windowStore,noteStore,wallpaperStore,shortcutStore  } from '../stores/window';
 import { disable, enable } from '@tauri-apps/plugin-autostart';
 import { invoke } from '@tauri-apps/api/core';
+import { register,isRegistered } from "@tauri-apps/plugin-global-shortcut"
 const systemstore= systemStore()
 const monitors = ref<{  
     title:string, 
@@ -25,7 +26,20 @@ const net = ref({
 })
 const netspeedshow = ref(false)
 const toggleMaximizeBool = ref(false)
-onMounted(async ()=>{       
+onMounted(async ()=>{  
+    let res =await isRegistered('Control+1')   
+    if(!res){
+        register('Control+1',async ()=>{
+            await getCurrentWebviewWindow().show();
+            await getCurrentWebviewWindow().setFocus()
+        })
+    }
+    res =await isRegistered('Control+2')
+    if(!res){
+        register('Control+2',async ()=>{
+            await getCurrentWebviewWindow().hide();
+        })
+    }
     invoke("netspeed")
     listen("netspeed",(e)=>{
         let res = JSON.parse(e.payload as string)

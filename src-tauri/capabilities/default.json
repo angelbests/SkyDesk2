@@ -147,6 +147,8 @@
           "url": "http://127.0.0.1:11434"
         }
       ]
-    }
+    },
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-is-registered"
   ]
 }
