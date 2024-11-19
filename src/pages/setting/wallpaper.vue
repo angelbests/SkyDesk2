@@ -5,14 +5,17 @@ import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
 import { open } from '@tauri-apps/plugin-dialog';
-import { appDataDir, basename, resolve } from '@tauri-apps/api/path'
+import { appDataDir, basename, resolve, pictureDir } from '@tauri-apps/api/path'
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { copyFile, mkdir } from "@tauri-apps/plugin-fs";
+import { copyFile, mkdir, exists } from "@tauri-apps/plugin-fs";
 import { LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
+import { downloadload } from "../../api/download";
+import wallpaperfall from "../../components/wallpaperfall.vue";
 const wallpaperWidth = ref(0);
 const wallpaperref = ref<HTMLDivElement>();
 const wallpapers = wallpaperStore()
+const waterfallshow = ref(false)
 onMounted(() => {
     updateElementHeight()
     window.addEventListener('resize', updateElementHeight);
@@ -208,22 +211,44 @@ const closewallpaper = async function () {
     })
 }
 
+const setwallpaper =async function(src:string){
+    console.log(src)
+    let path =await downloadwallpaper(src)
+    if(path){
+        addWallPaperData.value = {
+            "type": "image",
+            "title": "",
+            "preview": path,
+            "filename": await basename(path),
+            "path": path
+        }
+        addWallpaper()
+    }
+}
 
-
-import wallpaperfall from "../../components/wallpaperfall.vue";
-const waterfallshow = ref(true)
+const downloadwallpaper =async (src:string):Promise<string>=>{
+  let name = await basename(src);
+  let path = await pictureDir() + "\\skydesk2\\" + name;
+  if(!await exists(path)){
+    let res = await downloadload(path,src);
+    if(res){
+      return path
+    }
+  }
+  return "";
+}
 
 </script>
 
 <template>
     <div class="window">
-        <v-dialog v-model="waterfallshow" >
+        <v-dialog v-model="waterfallshow" persistent>
             <div style="width: 100%;height: 100vh;background: wheat;border-radius: 10px;">
                 <v-btn style="height: 30px;width: 100%;" @click="waterfallshow = false">
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
                 <div style="overflow: hidden;overflow-y: scroll;width: 100%;height: calc(100vh - 50px);box-sizing: border-box;padding: 10px;">
-                    <wallpaperfall></wallpaperfall>
+                    <wallpaperfall @setwallpaper="setwallpaper" @download="downloadwallpaper"></wallpaperfall>
                 </div>
             </div>
         </v-dialog>

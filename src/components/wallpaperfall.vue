@@ -2,8 +2,7 @@
 import buttonbox from "./buttonbox.vue"
 import { getwallpaper } from "./../api/api";
 import waterfall from "./waterfall.vue";
-
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 const wallpaperswaterfall = ref<{
   src: string,
   ratio: number,
@@ -11,6 +10,10 @@ const wallpaperswaterfall = ref<{
   height: number,
   thumbs: string
 }[]>([])
+
+onMounted(()=>{
+  getwallpapers(true)
+})
 
 const getwallpapers = async function(reset:boolean){
     if(reset){
@@ -39,6 +42,7 @@ const getwallpapers = async function(reset:boolean){
     
 }
 import RightBar from "./RightBar.vue";
+
 
 //#region 
 
@@ -163,20 +167,32 @@ watch(selectvalue.value, () => {
 //#endregion
 
 const mousename = ref("")
+const emit = defineEmits<{
+  setwallpaper:[src:string],
+  download:[src:string]
+}>()
+
+
+const setwallpaper = function(src:string){
+  emit("setwallpaper",src)
+}
+
+const download = function(src:string){
+  emit("download",src)
+}
 </script>
 
 <template>
     <div class="container"  data-tauri-drag-region>
-        <div ></div>
         <waterfall :col="4" :gap="5" :images="wallpaperswaterfall" @scrollload="getwallpapers(false)">
             <template v-slot="{ image }">
               <div style="position: relative;width: 100%;height: 100%;" @mouseover="mousename = image.src">
                 <img :src="image.thumbs" style="width: 100%;height: 100%;">
                 <div v-if="image.src == mousename" style="position: absolute;left: 0px;top: 0px;z-index:20000;display: flex;justify-content: space-evenly;align-items: center;width: 100%;height: 100%;">
-                    <v-btn icon size="small">
+                    <v-btn icon size="small" @click="setwallpaper(image.src)">
                       <v-icon>mdi-image</v-icon>
                     </v-btn>
-                    <v-btn icon size="small">
+                    <v-btn icon size="small" @click="download(image.src)">
                       <v-icon>mdi-download-outline</v-icon>
                     </v-btn>
                 </div>

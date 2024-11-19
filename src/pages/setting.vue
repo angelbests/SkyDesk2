@@ -122,6 +122,9 @@ const refresh = function(){
             <div v-show="netspeedshow" style="width: 100px;display: flex;align-items: center;">
                 <v-icon>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
             </div>
+            <v-btn icon >
+                <v-icon>mdi-help-circle-outline</v-icon>
+            </v-btn>
             <v-btn icon @click="settingshow = true">
                 <v-icon>mdi-cog-outline</v-icon>
             </v-btn>
