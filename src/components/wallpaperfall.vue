@@ -188,7 +188,7 @@ const download = function(src:string){
             <template v-slot="{ image }">
               <div style="position: relative;width: 100%;height: 100%;" @mouseover="mousename = image.src">
                 <img :src="image.thumbs" style="width: 100%;height: 100%;">
-                <div v-if="image.src == mousename" style="position: absolute;left: 0px;top: 0px;z-index:20000;display: flex;justify-content: space-evenly;align-items: center;width: 100%;height: 100%;">
+                <div v-if="image.src == mousename" style="position: absolute;left: 0px;top: 0px;z-index:100;display: flex;justify-content: space-evenly;align-items: center;width: 100%;height: 100%;">
                     <v-btn icon size="small" @click="setwallpaper(image.src)">
                       <v-icon>mdi-image</v-icon>
                     </v-btn>
