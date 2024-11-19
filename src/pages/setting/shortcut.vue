@@ -104,8 +104,8 @@ const createDocker = async function () {
     let data = {
         label: label,
         setting: {
-            w: 160,
-            h: 160,
+            w: 120,
+            h: 120,
             c: 2,
             r: 2,
             background: 'white',
@@ -120,8 +120,8 @@ const createDocker = async function () {
     await createWindow(label, {
         x: 100,
         y: 200,
-        width: 160,
-        height: 160,
+        width: 120,
+        height: 120,
         decorations: false,
         transparent: true,
         dragDropEnabled: false,
@@ -248,16 +248,16 @@ const submitshortcut2 = function () {
 const mouseenter = function (i: number) {
     let el = document.getElementById('img' + i);
     if (el) {
-        el.style.width = '50px'
-        el.style.height = '50px'
+        el.style.width = '40px'
+        el.style.height = '40px'
     }
 }
 
 const mouseleave = function (i: number) {
     let el = document.getElementById('img' + i);
     if (el) {
-        el.style.width = '45px'
-        el.style.height = '45px'
+        el.style.width = '35px'
+        el.style.height = '35px'
     }
 }
 
@@ -375,6 +375,7 @@ const clone = function (element: any) {
         </v-card>
         <v-progress-linear color="black" :indeterminate="scanbar"></v-progress-linear>
         <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;">
+            <!-- 左 -->
             <div v-show="!scanbtn" class="scan-container">
                 <VueDraggable class="VueDraggable" v-model="shortcutstore.shortcutsTemp" :animation="150" :group="{
                     name: 'shortcut',
@@ -386,7 +387,7 @@ const clone = function (element: any) {
                                 :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                         </div>
                         <div
-                            style="font-size: 12px;width:70px;height: 30px;
+                            style="font-size: 10px;width:60px;height: 30px;
                             text-wrap:balance;text-align: center;
                             text-overflow: clip;overflow: hidden;line-height: 15px;filter:drop-shadow(0px 5px 5px gray)">
                             {{ item.name }}
@@ -394,18 +395,19 @@ const clone = function (element: any) {
                     </v-sheet>
                 </VueDraggable>
             </div>
+            <!-- 右 -->
             <v-sheet :width="scanbtn ? '100%' : '50%'" class="shorcuts-container">
                 <VueDraggable class="VueDraggable" v-model="shortcutstore.shortcuts" :animation="150"
                     :group="{ name: 'shortcut', pull: 'clone' }" :setData="setdata" :onAdd="onAdd" :clone="clone">
                     <v-sheet v-for="(item, i) in shortcutstore.shortcuts" :data-lnk="JSON.stringify(item)"
-                        :height="setting ? '120px' : '100px'" class="shortcut-container">
+                        :height="setting ? '100px' : '80px'" class="shortcut-container">
                         <div class="icon-div" @click="exec(item)">
                             <img @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i" class="icon"
                                 :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                         </div>
-                        <div style="font-size: 12px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
+                        <div style="font-size: 10px;width:60px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
                                 text-wrap:balance;text-align: center;
-                                text-overflow: clip;overflow: hidden;line-height: 15px;">
+                                text-overflow: clip;overflow: hidden;">
                             {{ item.name }}
                         </div>
                         <div v-show="setting" style="width: 80px;height: 20px;display: flex;
@@ -418,7 +420,7 @@ const clone = function (element: any) {
                                 删
                             </v-btn>
                             <v-btn @click="editshortcut(i)"
-                                style="font-size: 12px;box-shadow: none;background: none;color: gray;" size="mini">
+                                style="font-size: 10px;box-shadow: none;background: none;color: gray;" size="mini">
                                 <template v-slot:prepend>
                                     <v-icon>mdi-pencil-box-outline</v-icon>
                                 </template>
@@ -429,13 +431,14 @@ const clone = function (element: any) {
                 </VueDraggable>
             </v-sheet>
         </div>
+        <!-- 下 -->
         <VueDraggable :onAdd="onAdd1" v-model="shortcutstore.wheels" :group="{ name: 'shortcut' }"
             class="VueDraggable-wheel">
             <v-sheet v-for="item in shortcutstore.wheels" :data-lnk="JSON.stringify(item)" class="shortcut-container">
                 <div class="icon-div">
                     <img class="icon" :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                 </div>
-                <div style="font-size: 12px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
+                <div style="font-size: 10px;width:70px;height: 30px;filter:drop-shadow(0px 5px 5px gray);
                         text-wrap:balance;text-align: center;
                         text-overflow: clip;overflow: hidden;line-height: 15px;">
                     {{ item.name }}
@@ -496,24 +499,24 @@ const clone = function (element: any) {
 }
 
 .icon-div {
-    width: 55px;
-    height: 55px;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     filter: drop-shadow(0px 5px 5px gray)
 }
 
 .icon {
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     border-radius: 5px;
     transition: all 0.1s linear;
 }
 
 .shortcut-container {
-    width: 100px;
+    width: 80px;
     margin: 5px;
-    height: 100px;
+    height: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;

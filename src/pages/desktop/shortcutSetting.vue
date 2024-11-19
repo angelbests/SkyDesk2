@@ -83,8 +83,8 @@ const getImage = async function() {
             <v-list-item>
                 <v-list-item-title>容器宽高</v-list-item-title>
                 <template v-slot:append>
-                    <v-number-input v-model="shortcutWindows.setting.w" @update:model-value="emitToShortcut('w')"  control-variant="stacked" :min="80" :max="4000"  width="100" hide-details="auto" density="compact"></v-number-input>
-                    <v-number-input v-model="shortcutWindows.setting.h" @update:model-value="emitToShortcut('h')"  control-variant="stacked" :min="80" :max="4000"  width="100" hide-details="auto" density="compact"></v-number-input>
+                    <v-number-input v-model="shortcutWindows.setting.w" @update:model-value="emitToShortcut('w')"  control-variant="stacked" :min="60" :max="4000"  width="100" hide-details="auto" density="compact"></v-number-input>
+                    <v-number-input v-model="shortcutWindows.setting.h" @update:model-value="emitToShortcut('h')"  control-variant="stacked" :min="60" :max="4000"  width="100" hide-details="auto" density="compact"></v-number-input>
                 </template>
             </v-list-item>
             <v-divider></v-divider>

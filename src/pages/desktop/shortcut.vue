@@ -118,16 +118,16 @@ const openshorcut =async function(item: {
 const mouseenter = function(i:number){
     let el =  document.getElementById('img'+i);
     if(el){
-        el.style.width = el.clientWidth + 10 + 'px'
-        el.style.height = el.clientHeight + 10 + 'px'
+        el.style.width = el.clientWidth + 5 + 'px'
+        el.style.height = el.clientHeight + 5 + 'px'
     }
 }
 
 const mouseleave = function(i:number){
     let el =  document.getElementById('img'+i);
     if(el){
-        el.style.width = shortcutWindows.value.setting.w / shortcutWindows.value.setting.c - 30 + 'px'
-        el.style.height = shortcutWindows.value.setting.w / shortcutWindows.value.setting.c - 30 + 'px'
+        el.style.width = shortcutWindows.value.setting.w / shortcutWindows.value.setting.c - 20 + 'px'
+        el.style.height = shortcutWindows.value.setting.w / shortcutWindows.value.setting.c - 20 + 'px'
     }
 }
 </script>
@@ -140,24 +140,26 @@ const mouseleave = function(i:number){
         <div class="window" :style="{ backdropFilter: `blur(${shortcutWindows.setting.blur}px)` }"
             @dragover="dragover($event)" @drop="drop($event)">
             <VueDraggable
-                :style="{ width: shortcutWindows.setting.w + 'px', height: shortcutWindows.setting.h + 'px', gridTemplateColumns: `repeat(auto-fill, ${shortcutWindows.setting.w / shortcutWindows.setting.c}px)`, gridTemplateRows: `repeat(auto-fill, ${shortcutWindows.setting.h / shortcutWindows.setting.r}px)` }"
+                :style="{ width: shortcutWindows.setting.w + 'px', height: shortcutWindows.setting.h + 'px', 
+                gridTemplateColumns: `repeat(auto-fill, ${shortcutWindows.setting.w / shortcutWindows.setting.c}px)`, 
+                gridTemplateRows: `repeat(auto-fill, ${shortcutWindows.setting.h / shortcutWindows.setting.r}px)` }"
                 class="lnklist" v-model="shortcutWindows.shortcuts" :animation="150"
                 group="shortcut">
                 <div v-for="(item,i) in shortcutWindows.shortcuts" :key="item.lnkPath">
                     <div class="imgdiv"
                         @click="openshorcut(item)"
-                        :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 10) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 30 : 10)) + 'px' }">
+                        :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 30 : 0)) + 'px' }">
                         <img class="img"
                             @mouseenter="mouseenter(i)"
                             @mouseleave="mouseleave(i)"
                             :id="'img'+i"
-                            :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 30) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 60 : 30)) + 'px' }"
+                            :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 20) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 50 : 20)) + 'px' }"
                             :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                     </div>
                     <div v-show="shortcutWindows.setting.font"
                         :style="{
-                            fontSize: '12px', height: '30px', textWrap: 'balance', textAlign: 'center', width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 10) + 'px',
-                            textOverflow: 'clip', overflow: 'hidden', lineHeight: '15px', filter: 'drop-shadow(0px 5px 5px gray)'
+                            fontSize: '10px', height: '30px', textWrap: 'balance', textAlign: 'center', width: (shortcutWindows.setting.w / shortcutWindows.setting.c) + 'px',
+                            textOverflow: 'clip', overflow: 'hidden'
                         }">
                         {{ item.name }}
                     </div>
@@ -166,16 +168,22 @@ const mouseleave = function(i:number){
             <right-bar :border-radius="'15px'">
                 <div style="display: flex;justify-content: space-evenly;align-content: space-evenly;width: 100%;height: 100%;flex-wrap: wrap;"
                     data-tauri-drag-region>
-                    <v-btn @click="close" size="small" icon=" mdi-close"></v-btn>
-                    <v-btn @click="opensetting" size="small" icon="mdi-cog-outline"></v-btn>
-                    <v-btn @click="deleteicon" size="small" icon="mdi-delete-outline"></v-btn>
+                    <v-btn @click="close" style="width: 30px;height: 30px;" icon>
+                        <v-icon size="mini">mdi-close</v-icon>
+                    </v-btn>
+                    <v-btn @click="opensetting" style="width: 30px;height: 30px;" icon>
+                        <v-icon size="mini">mdi-cog-outline</v-icon>
+                    </v-btn>
+                    <v-btn @click="deleteicon" style="width: 30px;height: 30px;" icon>
+                        <v-icon size="mini">mdi-delete-outline</v-icon>
+                    </v-btn>
                 </div>
             </right-bar>
         </div>
     </div>
 </template>
 
-<style>
+<style scoped >
 .wallpaper {
     width: 100vw;
     height: 100vh;
@@ -194,8 +202,6 @@ const mouseleave = function(i:number){
 
 .lnklist {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 60px);
-    grid-template-rows: repeat(auto-fit, 60px);
     grid-auto-flow: row;
     justify-items: center;
     align-items: center;
