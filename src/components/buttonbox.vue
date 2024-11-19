@@ -22,10 +22,9 @@ const checkbox = function (e: {
 
 <template>
     <div class="div">
-        <var-button class="button" size="small" :type="value == item.value ? 'primary' : 'default'" @click="checkbox(item)"
-            v-for="item in boxs">
+        <v-btn v-for="item in boxs" class="button" size="small" :style="{background:value == item.value ?'#5865f2':'white'}" @click="checkbox(item)" >
             {{ item.text }}
-        </var-button>
+        </v-btn>
     </div>
 </template>
 

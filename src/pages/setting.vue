@@ -28,9 +28,7 @@ const toggleMaximizeBool = ref(false)
 onMounted(async ()=>{       
     invoke("netspeed")
     listen("netspeed",(e)=>{
-        console.log(e.payload)
         let res = JSON.parse(e.payload as string)
-        console.log(res)
         net.value.speed_r = res.speed_r;
         net.value.speed_s = res.speed_s;
     })

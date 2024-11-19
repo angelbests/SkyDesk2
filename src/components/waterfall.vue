@@ -71,6 +71,7 @@ const waterfallset = (arr:{
 }
 // 监听图片合集变化
 watch(images.value,()=>{
+    console.log(images.value)
     if(images.value.length == 0){
         for(let i = 0;i<props.col;i++){
             height.value[i] = 0
