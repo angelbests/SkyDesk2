@@ -45,9 +45,10 @@ const createnote = function () {
     createWindow(label, {
         x: 0,
         y: 0,
-        width: 400,
-        height: 400,
-        minWidth: 400,
+        width: 300,
+        height: 300,
+        minWidth: 300,
+        minHeight:300,
         shadow: false,
         decorations: false,
         transparent: true,
