@@ -6,6 +6,8 @@ import { invoke } from '@tauri-apps/api/core';
 import { currentMonitor, LogicalPosition, LogicalSize, Monitor } from '@tauri-apps/api/window';
 import { resolve, videoDir } from '@tauri-apps/api/path';
 import moment from 'moment';
+import { captureStore } from '../../stores/window';
+const capturestore = captureStore()
 let app = getCurrentWebviewWindow();
 let c: Canvas
 let rect: Rect
@@ -146,7 +148,8 @@ const start_capture = async function () {
             window_size.x + monitor.value.position.x / monitor.value.scaleFactor + window_size.width / 2 - 40,
             window_size.y + monitor.value.position.y / monitor.value.scaleFactor - 30,
         ));
-        let path = await resolve(await videoDir(), moment().format("YYMMDDhhmmss") + '.mp4')
+        let title = moment().format("YYMMDDhhmmss") + '.mp4'
+        let path = await resolve(await videoDir(),"skydesk2",title)
         await invoke("start_capture", {
             x: Math.trunc(window_size.x * monitor.value.scaleFactor),
             y: Math.trunc(window_size.y * monitor.value.scaleFactor),
@@ -154,6 +157,10 @@ const start_capture = async function () {
             height: Math.trunc(window_size.height * monitor.value.scaleFactor),
             monitorname: monitor.value?.name,
             path: path
+        })
+        capturestore.video.push({
+            name:title,
+            path:path
         })
         captureWindow.value.setShadow(true)
         captureWindow.value.show()

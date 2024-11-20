@@ -7,7 +7,7 @@ import { createWindow } from "../../functions/window";
 import { open } from '@tauri-apps/plugin-dialog';
 import { appDataDir, basename, resolve, pictureDir } from '@tauri-apps/api/path'
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { copyFile, mkdir, exists } from "@tauri-apps/plugin-fs";
+import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
 import { LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { downloadload } from "../../api/download";
@@ -270,6 +270,20 @@ const selectcity =async function(e:string){
     })
     city.value = pois.value[index].city
 }
+
+const delwallpaper = async function(index:number){
+    console.log(wallpapers.wallpaperList[index])
+    let name = await basename(wallpapers.wallpaperList[index].path)
+    let path = wallpapers.wallpaperList[index].path.replace(name,"")
+    try {
+        await remove(path,{recursive:true})
+        wallpapers.wallpaperList.splice(index, 1)
+    } catch (error) {
+        console.log(error)
+        wallpapers.wallpaperList.splice(index, 1)
+    }
+}
+
 </script>
 
 <template>
@@ -379,7 +393,7 @@ const selectcity =async function(e:string){
                             <v-btn :disabled="true">{{ item.type == 'video' ? '视频' : item.type == 'image' ? '图片' : '网页' }}</v-btn>
                             <v-btn v-for="(monitor, i) in windowstore.monitors" @click="textwallpaper(item, monitor)">{{
                                 "屏幕"+(i+1) }}</v-btn>
-                            <v-btn @click="wallpapers.wallpaperList.splice(index, 1)">删除</v-btn>
+                            <v-btn @click="delwallpaper(index)">删除</v-btn>
                         </v-card-actions>
                     </v-card>
                 </div>

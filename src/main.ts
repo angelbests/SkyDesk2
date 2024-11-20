@@ -10,6 +10,7 @@ if(getCurrentWebviewWindow().label == "main"){
   await mkdir("note",{baseDir:BaseDirectory.AppData,"recursive":true})
   await mkdir("ollama",{baseDir:BaseDirectory.AppData,"recursive":true})
   await mkdir("skydesk2",{baseDir:BaseDirectory.Picture,"recursive":true})
+  await mkdir("skydesk2",{baseDir:BaseDirectory.Video,"recursive":true})
 }
 
 import { createApp } from "vue";

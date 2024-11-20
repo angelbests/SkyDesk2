@@ -161,7 +161,7 @@ const refresh = function(){
                     <v-list-item prepend-icon="mdi-wallpaper" title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
                     <v-list-item prepend-icon="mdi-note-outline" title="便签" :href="'/#/pages/setting/note'"></v-list-item>
                     <v-list-item prepend-icon="mdi-robot-outline" title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
-                    <!-- <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item> -->
+                    <v-list-item prepend-icon="mdi-wallpaper" title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
                     <v-list-item prepend-icon="mdi-calendar-range" title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="系统" :href="'/#/pages/setting/system'"></v-list-item> -->
                     <!-- <v-list-item prepend-icon="mdi-note-outline" title="剪贴板" :href="''"></v-list-item> -->

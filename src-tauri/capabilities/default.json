@@ -52,11 +52,11 @@
     "clipboard-manager:allow-write-text",
     {
       "identifier":"fs:write-files",
-      "allow": [{ "path": "$APPDATA/**" },{"path": "$PICTURE/**"}]
+      "allow": [{ "path": "$APPDATA/**" },{"path": "$PICTURE/**"},{"path": "$VIDEO/**"}]
     },
     {
       "identifier":"fs:allow-mkdir",
-      "allow": [{ "path": "$APPDATA/**" },{"path": "$PICTURE/**"}]
+      "allow": [{ "path": "$APPDATA/**" },{"path": "$PICTURE/**"},{"path": "$VIDEO/**"}]
     },
     {
       "identifier":"fs:read-dirs",
