@@ -168,9 +168,11 @@ const refresh = function(){
                 </v-list>
             </v-navigation-drawer>
             <router-view v-slot="{ Component }" :key="$route.fullPath" style="width: auto;height: 100%;box-sizing: border-box;padding: 10px;">
-                <keep-alive>
-                    <component :is="Component" />
-                </keep-alive>
+                <transition name="fade" mode="out-in" appear>
+                    <keep-alive>
+                        <component :is="Component" />
+                    </keep-alive>
+                </transition>
             </router-view>
         </v-main>
 
@@ -247,5 +249,24 @@ const refresh = function(){
 }
 .v-list-group__items{
     --parent-padding:calc(0px)
+}
+
+.fade-leave-active,
+.fade-enter-active {
+  transition: all 0.3s;
+}
+ 
+.fade-enter-from {  
+  opacity: 0;
+  transform: translateX(-30px);
+}
+.fade-enter-to { 
+  opacity: 1;
+  transform: translateX(0px);
+}
+ 
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
 }
 </style>
