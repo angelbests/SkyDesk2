@@ -1,13 +1,17 @@
 import { BaseDirectory, mkdir } from '@tauri-apps/plugin-fs';
-await mkdir("lnk",{"baseDir":BaseDirectory.AppData,"recursive":true})
-await mkdir("window",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("wallpapers",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("wallpapers\\image",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("wallpapers\\html",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("wallpapers\\video",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("note",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("ollama",{baseDir:BaseDirectory.AppData,"recursive":true})
-await mkdir("skydesk2",{baseDir:BaseDirectory.Picture,"recursive":true})
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+if(getCurrentWebviewWindow().label == "main"){
+  await mkdir("lnk",{"baseDir":BaseDirectory.AppData,"recursive":true})
+  await mkdir("window",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("wallpapers",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("wallpapers\\image",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("wallpapers\\html",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("wallpapers\\video",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("note",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("ollama",{baseDir:BaseDirectory.AppData,"recursive":true})
+  await mkdir("skydesk2",{baseDir:BaseDirectory.Picture,"recursive":true})
+}
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import { createPinia } from "pinia"
