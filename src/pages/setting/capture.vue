@@ -7,11 +7,11 @@ import { onMounted } from 'vue';
 import { convertFileSrc } from '@tauri-apps/api/core';
 const windowstore = windowStore()
 const { monitors } = storeToRefs(windowstore)
-const capturestroe = captureStore()
+const capturestore = captureStore()
 onMounted(()=>{
     window.addEventListener("storage",(e)=>{
         if(e.key == "capture"){
-            capturestroe.$hydrate()
+            capturestore.$hydrate()
         }
     })
 })
@@ -37,9 +37,9 @@ const selectcapture = function(){
 import { open } from '@tauri-apps/plugin-shell';
 import { videoDir } from '@tauri-apps/api/path';
 import { remove } from '@tauri-apps/plugin-fs';
-const openvideo = function(path:string){
-    open(path)
-}
+// const openvideo = function(path:string){
+//     open(path)
+// }
 
 const opendir =async function(){
     let path = await videoDir() + "\\skydesk2"
@@ -47,10 +47,10 @@ const opendir =async function(){
 }
 
 const delvideo = function(path:string){
-    let index = capturestroe.video.findIndex(item=>{
+    let index = capturestore.video.findIndex(item=>{
         return item.path == path
     })
-    capturestroe.video.splice(index,1)
+    capturestore.video.splice(index,1)
     remove(path)
 }
 </script>
@@ -69,7 +69,7 @@ const delvideo = function(path:string){
         <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
             <div class="video">
                 <div class="video-list">
-                    <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10" v-for="item in capturestroe.video">
+                    <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10" v-for="item in capturestore.video">
                         <v-card-text style="position: relative;">
                             <video style="width: 100%;height: 220px;" :src="convertFileSrc(item.path)"></video>
                             <div style="width: 100%;position: absolute;left: 15px;top: 240px;z-index: 50;color: gray;">
@@ -77,7 +77,7 @@ const delvideo = function(path:string){
                             </div>
                         </v-card-text>
                         <v-card-actions>
-                            <v-btn @click="openvideo(item.path)">打开</v-btn>
+                            <!-- <v-btn @click="openvideo(item.path)">打开</v-btn> -->
                             <v-btn @click="opendir">文件夹</v-btn>
                             <v-btn @click="delvideo(item.path)">删除</v-btn>
                         </v-card-actions>

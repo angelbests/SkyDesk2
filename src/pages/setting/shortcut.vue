@@ -86,6 +86,7 @@ const scanProgram = async function () {
         }
     } else {
         scanbtn.value = true
+        scanbar.value = false
     }
 }
 

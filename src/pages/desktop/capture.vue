@@ -6,8 +6,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { currentMonitor, LogicalPosition, LogicalSize, Monitor } from '@tauri-apps/api/window';
 import { resolve, videoDir } from '@tauri-apps/api/path';
 import moment from 'moment';
-import { captureStore } from '../../stores/window';
-const capturestore = captureStore()
+import { emit } from '@tauri-apps/api/event';
 let app = getCurrentWebviewWindow();
 let c: Canvas
 let rect: Rect
@@ -158,7 +157,7 @@ const start_capture = async function () {
             monitorname: monitor.value?.name,
             path: path
         })
-        capturestore.video.push({
+        await emit("capturemessage",{
             name:title,
             path:path
         })

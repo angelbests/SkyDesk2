@@ -273,15 +273,12 @@ const selectcity =async function(e:string){
 
 const delwallpaper = async function(index:number){
     console.log(wallpapers.wallpaperList[index])
-    let name = await basename(wallpapers.wallpaperList[index].path)
+    let name = await basename(wallpapers.wallpaperList[index].preview)
     let path = wallpapers.wallpaperList[index].path.replace(name,"")
-    try {
+    if(await exists(path)){
         await remove(path,{recursive:true})
-        wallpapers.wallpaperList.splice(index, 1)
-    } catch (error) {
-        console.log(error)
-        wallpapers.wallpaperList.splice(index, 1)
     }
+    wallpapers.wallpaperList.splice(index, 1)
 }
 
 </script>
