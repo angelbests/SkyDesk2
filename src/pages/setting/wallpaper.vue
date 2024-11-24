@@ -13,13 +13,16 @@ import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { downloadload } from "../../api/download";
 import wallpaperfall from "../../components/wallpaperfall.vue";
 import  { getpoi } from "./../../api/weather"
+
 const wallpaperWidth = ref(0);
 const wallpaperref = ref<HTMLDivElement>();
 const wallpapers = wallpaperStore()
 const waterfallshow = ref(false)
+
 onMounted(() => {
     updateElementHeight()
     window.addEventListener('resize', updateElementHeight);
+
 })
 
 const updateElementHeight = function () {
@@ -396,6 +399,7 @@ const delwallpaper = async function(index:number){
                 </div>
             </div>
         </div>
+
     </div>
 
 </template>
@@ -427,4 +431,5 @@ const delwallpaper = async function(index:number){
     justify-content: center;
 
 }
+
 </style>

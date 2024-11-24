@@ -35,7 +35,7 @@ pub fn run() {
             capture::get_display_capture,
             capture::get_window_capture,
             capture::start_capture,
-            netspeed::netspeed
+            netspeed::netspeed,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

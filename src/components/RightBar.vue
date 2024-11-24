@@ -30,7 +30,7 @@ onMounted(async ()=>{
 <style>
 .rightbar{
     position: absolute;
-    z-index: 1000;
+    z-index: 200;
     left: 0;
     top: 0;
     width: 100%;
