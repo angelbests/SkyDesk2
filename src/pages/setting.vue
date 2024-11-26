@@ -24,7 +24,6 @@ const net = ref({
     speed_r:0,
     speed_s:0
 })
-const netspeedshow = ref(false)
 const toggleMaximizeBool = ref(false)
 onMounted(async ()=>{  
     let res =await isRegistered('Control+1')   
@@ -46,9 +45,7 @@ onMounted(async ()=>{
         net.value.speed_r = res.speed_r;
         net.value.speed_s = res.speed_s;
     })
-    setTimeout(()=>{
-        netspeedshow.value = true
-    },3000)
+    // 创建托盘
     await createtray()
     await traystart()
     // 初始化窗口
@@ -75,6 +72,9 @@ onMounted(async ()=>{
             icon: 'mdi-monitor'
         })
     }
+    document.addEventListener("selectstart",(e)=>{
+        e.preventDefault();
+    })
 })
 
 const toggleMaximize =async function(){
@@ -130,10 +130,10 @@ const refresh = function(){
             <template v-slot:prepend>
                 <v-app-bar-nav-icon @click="drawer=!drawer"></v-app-bar-nav-icon>
             </template>
-            <div v-show="netspeedshow" style="width: 100px;display: flex;align-items: center;">
+            <div style="width: 100px;display: flex;align-items: center;">
                 <v-icon>mdi-arrow-down-thin</v-icon>{{ Math.trunc(net.speed_r/1024)<1024?Math.trunc(net.speed_r/1024)+'KB/s':Math.trunc(net.speed_r/1024/1024*10)/10+'MB/s' }}
             </div>
-            <div v-show="netspeedshow" style="width: 100px;display: flex;align-items: center;">
+            <div style="width: 100px;display: flex;align-items: center;">
                 <v-icon>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
             </div>
             <v-btn icon >
