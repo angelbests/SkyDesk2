@@ -123,7 +123,6 @@ watch(city,async ()=>{
 .window{
     width: 100vw;
     height: 100vh;
-    background-color: black;
     position: relative;
     font-size: 20px;
 }
@@ -135,7 +134,7 @@ watch(city,async ()=>{
 .video{
     width: 100vw;
     height: 100vh;
-    object-fit: contain;
+    object-fit: cover;
 }
 .netspeed {
     position: absolute;

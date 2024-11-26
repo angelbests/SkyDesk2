@@ -70,9 +70,9 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         url: url,
     },{
         x:monitor.position.x,
-        y:monitor.position.y,
+        y:monitor.position.y -5,
         w:monitor.size.width,
-        h:monitor.size.height,
+        h:monitor.size.height + 10,
         z:0,
         status:true
     })
