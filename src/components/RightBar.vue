@@ -35,7 +35,7 @@ onMounted(async ()=>{
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(123,133,133,0.3);
+    background: rgba(123,133,133,0.1);
     border-radius: 10px;
     transition: all 0.5s linear;
 }

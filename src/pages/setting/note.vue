@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref} from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { uuid } from '../../functions';
 import { createWindow } from '../../functions/window';
 import { listen } from '@tauri-apps/api/event';
-import { noteStore } from '../../stores/window';
-import { getAllWebviewWindows } from '@tauri-apps/api/webviewWindow';
+import { noteStore, windowStore } from '../../stores/window';
+import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 const noteref = ref<HTMLDivElement>()
 const notestore = noteStore()
 window.addEventListener('storage', (e) => {
-  if (e.key === "note") {
-    notestore.$hydrate()
-  }
+    if (e.key === "note") {
+        notestore.$hydrate()
+    }
 })
 const noteWidth = ref()
 onMounted(() => {
@@ -26,7 +26,6 @@ onMounted(() => {
         } else {
             notestore.note.push(e.payload)
         }
-        console.log(e.payload)
     })
 })
 
@@ -37,7 +36,7 @@ const updateElementHeight = function () {
 }
 
 const noteListHeight = computed(() => {
-    return Math.ceil((notestore.note.length / Math.trunc(noteWidth.value / 420))) * 320+10 + 'px';
+    return Math.ceil((notestore.note.length / Math.trunc(noteWidth.value / 420))) * 320 + 10 + 'px';
 })
 
 const createnote = function () {
@@ -45,14 +44,14 @@ const createnote = function () {
     createWindow(label, {
         x: 0,
         y: 0,
-        width: 300,
-        height: 300,
-        minWidth: 300,
-        minHeight:300,
+        width: 330,
+        height: 330,
+        minWidth: 330,
+        minHeight: 100,
         shadow: false,
         decorations: false,
         transparent: true,
-        skipTaskbar:true,
+        skipTaskbar: true,
         url: "/#/pages/desktop/note"
     })
 }
@@ -96,6 +95,63 @@ const delnote = function (item: { label: string }) {
     })
 
 }
+import { setWindowToMonitor, cancelwallpaper } from '../../functions/monitor';
+const notewallpaper = async function (note:any) {
+    // 检查窗口是否存在
+    let all = await getAllWebviewWindows();
+    let index = all.findIndex(item => {
+        return item.label == note.label
+    })
+    if (index >= 0) {
+        let win = all[index];
+        const windowstore = windowStore()
+        if (note.wallpaper) {
+            windowstore.windows.filter((item, index) => {
+                if (item.label == win.label) {
+                    cancelwallpaper(
+                        win.label,
+                        windowstore.windows[index].wallpaper.x,
+                        windowstore.windows[index].wallpaper.y,
+                        windowstore.windows[index].wallpaper.w,
+                        windowstore.windows[index].wallpaper.h,
+                    )
+                    windowstore.windows[index].wallpaper.status = false
+                }
+            })
+            notestore.note.filter((item,index)=>{
+                if(item.label == win.label){
+                    notestore.note[index].wallpaper = false
+                }
+            })
+        } else if(!note.wallpaper){
+            let factor = await getCurrentWebviewWindow().scaleFactor()
+            console.log(factor)
+            windowstore.windows.filter((item, index) => {
+                if (item.label == win.label) {
+                    windowstore.windows[index].wallpaper.x = Math.trunc(windowstore.windows[index].option.x as number * factor)
+                    windowstore.windows[index].wallpaper.y = Math.trunc(windowstore.windows[index].option.y as number * factor)
+                    windowstore.windows[index].wallpaper.w = Math.trunc(windowstore.windows[index].option.width  as number * factor)
+                    windowstore.windows[index].wallpaper.h = Math.trunc(windowstore.windows[index].option.height as number * factor)
+                    windowstore.windows[index].wallpaper.z = 1
+                    windowstore.windows[index].wallpaper.status = true
+                    setWindowToMonitor(
+                        win.label,
+                        windowstore.windows[index].wallpaper.x,
+                        windowstore.windows[index].wallpaper.y,
+                        windowstore.windows[index].wallpaper.w,
+                        windowstore.windows[index].wallpaper.h,
+                        1
+                    )
+                }
+            })
+            notestore.note.filter((item,index)=>{
+                if(item.label == win.label){
+                    notestore.note[index].wallpaper = true
+                }
+            })
+        }
+    }
+}
 </script>
 
 <template>
@@ -122,6 +178,12 @@ const delnote = function (item: { label: string }) {
                             </div>
                         </v-card-text>
                         <v-card-actions>
+                            <v-btn @click="notewallpaper(item)">
+                                <template v-slot:prepend>
+                                    <v-icon>mdi-credit-card-chip-outline</v-icon>
+                                </template>
+                                {{ item.wallpaper ? "映出" : "映入" }}
+                            </v-btn>
                             <v-btn @click="opennote(item)">
                                 <template v-slot:prepend>
                                     <v-icon>mdi-note-edit-outline</v-icon>

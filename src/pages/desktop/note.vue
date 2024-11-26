@@ -22,7 +22,8 @@ const editorData = reactive({
     color:'213,213,213',
     opacity:100,
     label:appWindow.label,
-    always:"normal"
+    always:"normal",
+    wallpaper:false
 });
 const show = ref(true)
 onMounted(()=>{
@@ -127,7 +128,7 @@ const onChange = function(){
 const mode = ref<string>('default');
 const toolbarConfig:Partial<IToolbarConfig> = {}
 toolbarConfig.toolbarKeys = [
-    'todo','numberedList','codeBlock','bold','italic','underline','through','upimage','color','lineHeight'
+    'todo','numberedList','codeBlock','bold','underline','through','upimage','color'
 ]
 
 const editorConfig:Partial<IEditorConfig> = { 
@@ -430,6 +431,7 @@ const rightClick = function(){
 .toolbar{
     width: 100vw;
     height: 40px;
+    /* overflow: hidden; */
 }
 /* editor */
 .editor{

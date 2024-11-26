@@ -68,8 +68,14 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         alwaysOnBottom: true,
         skipTaskbar: true,
         url: url,
+    },{
+        x:monitor.position.x,
+        y:monitor.position.y,
+        w:monitor.size.width,
+        h:monitor.size.height,
+        z:0,
+        status:true
     })
-    console.log(w)
     w?.setSize(new LogicalSize(0, 0));
     wallpapers.config.push({
         label: label,
@@ -78,7 +84,8 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         url: url,
     })
     await setWindowToMonitor(
-        label, monitor.position.x as number,
+        label,
+        monitor.position.x as number,
         monitor.position.y as number,
         monitor.size.width as number,
         monitor.size.height as number

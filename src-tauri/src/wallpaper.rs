@@ -1,31 +1,31 @@
+use std::thread;
+use std::time::Duration;
+use tauri::{AppHandle, Manager};
 use windows::{
     core::s,
     Win32::{
         Foundation::{BOOL, HWND, LPARAM, POINT, WPARAM},
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
-            self, GWL_EXSTYLE, GWL_STYLE, HWND_BOTTOM, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_ACCEPTFILES, WS_EX_APPWINDOW, WS_EX_LAYERED, WS_EX_TOPMOST, WS_EX_TRANSPARENT, WS_EX_WINDOWEDGE, WS_TILEDWINDOW
+            self, GWL_EXSTYLE,HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_LAYERED, 
         },
     },
 };
-use tauri::{AppHandle, Manager};
-use std::time::Duration;
-use std::thread;
 #[tauri::command]
-pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32) {
+pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32,z:i32) {
     tauri::async_runtime::spawn(async move {
         let webview = app.get_webview_window(&label).unwrap();
         let hwnd = webview.hwnd().unwrap();
-        attach(hwnd, x, y, w, h);
+        attach(hwnd, x, y, w, h,z);
     });
 }
 
 #[tauri::command]
-pub fn cancelwallpaper(app: AppHandle, label: String) {
+pub fn cancelwallpaper(app: AppHandle, label: String,x: i32, y: i32, w: i32, h: i32) {
     tauri::async_runtime::spawn(async move {
         let webview = app.get_webview_window(&label).unwrap();
         let hwnd = webview.hwnd().unwrap();
-        detach(hwnd);
+        detach(hwnd,x, y, w, h);
     });
 }
 
@@ -64,7 +64,7 @@ extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     }
 }
 
-fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
+fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32,z:i32) {
     unsafe {
         let progman = WindowsAndMessaging::FindWindowA(s!("Progman"), None).unwrap();
 
@@ -105,46 +105,57 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
             h,
             SWP_HIDEWINDOW,
         );
-        WindowsAndMessaging::SetWindowLongPtrA(
-            hwnd,
-            GWL_STYLE,
-            WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_STYLE) & (!WS_TILEDWINDOW).0 as isize,
-        );
+        // 该窗口是一个分层窗口。 如果窗口的 类样式 为 CS_OWNDC 或 CS_CLASSDC，则不能使用此样式。Windows 8：顶级窗口和子窗口支持WS_EX_LAYERED样式。 以前的 Windows 版本仅支持 顶级窗口WS_EX_LAYERED 。
         WindowsAndMessaging::SetWindowLongPtrA(
             hwnd,
             GWL_EXSTYLE,
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
-                & (!WS_EX_APPWINDOW).0 as isize
-                & (!WS_EX_WINDOWEDGE).0 as isize
-                & (!WS_EX_ACCEPTFILES).0 as isize
-                & (!WS_EX_TOPMOST).0 as isize
-                | WS_EX_TRANSPARENT.0 as isize
                 | WS_EX_LAYERED.0 as isize,
         );
-        println!("{},{},{},{}", x, y, w, h);
-        println!("{},{}",p.x,p.y);
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
         thread::sleep(Duration::from_millis(300));
-        let _ = WindowsAndMessaging::SetWindowPos(
-            hwnd,
-            HWND_BOTTOM,
-            0 - p.x + x,
-            0 - p.y + y,
-            w,
-            h,
-            SWP_SHOWWINDOW,
-        );
+        if z == 1 {
+            let _ = WindowsAndMessaging::SetWindowPos(
+                hwnd,
+                HWND_TOP,
+                0 - p.x + x,
+                0 - p.y + y,
+                w,
+                h,
+                SWP_SHOWWINDOW,
+            );
+        }else{
+            let _ = WindowsAndMessaging::SetWindowPos(
+                hwnd,
+                HWND_BOTTOM,
+                0 - p.x + x,
+                0 - p.y + y,
+                w,
+                h,
+                SWP_SHOWWINDOW,
+            );
+        }
+;
     };
 }
 
-fn detach(hwnd: HWND) {
+fn detach(hwnd: HWND,x:i32,y:i32,w:i32,h:i32) {
     unsafe {
         let _ = WindowsAndMessaging::SetParent(hwnd, None);
-        let _ = WindowsAndMessaging::SystemParametersInfoA(
-            WindowsAndMessaging::SPI_SETDESKWALLPAPER,
-            0,
-            None,
-            WindowsAndMessaging::SPIF_UPDATEINIFILE,
+        WindowsAndMessaging::SetWindowLongPtrA(
+            hwnd,
+            GWL_EXSTYLE,
+            WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
+                & WS_EX_LAYERED.0 as isize,
+        );
+        let _ = WindowsAndMessaging::SetWindowPos(
+            hwnd,
+            HWND_NOTOPMOST,
+            x,
+            y,
+            w,
+            h,
+            SWP_SHOWWINDOW,
         );
     };
 }

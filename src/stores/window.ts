@@ -11,6 +11,14 @@ const windowStore = defineStore("window", {
         monitor?: boolean;
         option: Omit<WebviewOptions, "x" | "y" | "width" | "height"> &
           WindowOptions;
+        wallpaper:{
+          x:number,
+          y:number,
+          w:number,
+          h:number,
+          z:number,
+          status:boolean
+        }
       }[],
       monitors: monitors as Monitor[],
     };
@@ -46,6 +54,7 @@ const noteStore = defineStore("note", {
         color: string;
         opacity: number;
         label: string;
+        wallpaper:boolean;
         option?: Omit<WebviewOptions, "x" | "y" | "width" | "height"> &
           WindowOptions;
       }[],
