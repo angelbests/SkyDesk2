@@ -7,7 +7,7 @@ use windows::{
         Foundation::{BOOL, HWND, LPARAM, POINT, WPARAM},
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
-            self, GWL_EXSTYLE,HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_LAYERED, 
+            self, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_LAYERED 
         },
     },
 };
@@ -110,7 +110,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32,z:i32) {
             hwnd,
             GWL_EXSTYLE,
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
-                | WS_EX_LAYERED.0 as isize,
+                | WS_EX_LAYERED.0 as isize
         );
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
         thread::sleep(Duration::from_millis(300));

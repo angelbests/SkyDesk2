@@ -56,10 +56,10 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         url = "/#/pages/desktop/wallpaper?type=" + item.type + "&path=" + item.path
     }
     let w = await createWindow(label, {
-        x: 99999999,
-        y: 99999999,
-        width: 100,
-        height: 100,
+        x: 999999999,
+        y: 999999999,
+        width: 1000,
+        height: 1000,
         decorations: false,
         transparent: true,
         fullscreen: false,
@@ -85,10 +85,10 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
     })
     await setWindowToMonitor(
         label,
-        monitor.position.x as number,
-        monitor.position.y as number,
+        monitor.position.x as number ,
+        monitor.position.y as number -5,
         monitor.size.width as number,
-        monitor.size.height as number
+        monitor.size.height as number + 10
     )
 }
 

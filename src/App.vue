@@ -16,6 +16,7 @@ html,body {
   background: transparent;
   padding: 0;
   margin: 0;
+  border: none !important;
 }
 
 ::-webkit-scrollbar {

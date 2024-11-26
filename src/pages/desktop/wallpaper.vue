@@ -119,7 +119,7 @@ watch(city,async ()=>{
     </div>
 </template>
 
-<style>
+<style scoped>
 .window{
     width: 100vw;
     height: 100vh;
@@ -135,7 +135,7 @@ watch(city,async ()=>{
 .video{
     width: 100vw;
     height: 100vh;
-    object-fit: cover;
+    object-fit: contain;
 }
 .netspeed {
     position: absolute;
