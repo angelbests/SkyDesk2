@@ -385,7 +385,7 @@ const delwallpaper = async function(index:number){
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
+        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;">
             <div class="wallpaper" id="wallpaper" ref="wallpaperref">
                 <div class="wallpaper-list" :style="{ height: wallpaperListHeight, minHeight: '100%' }">
                     <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10"

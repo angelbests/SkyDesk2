@@ -210,7 +210,7 @@ const delmsg =async function(){
                     <v-tab v-for="item in modellist" :key="item.name" :text="item.name" :value="item"></v-tab>
                 </v-tabs>
                 <div id="chatdiv"
-                    style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;overflow-y: scroll;flex-direction: column;background-color: rgba(203,203,203,1);box-sizing: border-box;padding: 10px;transition: all 0.3s linear;">
+                    style="width: 100%;height: calc(100% - 110px);display: flex;overflow: hidden;overflow-y: scroll;flex-direction: column;background-color: rgba(203,203,203,1);box-sizing: border-box;padding: 10px;transition: all 0.3s linear;">
                     <template v-for="item in messages">
                         <div v-if="item.role == 'assistant'"
                             style="width: 100%;display: flex;justify-content: flex-start;margin-bottom: 20px;transition: all 0.3s linear;">

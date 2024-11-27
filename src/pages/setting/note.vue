@@ -166,7 +166,7 @@ const notewallpaper = async function (note:any) {
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
+        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;">
             <div class="note" id="note" ref="noteref">
                 <div class="note-list" :style="{ height: noteListHeight, minHeight: '100%' }">
                     <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10"
