@@ -24,8 +24,8 @@ onMounted(async ()=>{
     })
     path.value = route.query.path
     type.value = route.query.type
-    setTimeout(async ()=>{
-        show.value = true
+    setTimeout(()=>{
+        show.value = true 
     },500)
 
     setInterval(async () => {
@@ -87,7 +87,7 @@ watch(city,async ()=>{
     <div class="window" >
         <img v-if="type=='image'" :src="convertFileSrc(path)" class="image"/>
         <video muted v-else class="video" id="video" ref="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
-        <div style="display: flex;flex-direction: column;position: absolute;right:40px;top:40px;z-index: 100;width: 200px;height: 300px;">
+        <div v-if="weatherstore.citycode" style="display: flex;flex-direction: column;position: absolute;right:40px;top:40px;z-index: 100;width: 200px;height: 300px;">
             <div style="width: 200px;height: 30px;text-align: center;">
                 {{ city }} 
             </div>

@@ -24,13 +24,23 @@ export const getWeather =async function(location:string):Promise<any>{
         method:"GET",
         headers:header
     })
-    console.log(respone)
-    if(respone.ok){
-        // 解压gzip数据
-        let blob = await respone.blob()
-        let ds = new DecompressionStream("gzip")
-        const de = blob.stream().pipeThrough(ds);
-        let res = await new Response(de).json()
-        return res
+    console.log(respone) 
+    try {
+        if(respone.ok){
+            // 解压gzip数据
+            // for (const pair of respone.headers.entries()) {
+            //     console.log(`${pair[0]}: ${pair[1]}`);
+            // }
+            let json = await respone.json()
+            console.log(json) 
+            // 解压Gzip
+            // let blob = await respone.blob()
+            // let ds = new DecompressionStream("gzip")
+            // const de = blob.stream().pipeThrough(ds);
+            // let res = await new Response(de).json()
+            return json
+        }
+    } catch (error) {
+        console.log(error)
     }
 }

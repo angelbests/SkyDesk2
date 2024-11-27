@@ -130,11 +130,11 @@ const refresh = function(){
             <template v-slot:prepend>
                 <v-app-bar-nav-icon @click="drawer=!drawer"></v-app-bar-nav-icon>
             </template>
-            <div style="width: 100px;display: flex;align-items: center;">
-                <v-icon>mdi-arrow-down-thin</v-icon>{{ Math.trunc(net.speed_r/1024)<1024?Math.trunc(net.speed_r/1024)+'KB/s':Math.trunc(net.speed_r/1024/1024*10)/10+'MB/s' }}
+            <div style="width: 100px;display: flex;align-items: center;" data-tauri-drag-region>
+                <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{ Math.trunc(net.speed_r/1024)<1024?Math.trunc(net.speed_r/1024)+'KB/s':Math.trunc(net.speed_r/1024/1024*10)/10+'MB/s' }}
             </div>
-            <div style="width: 100px;display: flex;align-items: center;">
-                <v-icon>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
+            <div style="width: 100px;display: flex;align-items: center;" data-tauri-drag-region>
+                <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{ Math.trunc(net.speed_s/1024)<1024?Math.trunc(net.speed_s/1024)+'KB/s':Math.trunc(net.speed_s/1024/1024*10)/10+'MB/s' }}
             </div>
             <v-btn icon >
                 <v-icon>mdi-help-circle-outline</v-icon>

@@ -56,8 +56,8 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         url = "/#/pages/desktop/wallpaper?type=" + item.type + "&path=" + item.path
     }
     let w = await createWindow(label, {
-        x: 999999999,
-        y: 999999999,
+        x: 9999999,
+        y: 9999999,
         width: 1000,
         height: 1000,
         decorations: false,
@@ -76,7 +76,7 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         z:0,
         status:true
     })
-    w?.setSize(new LogicalSize(0, 0));
+    w?.setSize(new LogicalSize(100, 100));
     wallpapers.config.push({
         label: label,
         monitor: monitor,

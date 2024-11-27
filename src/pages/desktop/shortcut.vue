@@ -93,6 +93,7 @@ const opensetting = function () {
         decorations: false,
         parent:app.label,
         maximizable:false,
+        shadow:false,
         resizable:false,
         url: "/#/pages/desktop/shortcutSetting?label=" + app.label
     })
