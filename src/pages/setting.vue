@@ -1,23 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { initWindow } from '../functions/window';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { exit, relaunch } from '@tauri-apps/plugin-process';
-import { Monitor } from '@tauri-apps/api/window';
-import { createtray,traystart } from '../functions/tray';
+import { relaunch } from '@tauri-apps/plugin-process';
 import { listen } from '@tauri-apps/api/event';
 import { systemStore,windowStore,noteStore,wallpaperStore,shortcutStore  } from '../stores/window';
 import { disable, enable } from '@tauri-apps/plugin-autostart';
-import { invoke } from '@tauri-apps/api/core';
-import { register,isRegistered } from "@tauri-apps/plugin-global-shortcut"
+import { maininit } from '../functions/mianinit';
 const systemstore= systemStore()
-const monitors = ref<{  
-    title:string, 
-    value:string,
-    icon:string 
-    monitor?: Monitor
-}[]>([])
-const windowstore = windowStore()
 const drawer = ref(true)
 const settingshow = ref(false)
 const net = ref({
@@ -26,54 +15,17 @@ const net = ref({
 })
 const toggleMaximizeBool = ref(false)
 onMounted(async ()=>{  
-    let res =await isRegistered('Control+1')   
-    if(!res){
-        register('Control+1',async ()=>{
-            await getCurrentWebviewWindow().show();
-            await getCurrentWebviewWindow().setFocus()
-        })
-    }
-    res =await isRegistered('Control+2')
-    if(!res){
-        register('Control+2',async ()=>{
-            await getCurrentWebviewWindow().hide();
-        })
-    }
-    invoke("netspeed")
+    await maininit()
     listen("netspeed",(e)=>{
         let res = JSON.parse(e.payload as string)
         net.value.speed_r = res.speed_r;
         net.value.speed_s = res.speed_s;
     })
-    // 创建托盘
-    await createtray()
-    await traystart()
-    // 初始化窗口
-    await initWindow()
     // 设置窗口拖拽
     document.getElementById("toolbar")?.querySelector(".v-toolbar__content")?.setAttribute("data-tauri-drag-region","true")
     document.getElementById("toolbar")?.querySelector(".v-toolbar-title__placeholder")?.setAttribute("data-tauri-drag-region","true")
     document.getElementById("toolbar")?.addEventListener("selectstart",function(e){
         e.preventDefault()
-    }) 
-        
-    getCurrentWebviewWindow().setShadow(true)
-    // 任务栏关闭窗口
-    getCurrentWebviewWindow().onCloseRequested(()=>{
-        exit()
-    })
-    
-    // getCurrentWebviewWindow().setAlwaysOnTop(true)
-    for(let i = 0;i<windowstore.monitors.length;i++){
-        monitors.value.push({
-            title: "显示器 " + (i+1),
-            value: windowstore.monitors[i].name as string,
-            monitor: windowstore.monitors[i],
-            icon: 'mdi-monitor'
-        })
-    }
-    document.addEventListener("selectstart",(e)=>{
-        e.preventDefault();
     })
 })
 
@@ -155,8 +107,8 @@ const refresh = function(){
         </v-app-bar>
 
         <v-main style="height:calc(100vh);background-color: wheat;overflow-y: auto;width: 100%;">
-            <v-navigation-drawer :style="{boxShadow:drawer?'5px 0px 5px rgba(123,123,123,0.5)':'none'}" width="200" temporary v-model="drawer" :permanent="true" expand-on-hover>
-                <v-list style="height: 100%;" :items="monitors">
+            <v-navigation-drawer :style="{boxShadow:drawer?'5px 0px 5px rgba(123,123,123,0.5)':'none'}" width="150" temporary v-model="drawer" :permanent="true" expand-on-hover>
+                <v-list style="height: 100%;" >
                     <v-list-item prepend-icon="mdi-apps" title="快捷" :href="'/#/pages/setting/shortcut'"></v-list-item>
                     <v-list-item prepend-icon="mdi-wallpaper" title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
                     <v-list-item prepend-icon="mdi-note-outline" title="便签" :href="'/#/pages/setting/note'"></v-list-item>

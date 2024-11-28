@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, toRefs } from "vue";
+import { ref, watch, toRefs } from "vue";
 import { wallpaperStore, weatherStore, windowStore } from "../../stores/window";
 import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
@@ -11,30 +11,11 @@ import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
 import { LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { downloadload } from "../../api/download";
-import wallpaperfall from "../../components/wallpaperfall.vue";
+import wallpaperfall from "../../components/WallpaperFall.vue";
+import GridContainer from "../../components/GridContainer.vue";
 import  { getpoi } from "./../../api/weather"
-
-const wallpaperWidth = ref(0);
-const wallpaperref = ref<HTMLDivElement>();
 const wallpapers = wallpaperStore()
 const waterfallshow = ref(false)
-
-onMounted(() => {
-    updateElementHeight()
-    window.addEventListener('resize', updateElementHeight);
-
-})
-
-const updateElementHeight = function () {
-    if (wallpaperref.value) {
-        wallpaperWidth.value = wallpaperref.value.offsetWidth
-    }
-}
-
-const wallpaperListHeight = computed(() => {
-    return Math.ceil((wallpapers.wallpaperList.length / Math.trunc(wallpaperWidth.value / 420))) * 320 + 'px';
-})
-
 const windowstore = windowStore()
 const textwallpaper = async function (item: any, monitor: Monitor) {
     let index = wallpapers.config.findIndex(item => {
@@ -385,26 +366,22 @@ const delwallpaper = async function(index:number){
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;">
-            <div class="wallpaper" id="wallpaper" ref="wallpaperref">
-                <div class="wallpaper-list" :style="{ height: wallpaperListHeight, minHeight: '100%' }">
-                    <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10"
-                        v-for="(item, index) in wallpapers.wallpaperList">
-                        <v-card-text style="position: relative;">
-                            <v-img :src="convertFileSrc(item.preview)" cover :height="220"></v-img>
-                            <div style="width: 100%;position: absolute;left: 15px;top: 240px;z-index: 50;color: gray;">
-                                {{ item.title }}
-                            </div>
+        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;padding: 10px;box-sizing: border-box;">
+            <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="wallpapers.wallpaperList" :gridheight="240" :gridwidth="320" :padding="10">
+                <template v-slot="{item,index}">
+                    <v-card style="width: 100%;height: 100%;" variant="elevated" elevation="5">
+                        <v-card-text style="width: 100%;height: 80%;padding: 0px;">
+                            <img :src="convertFileSrc(item.preview)" style="width: 100%;height: 100%;object-fit: cover;">
                         </v-card-text>
-                        <v-card-actions>
-                            <v-btn :disabled="true">{{ item.type == 'video' ? '视频' : item.type == 'image' ? '图片' : '网页' }}</v-btn>
-                            <v-btn v-for="(monitor, i) in windowstore.monitors" @click="textwallpaper(item, monitor)">{{
-                                "屏幕"+(i+1) }}</v-btn>
-                            <v-btn @click="delwallpaper(index)">删除</v-btn>
+                        <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
+                                <v-btn size="small" >{{ item.type == 'video' ? '视频' : item.type == 'image' ? '图片' : '网页' }}</v-btn>
+                                <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in windowstore.monitors" @click="textwallpaper(item, monitor)" >{{
+                                    "屏幕"+(i+1) }}</v-btn>
+                                <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)" >删除</v-btn>
                         </v-card-actions>
                     </v-card>
-                </div>
-            </div>
+                </template>
+            </GridContainer>
         </div>
 
     </div>
@@ -436,7 +413,6 @@ const delwallpaper = async function(index:number){
     justify-items: center;
     align-items: center;
     justify-content: center;
-
+    min-height: '100%'
 }
-
 </style>

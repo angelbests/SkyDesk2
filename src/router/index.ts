@@ -19,20 +19,8 @@ const routes:RouteRecordRaw[] = [
                 component:()=>import("./../pages/setting/datenote.vue")
             },
             {
-                path:"monitor",
-                component:()=>import("./../pages/setting/monitor.vue")
-            },
-            {
                 path:'shortcut',
                 component:()=>import("./../pages/setting/shortcut.vue")
-            },
-            {
-                path:'window',
-                component:()=>import("./../pages/setting/window.vue")
-            },
-            {
-                path:"system",
-                component:()=>import("./../pages/setting/system.vue")
             },
             {
                 path:"capture",
@@ -53,10 +41,6 @@ const routes:RouteRecordRaw[] = [
         component:null,
         children:[
             {
-                path:'folder',
-                component:()=>import("./../pages/desktop/folder.vue")
-            },
-            {
                 path:'note',
                 component:()=>import('./../pages/desktop/note.vue')
             },
@@ -69,16 +53,8 @@ const routes:RouteRecordRaw[] = [
                 component:()=>import("./../pages/desktop/shortcutSetting.vue")
             },
             {
-                path:'time',
-                component:()=>import('./../pages/desktop/time.vue')
-            },
-            {
                 path:'wallpaper',
                 component:()=>import('./../pages/desktop/wallpaper.vue')
-            },
-            {
-                path:'weather',
-                component:()=>import('./../pages/desktop/weather.vue')
             },
             {
                 path:'capture',

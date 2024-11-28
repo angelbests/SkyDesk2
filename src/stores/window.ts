@@ -96,13 +96,21 @@ const shortcutStore = defineStore("shortcut", {
         icoPath: string;
         name: string;
       }[],
-      shortcuts: [] as {
-        targetPath: string;
-        iconLocationPeFile: string;
-        iconLocation: string;
-        lnkPath: string;
-        icoPath: string;
-        name: string;
+      shortcuts: [{
+        title:"开始",
+        index:0,
+        shortcut:[]
+      }] as {
+        title:string,
+        index:number,
+        shortcut:{
+          targetPath: string;
+          iconLocationPeFile: string;
+          iconLocation: string;
+          lnkPath: string;
+          icoPath: string;
+          name: string;
+        }[]
       }[],
       wheels: [] as {
         targetPath: string;

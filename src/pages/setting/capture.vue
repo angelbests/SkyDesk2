@@ -8,6 +8,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 const windowstore = windowStore()
 const { monitors } = storeToRefs(windowstore)
 const capturestore = captureStore()
+import GridContainer from "../../components/GridContainer.vue";
 onMounted(()=>{
     window.addEventListener("storage",(e)=>{
         if(e.key == "capture"){
@@ -66,23 +67,23 @@ const delvideo = function(path:string){
                 录屏
             </v-btn>
         </v-card>
-        <div style="width: 100%;height: calc(100% - 60px);display: flex;overflow: hidden;background: white;">
+        <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
+        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;padding: 10px;">
             <div class="video">
-                <div class="video-list">
-                    <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10" v-for="item in capturestore.video">
-                        <v-card-text style="position: relative;">
-                            <video style="width: 100%;height: 220px;" :src="convertFileSrc(item.path)"></video>
-                            <div style="width: 100%;position: absolute;left: 15px;top: 240px;z-index: 50;color: gray;">
-                                {{ item.name }}
-                            </div>
-                        </v-card-text>
-                        <v-card-actions>
-                            <!-- <v-btn @click="openvideo(item.path)">打开</v-btn> -->
-                            <v-btn @click="opendir">文件夹</v-btn>
-                            <v-btn @click="delvideo(item.path)">删除</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </div>
+                <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="capturestore.video" :gridheight="240"
+                    :gridwidth="320" :padding="10">
+                    <template v-slot="{ item }">
+                        <v-card width="320" height="240" variant="elevated" elevation="10" style="width: 100%;height: 100%;">
+                            <v-card-text style="width: 100%;height: 80%;padding: 0px;">
+                                <video style="width: 100%;height: 100%;object-fit: cover;" :src="convertFileSrc(item.path)"></video>
+                            </v-card-text>
+                            <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
+                                <v-btn size="small" border="opacity-50 sm"  @click="opendir">文件夹</v-btn>
+                                <v-btn size="small" border="opacity-50 sm"  @click="delvideo(item.path)">删除</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </template>
+                </GridContainer>
             </div>
         </div>
     </div>
@@ -101,16 +102,5 @@ const delvideo = function(path:string){
     justify-content: center;
     overflow-x: hidden;
     overflow-y: scroll;
-}
-.video-list{
-    width: 100%;
-    height: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 420px);
-    grid-template-rows: repeat(auto-fit, 320px);
-    grid-auto-flow: row;
-    justify-items: center;
-    align-items: center;
-    justify-content: center;
 }
 </style>

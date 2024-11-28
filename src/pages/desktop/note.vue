@@ -19,7 +19,7 @@ const appWindow = getCurrentWebviewWindow()
 const editorData = reactive({
     value:'',
     date:gettime(),
-    color:'213,213,213',
+    color:'235,235,235',
     opacity:100,
     label:appWindow.label,
     always:"normal",

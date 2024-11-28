@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import buttonbox from "./buttonbox.vue"
-import { getwallpaper } from "./../api/api";
-import waterfall from "./waterfall.vue";
+import buttonbox from "./ButtonBox.vue"
+import { getwallpaper } from "../api/api";
+import waterfall from "./WaterFall.vue";
 import { onMounted, ref, watch } from "vue";
 const wallpaperswaterfall = ref<{
   src: string,

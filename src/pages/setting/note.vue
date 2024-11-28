@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { uuid } from '../../functions';
 import { createWindow } from '../../functions/window';
 import { listen } from '@tauri-apps/api/event';
 import { noteStore, windowStore } from '../../stores/window';
 import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-const noteref = ref<HTMLDivElement>()
+import GridContainer from "../../components/GridContainer.vue";
 const notestore = noteStore()
 window.addEventListener('storage', (e) => {
     if (e.key === "note") {
         notestore.$hydrate()
     }
 })
-const noteWidth = ref()
 onMounted(() => {
-    updateElementHeight()
-    window.addEventListener('resize', updateElementHeight);
     listen("note", (e: any) => {
         let index = notestore.note.findIndex(item => {
             return item.label == e.payload.label
@@ -27,16 +24,6 @@ onMounted(() => {
             notestore.note.push(e.payload)
         }
     })
-})
-
-const updateElementHeight = function () {
-    if (noteref.value) {
-        noteWidth.value = noteref.value.offsetWidth
-    }
-}
-
-const noteListHeight = computed(() => {
-    return Math.ceil((notestore.note.length / Math.trunc(noteWidth.value / 420))) * 320 + 10 + 'px';
 })
 
 const createnote = function () {
@@ -93,10 +80,9 @@ const delnote = function (item: { label: string }) {
             }
         })
     })
-
 }
 import { setWindowToMonitor, cancelwallpaper } from '../../functions/monitor';
-const notewallpaper = async function (note:any) {
+const notewallpaper = async function (note: any) {
     // 检查窗口是否存在
     let all = await getAllWebviewWindows();
     let index = all.findIndex(item => {
@@ -118,19 +104,19 @@ const notewallpaper = async function (note:any) {
                     windowstore.windows[index].wallpaper.status = false
                 }
             })
-            notestore.note.filter((item,index)=>{
-                if(item.label == win.label){
+            notestore.note.filter((item, index) => {
+                if (item.label == win.label) {
                     notestore.note[index].wallpaper = false
                 }
             })
-        } else if(!note.wallpaper){
+        } else if (!note.wallpaper) {
             let factor = await getCurrentWebviewWindow().scaleFactor()
             console.log(factor)
             windowstore.windows.filter((item, index) => {
                 if (item.label == win.label) {
                     windowstore.windows[index].wallpaper.x = Math.trunc(windowstore.windows[index].option.x as number * factor)
                     windowstore.windows[index].wallpaper.y = Math.trunc(windowstore.windows[index].option.y as number * factor)
-                    windowstore.windows[index].wallpaper.w = Math.trunc(windowstore.windows[index].option.width  as number * factor)
+                    windowstore.windows[index].wallpaper.w = Math.trunc(windowstore.windows[index].option.width as number * factor)
                     windowstore.windows[index].wallpaper.h = Math.trunc(windowstore.windows[index].option.height as number * factor)
                     windowstore.windows[index].wallpaper.z = 1
                     windowstore.windows[index].wallpaper.status = true
@@ -144,8 +130,8 @@ const notewallpaper = async function (note:any) {
                     )
                 }
             })
-            notestore.note.filter((item,index)=>{
-                if(item.label == win.label){
+            notestore.note.filter((item, index) => {
+                if (item.label == win.label) {
                     notestore.note[index].wallpaper = true
                 }
             })
@@ -166,40 +152,30 @@ const notewallpaper = async function (note:any) {
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;">
-            <div class="note" id="note" ref="noteref">
-                <div class="note-list" :style="{ height: noteListHeight, minHeight: '100%' }">
-                    <v-card prepend-icon="" width="400" height="305" variant="elevated" elevation="10"
-                        v-for="item in notestore.note">
+        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;box-sizing: border-box;padding: 10px;">
+            <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="notestore.note" :gridheight="240"
+                :gridwidth="320" :padding="10">
+                <template v-slot="{ item }">
+                    <v-card style="width: 100%;height: 100%;" variant="elevated" elevation="5">
                         <v-card-text
-                            :style="{ width: '100%', height: '255px', background: 'rgba(' + item.color + ',' + item.opacity / 100 + ')', boxSizing: 'border-box', padding: '10px', overflow: 'hidden', overflowY: 'scroll' }">
+                            :style="{ width: '100%', height: '80%', background: 'rgba(' + item.color + ',' + item.opacity / 100 + ')', boxSizing: 'border-box', padding: '10px', overflow: 'hidden', overflowY: 'scroll' }">
                             <div v-html="item.value">
-
                             </div>
                         </v-card-text>
-                        <v-card-actions>
-                            <v-btn @click="notewallpaper(item)">
-                                <template v-slot:prepend>
-                                    <v-icon>mdi-credit-card-chip-outline</v-icon>
-                                </template>
+                        <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
+                            <v-btn size="small" border="opacity-50 sm" @click="notewallpaper(item)">
                                 {{ item.wallpaper ? "映出" : "映入" }}
                             </v-btn>
-                            <v-btn @click="opennote(item)">
-                                <template v-slot:prepend>
-                                    <v-icon>mdi-note-edit-outline</v-icon>
-                                </template>
+                            <v-btn size="small" border="opacity-50 sm" @click="opennote(item)">
                                 编辑
                             </v-btn>
-                            <v-btn @click="delnote(item)">
-                                <template v-slot:prepend>
-                                    <v-icon>mdi-note-remove-outline</v-icon>
-                                </template>
+                            <v-btn size="small" border="opacity-50 sm" @click="delnote(item)">
                                 删除
                             </v-btn>
                         </v-card-actions>
                     </v-card>
-                </div>
-            </div>
+                </template>
+            </GridContainer>
         </div>
     </div>
 </template>
@@ -217,18 +193,5 @@ const notewallpaper = async function (note:any) {
     justify-content: center;
     overflow-x: hidden;
     overflow-y: scroll;
-}
-
-.note-list {
-    width: 100%;
-    height: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 420px);
-    grid-template-rows: repeat(auto-fit, 320px);
-    grid-auto-flow: row;
-    justify-items: center;
-    align-items: center;
-    justify-content: center;
-
 }
 </style>

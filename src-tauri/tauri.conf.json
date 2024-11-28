@@ -12,10 +12,10 @@
     "windows": [
       {
         "title": "SkyDesk2",
-        "width": 1064,
-        "minWidth": 1064,
-        "height": 776,
-        "minHeight": 776,
+        "width": 880,
+        "minWidth": 880,
+        "height": 650,
+        "minHeight": 650,
         "shadow": false,
         "decorations": false,
         "label": "main",

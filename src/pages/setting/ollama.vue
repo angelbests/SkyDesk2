@@ -206,7 +206,7 @@ const delmsg =async function(){
         <v-progress-linear color="black" :indeterminate="loading"></v-progress-linear>
         <div style="width: 100%;height: calc(100% - 64px);overflow: hidden;">
             <v-tabs-window v-model="model" style="width: 100%;height: 100%;">
-                <v-tabs bg-color="teal-darken-3" slider-color="teal-lighten-3" show-arrows v-model="model">
+                <v-tabs density="compact" bg-color="indigo-darken-2" slider-color="teal-lighten-3" show-arrows v-model="model">
                     <v-tab v-for="item in modellist" :key="item.name" :text="item.name" :value="item"></v-tab>
                 </v-tabs>
                 <div id="chatdiv"
