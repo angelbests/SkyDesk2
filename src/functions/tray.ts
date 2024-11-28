@@ -4,7 +4,6 @@ import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/w
 import { systemStore } from './../stores/window';
 export const createtray = async function(){
     let icodir =await resourceDir();
-    console.log(icodir)
     await TrayIcon.new({ 
         tooltip: 'SkyDesk2',
         icon:icodir + "\\icons\\icon.ico",

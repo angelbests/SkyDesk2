@@ -45,6 +45,14 @@ export const maininit =async function(){
     })
     // 恢复阴影
     getCurrentWebviewWindow().setShadow(true)
+    const factor = await getCurrentWebviewWindow().scaleFactor()
+    getCurrentWebviewWindow().listen("tauri://resize",(e:any)=>{
+        let size = {
+            width:e.payload.width/factor,
+            height:e.payload.height/factor
+        }
+        localStorage.setItem("size",JSON.stringify(size))
+    })
 }
 
 export const allinit =async function(){
@@ -54,7 +62,6 @@ export const allinit =async function(){
     })
     // 禁止快捷按键
     document.onkeydown = function(e){
-        console.log(e)
         if(e.key == "F7"){
             return false
         }

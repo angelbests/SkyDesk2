@@ -38,6 +38,10 @@ const systemStore = defineStore("system", {
         x: 0,
         y: 0,
       },
+      szie:{
+        width:0,
+        height:0
+      }
     };
   },
   persist: {
