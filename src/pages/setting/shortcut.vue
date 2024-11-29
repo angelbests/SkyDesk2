@@ -305,6 +305,7 @@ const addtab = function(){
 
 const deltab = function(){
     shortcuts.value.splice(tab.value,1)
+    tab.value = shortcuts.value.length - 1
     deltabshow.value = false
 }
 </script>
@@ -447,13 +448,13 @@ const deltab = function(){
             </div>
             <!-- 右 -->
             <div :style="{ width: scanbtn ? '100%' : '50%',height:'100%',transition:'all 0.1s linear' }">
-                <v-tabs  id="shortcuttab" bg-color="indigo-darken-2" density="compact" v-model="tab" center-active style="height: 36px;width: 100%;" slider-color="#f78166" show-arrows>
+                <v-tabs  id="shortcuttab" bg-color="indigo-darken-2" density="compact" v-model="tab" center-active style="height: 36px;width: 100%;" hide-slider show-arrows>
                     <v-tab v-for="item in shortcuts" :value="item.index" >
-                        <div style="width: 120px;display: flex;justify-content: center;">
-                            <div style="width: calc(100% - 20px);">
+                        <div style="display: flex;justify-content: center;">
+                            <div style="width: calc(100% - 20px);margin-right: 10px;">
                                 {{ item.title }}
                             </div>
-                            <v-btn @click="deltabshow=true" icon size="mini" style="width: 20px;height: 20px;box-shadow: none;background: transparent;">
+                            <v-btn v-show="setting" @click="deltabshow=true" icon size="mini" style="width: 20px;height: 20px;box-shadow: none;background: transparent;">
                                 <v-icon color="white" size="mini">mdi-close</v-icon>
                             </v-btn>
                         </div>
