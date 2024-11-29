@@ -17,6 +17,8 @@ export const maininit =async function(){
     await mkdir("ollama",{baseDir:BaseDirectory.AppData,"recursive":true})
     await mkdir("skydesk2",{baseDir:BaseDirectory.Picture,"recursive":true})
     await mkdir("skydesk2",{baseDir:BaseDirectory.Video,"recursive":true})
+    await mkdir("ico", { baseDir:BaseDirectory.AppData,recursive: true });
+    await mkdir("ico\\other", { baseDir:BaseDirectory.AppData,recursive: true });
     // 注册快捷按键
     let res =await isRegistered('Control+1')   
     if(!res){

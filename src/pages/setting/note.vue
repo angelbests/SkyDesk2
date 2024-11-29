@@ -102,11 +102,13 @@ const notewallpaper = async function (note: any) {
                         windowstore.windows[index].wallpaper.h,
                     )
                     windowstore.windows[index].wallpaper.status = false
+                    
                 }
             })
             notestore.note.filter((item, index) => {
                 if (item.label == win.label) {
                     notestore.note[index].wallpaper = false
+                    localStorage.setItem(note.label,JSON.stringify(notestore.note[index]))
                 }
             })
         } else if (!note.wallpaper) {
@@ -133,6 +135,7 @@ const notewallpaper = async function (note: any) {
             notestore.note.filter((item, index) => {
                 if (item.label == win.label) {
                     notestore.note[index].wallpaper = true
+                    localStorage.setItem(note.label,JSON.stringify(notestore.note[index]))
                 }
             })
         }
@@ -152,14 +155,16 @@ const notewallpaper = async function (note: any) {
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;box-sizing: border-box;padding: 10px;">
+        <div
+            style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;box-sizing: border-box;padding: 10px;">
             <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="notestore.note" :gridheight="240"
                 :gridwidth="320" :padding="10">
                 <template v-slot="{ item }">
                     <v-card style="width: 100%;height: 100%;" variant="elevated" elevation="5">
                         <v-card-text
-                            :style="{ width: '100%', height: '80%', background: 'rgba(' + item.color + ',' + item.opacity / 100 + ')', boxSizing: 'border-box', padding: '10px', overflow: 'hidden', overflowY: 'scroll' }">
-                            <div v-html="item.value">
+                            :style="{ width: '100%', height: '80%', background: 'rgba(' + item.color + ',' + item.opacity / 100 + ')', 
+                            boxSizing: 'border-box', padding: '10px', overflow: 'hidden', overflowY: 'scroll', }">
+                            <div style="width: 100%;height: auto;" v-html="item.value">
                             </div>
                         </v-card-text>
                         <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
@@ -185,7 +190,9 @@ const notewallpaper = async function (note: any) {
     width: 100%;
     height: 100%;
 }
-
+ol{
+    list-style-position:inside !important;
+}
 .note {
     width: 100%;
     background: white;

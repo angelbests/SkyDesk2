@@ -130,7 +130,7 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": ["**"]
+        "scope": ["$APPDATA/**","$RESOURCE/**","$VIDEO/**","$PICTURE/**"]
       }
     },
     "withGlobalTauri": true

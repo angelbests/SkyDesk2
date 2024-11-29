@@ -37,6 +37,7 @@ onMounted(()=>{
             editorData.color = data.color
             editorData.opacity = data.opacity
             editorData.always = data.always
+            editorData.wallpaper = data.wallpaper
             setconfig()
         }else{
             localStorage.setItem(appWindow.label,JSON.stringify(editorData))
@@ -75,6 +76,9 @@ const setconfig =async function(){
     }else if(editorData.always == "normal"){
         await getCurrentWebviewWindow().setAlwaysOnBottom(false)
         await getCurrentWebviewWindow().setAlwaysOnTop(false)
+    }
+    if(editorData.wallpaper){
+        show.value = false
     }
 }
 

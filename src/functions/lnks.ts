@@ -51,7 +51,7 @@ export const getlnks =async function(){
             
         })
     }
-    console.log(`lnks：${lnks}`)
+    console.log('完成快捷方式信息提取！')
     return lnks;
 }
 
@@ -59,11 +59,7 @@ export const getlnks =async function(){
 const getLnkFile =async function(){
     let lnkFiles = [];
     let files = [];
-    const lnkPath = [
-        "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-        await homeDir() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs"
-    ]
-
+    // 桌面桌面文件夹不递归。
     let desktop = await readDir(await homeDir() + "\\desktop");
     for(let i=0;i<desktop.length;i++){
         if(desktop[i].isFile){
@@ -71,9 +67,15 @@ const getLnkFile =async function(){
         }
     }
 
+    // 递归默认程序快捷方式文件夹
+    const lnkPath = [
+        "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+        await homeDir() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs"
+    ]
     for(let i=0;i<lnkPath.length;i++){
         files.push(...await scanFiles(lnkPath[i]))
     }
+    // 查找lnk和url文件，去除多余文件
     for(let i=0;i<files.length;i++){
         try {
             let ext =await extname(files[i])
@@ -84,19 +86,19 @@ const getLnkFile =async function(){
            console.log(error)
         }
     }
-
+    // 去掉有关卸载的程序lnk
     lnkFiles = lnkFiles.filter(item=>{
         if(item.indexOf("卸载")<0){
             return true
         }
     })
-
+    // 去掉有关uninstalll的lnk
     lnkFiles = lnkFiles.filter(item=>{
         if((item.toLowerCase()).indexOf("uninstall")<0){
             return true
         }
     })
-    console.log(lnkFiles)
+    console.log("完成快捷方式文件的扫描！")
     return lnkFiles;
 }
 

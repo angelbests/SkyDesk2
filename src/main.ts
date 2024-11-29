@@ -15,11 +15,14 @@ import { VDateInput } from 'vuetify/labs/VDateInput'
 import { zhHans } from 'vuetify/locale'
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { LogicalSize } from "@tauri-apps/api/dpi";
-let datastr = localStorage.getItem("size")
-if(datastr){
-  let data = JSON.parse(datastr)
-  getCurrentWebviewWindow().setSize(new LogicalSize(data.width,data.height))
+if(getCurrentWebviewWindow().label == 'main'){
+  let datastr = localStorage.getItem("size")
+  if(datastr){
+    let data = JSON.parse(datastr)
+    getCurrentWebviewWindow().setSize(new LogicalSize(data.width,data.height))
+  }
 }
+
 const vuetify = createVuetify({
     components:{
       VNumberInput,
