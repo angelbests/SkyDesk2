@@ -7,16 +7,15 @@ import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewW
 import { LogicalSize } from '@tauri-apps/api/dpi';
 import { listen } from '@tauri-apps/api/event';
 import { Command } from '@tauri-apps/plugin-shell';
-const app = getCurrentWebviewWindow()
 const show = ref(false)
-const shortcutWindows = ref(JSON.parse(localStorage.getItem(app.label) || "{}"));
+const shortcutWindows = ref(JSON.parse(localStorage.getItem(getCurrentWebviewWindow().label) || "{}"));
 onMounted(async () => {
-    app.hide()
-    app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
-    app.show();
+    await getCurrentWebviewWindow().hide()
+    await getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
+    await getCurrentWebviewWindow().show();
     show.value = true
 
-    await listen(app.label + "-setting", (e: {
+    await listen(getCurrentWebviewWindow().label + "-setting", (e: {
         payload: { key: string, value: string }
     }) => {
         let { key, value } = e.payload
@@ -31,25 +30,25 @@ onMounted(async () => {
         } else if (key == 'h' || key == 'w') {
             shortcutWindows.value.setting[key] = value
             shortcutWindows.value.setting.font = false
-            app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
+            getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
             shortcutWindows.value.setting.h = shortcutWindows.value.setting.h
         } else if (key == 'font') {
             shortcutWindows.value.setting[key] = value
             if (shortcutWindows.value.setting.font) {
-                app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r))
+                getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r))
                 shortcutWindows.value.setting.h = shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r
             } else {
-                app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r))
+                getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r))
                 shortcutWindows.value.setting.h = shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r
             }
         } else if (key == 'alwaysOnTop') {
             if (value) {
-                app.setAlwaysOnBottom(false)
-                app.setAlwaysOnTop(true)
+                getCurrentWebviewWindow().setAlwaysOnBottom(false)
+                getCurrentWebviewWindow().setAlwaysOnTop(true)
             } else {
 
-                app.setAlwaysOnTop(false),
-                    app.setAlwaysOnBottom(true)
+                getCurrentWebviewWindow().setAlwaysOnTop(false),
+                getCurrentWebviewWindow().setAlwaysOnBottom(true)
             }
             shortcutWindows.value.setting[key] = value
         }
@@ -57,7 +56,7 @@ onMounted(async () => {
 
     await listen("dellnk",(e:{payload:{label:string,lnk:string}})=>{
         console.log(e.payload)
-        if(e.payload.label == app.label){
+        if(e.payload.label == getCurrentWebviewWindow().label){
             let lnk = JSON.parse(e.payload.lnk)
             let i = shortcutWindows.value.shortcuts.findIndex((item: { targetPath: any; })=>{
                 return item.targetPath == lnk.targetPath
@@ -69,7 +68,7 @@ onMounted(async () => {
 })
 
 watch(shortcutWindows,()=>{
-    localStorage.setItem(app.label, JSON.stringify(shortcutWindows.value))
+    localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(shortcutWindows.value))
 },{
     deep:true
 })
@@ -92,24 +91,24 @@ const drop = function (e: DragEvent) {
 }
 
 // 关闭窗口
-const close = function () {
+const close =async function () {
     localStorage.removeItem(getCurrentWebviewWindow().label)
     getCurrentWebviewWindow().close()
 }
 
 // 打开设置
 const opensetting = function () {
-    new WebviewWindow(app.label + '-setting', {
+    new WebviewWindow(getCurrentWebviewWindow().label + '-setting', {
         width: 400,
         height: 380,
         center: true,
         transparent: true,
         decorations: false,
-        parent: app.label,
+        parent: getCurrentWebviewWindow().label,
         maximizable: false,
         shadow: false,
         resizable: false,
-        url: "/#/pages/desktop/shortcutSetting?label=" + app.label
+        url: "/#/pages/desktop/shortcutSetting?label=" + getCurrentWebviewWindow().label
     })
 }
 
