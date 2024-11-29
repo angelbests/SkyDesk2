@@ -4,9 +4,10 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { VueDraggable } from 'vue-draggable-plus'
 import RightBar from '../../components/RightBar.vue';
 import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { LogicalSize } from '@tauri-apps/api/dpi';
+import { LogicalPosition, LogicalSize } from '@tauri-apps/api/dpi';
 import { listen } from '@tauri-apps/api/event';
 import { Command } from '@tauri-apps/plugin-shell';
+import { windowStore } from '../../stores/window';
 const show = ref(false)
 const shortcutWindows = ref(JSON.parse(localStorage.getItem(getCurrentWebviewWindow().label) || "{}"));
 onMounted(async () => {
@@ -93,6 +94,11 @@ const drop = function (e: DragEvent) {
 // 关闭窗口
 const close =async function () {
     localStorage.removeItem(getCurrentWebviewWindow().label)
+    const windowstore = windowStore()
+    let i = windowstore.windows.findIndex(item=>{
+        return item.label == getCurrentWebviewWindow().label
+    })
+    getCurrentWebviewWindow().setPosition(new LogicalPosition(windowstore.windows[i].option.x as number,windowstore.windows[i].option.y as number))
     getCurrentWebviewWindow().close()
 }
 
