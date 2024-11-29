@@ -10,6 +10,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { Command } from '@tauri-apps/plugin-shell';
 import { resourceDir } from '@tauri-apps/api/path';
 import GridContainer from '../../components/GridContainer.vue';
+import { emit } from '@tauri-apps/api/event';
 const systemprogram = ref<any[]>([])
 const tab = ref()
 const tabshow = ref(false)
@@ -308,6 +309,18 @@ const deltab = function(){
     tab.value = shortcuts.value.length - 1
     deltabshow.value = false
 }
+
+// 删除对应的桌面合集图标
+const dragover = function (e: DragEvent) {
+    e.preventDefault()
+}
+
+const drop = function (e: DragEvent) {
+    if (e.dataTransfer?.getData("dellnk")) {
+        let lnk = JSON.parse(e.dataTransfer.getData("dellnk"))
+        emit("dellnk",lnk)
+    }
+}
 </script>
 
 <template>
@@ -422,7 +435,7 @@ const deltab = function(){
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="scanbar"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 180px);display: flex;overflow: hidden;background: white;">
+        <div @dragover="dragover($event)" @drop="drop($event)" style="width: 100%;height: calc(100% - 180px);display: flex;overflow: hidden;background: white;">
             <!-- 左 -->
             <div :style="{ width: scanbtn ? '100%' : '50%', background: 'wheat',}" v-show="!scanbtn">
                 <GridContainer v-model="shortcutsTemp" :animation="150" :group="{

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { VueDraggable } from 'vue-draggable-plus'
 import RightBar from '../../components/RightBar.vue';
@@ -16,47 +16,62 @@ onMounted(async () => {
     app.show();
     show.value = true
 
-    await listen(app.label+"-setting",(e:{
-        payload:{key:string,value:string}
-    })=>{
-        let {key,value} = e.payload
-        if(key == "background"){
+    await listen(app.label + "-setting", (e: {
+        payload: { key: string, value: string }
+    }) => {
+        let { key, value } = e.payload
+        if (key == "background") {
             shortcutWindows.value.setting[key] = value
-        }else if(key == 'blur'){
+        } else if (key == 'blur') {
             shortcutWindows.value.setting[key] = value
-        }else if(key == 'r'){
+        } else if (key == 'r') {
             shortcutWindows.value.setting[key] = value
-        }else if(key == 'c'){
+        } else if (key == 'c') {
             shortcutWindows.value.setting[key] = value
-        }else if(key == 'h' || key == 'w'){
+        } else if (key == 'h' || key == 'w') {
             shortcutWindows.value.setting[key] = value
             shortcutWindows.value.setting.font = false
-            app.setSize(new LogicalSize(shortcutWindows.value.setting.w,shortcutWindows.value.setting.h))
+            app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
             shortcutWindows.value.setting.h = shortcutWindows.value.setting.h
-        }else if(key == 'font'){
+        } else if (key == 'font') {
             shortcutWindows.value.setting[key] = value
-            if(shortcutWindows.value.setting.font){
-                app.setSize(new LogicalSize(shortcutWindows.value.setting.w,shortcutWindows.value.setting.h + 30*shortcutWindows.value.setting.r))
-                shortcutWindows.value.setting.h = shortcutWindows.value.setting.h + 30*shortcutWindows.value.setting.r
-            }else{
-                app.setSize(new LogicalSize(shortcutWindows.value.setting.w,shortcutWindows.value.setting.h - 30*shortcutWindows.value.setting.r))
-                shortcutWindows.value.setting.h = shortcutWindows.value.setting.h - 30*shortcutWindows.value.setting.r
+            if (shortcutWindows.value.setting.font) {
+                app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r))
+                shortcutWindows.value.setting.h = shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r
+            } else {
+                app.setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r))
+                shortcutWindows.value.setting.h = shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r
             }
-        }else if(key == 'alwaysOnTop'){
-            if(value){
+        } else if (key == 'alwaysOnTop') {
+            if (value) {
                 app.setAlwaysOnBottom(false)
                 app.setAlwaysOnTop(true)
-            }else{
+            } else {
 
                 app.setAlwaysOnTop(false),
-                app.setAlwaysOnBottom(true)
+                    app.setAlwaysOnBottom(true)
             }
             shortcutWindows.value.setting[key] = value
         }
-        localStorage.setItem(app.label,JSON.stringify(shortcutWindows.value))
-        console.log(key,value)
     })
 
+    await listen("dellnk",(e:{payload:{label:string,lnk:string}})=>{
+        console.log(e.payload)
+        if(e.payload.label == app.label){
+            let lnk = JSON.parse(e.payload.lnk)
+            let i = shortcutWindows.value.shortcuts.findIndex((item: { targetPath: any; })=>{
+                return item.targetPath == lnk.targetPath
+            })
+            shortcutWindows.value.shortcuts.splice(i,1)
+        }
+    })
+
+})
+
+watch(shortcutWindows,()=>{
+    localStorage.setItem(app.label, JSON.stringify(shortcutWindows.value))
+},{
+    deep:true
 })
 
 const dragover = function (e: DragEvent) {
@@ -65,7 +80,7 @@ const dragover = function (e: DragEvent) {
 
 // 拖拽添加shortcut
 const drop = function (e: DragEvent) {
-    if (e.dataTransfer?.getData("lnk")) {
+    if (e.dataTransfer?.getData("lnk")){
         let lnk = JSON.parse(e.dataTransfer?.getData("lnk"))
         let arr = shortcutWindows.value.shortcuts.filter((item: { name: any; }) => {
             return item.name == lnk.name
@@ -74,7 +89,6 @@ const drop = function (e: DragEvent) {
             shortcutWindows.value.shortcuts.push(lnk)
         }
     }
-    localStorage.setItem(app.label,JSON.stringify(shortcutWindows.value))
 }
 
 // 关闭窗口
@@ -91,22 +105,21 @@ const opensetting = function () {
         center: true,
         transparent: true,
         decorations: false,
-        parent:app.label,
-        maximizable:false,
-        shadow:false,
-        resizable:false,
+        parent: app.label,
+        maximizable: false,
+        shadow: false,
+        resizable: false,
         url: "/#/pages/desktop/shortcutSetting?label=" + app.label
     })
 }
 
-const deleteicon = function(){
-    shortcutWindows.value.shortcuts = []
-    localStorage.setItem(app.label,JSON.stringify(shortcutWindows.value))
+const deleteicon = function () {
+    shortcutWindows.value.shortcuts.splice(0)
 }
 
-const openshorcut =async function(item: {
-    targetPath: any; lnkPath: string; 
-}){
+const openshorcut = async function (item: {
+    targetPath: any; lnkPath: string;
+}) {
     if (item.lnkPath) {
         console.log(item)
         let res = await Command.create("powershell", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
@@ -116,19 +129,28 @@ const openshorcut =async function(item: {
     }
 }
 
-const mouseenter = function(i:number){
-    let el =  document.getElementById('img'+i);
-    if(el){
+const mouseenter = function (i: number) {
+    let el = document.getElementById('img' + i);
+    if (el) {
         el.style.width = el.clientWidth + 5 + 'px'
         el.style.height = el.clientHeight + 5 + 'px'
     }
 }
 
-const mouseleave = function(i:number){
-    let el =  document.getElementById('img'+i);
-    if(el){
+const mouseleave = function (i: number) {
+    let el = document.getElementById('img' + i);
+    if (el) {
         el.style.width = shortcutWindows.value.setting.w / shortcutWindows.value.setting.c - 20 + 'px'
         el.style.height = shortcutWindows.value.setting.w / shortcutWindows.value.setting.c - 20 + 'px'
+    }
+}
+
+const setdata = function (d: DataTransfer, h: HTMLElement) {
+    if (h.dataset.lnk) {
+        d.setData("dellnk", JSON.stringify({
+            label:getCurrentWebviewWindow().label,
+            lnk:h.dataset.lnk
+        }))
     }
 }
 </script>
@@ -140,28 +162,27 @@ const mouseleave = function(i:number){
         </div>
         <div class="window" :style="{ backdropFilter: `blur(${shortcutWindows.setting.blur}px)` }"
             @dragover="dragover($event)" @drop="drop($event)">
-            <VueDraggable
-                :style="{ width: shortcutWindows.setting.w + 'px', height: shortcutWindows.setting.h + 'px', 
-                gridTemplateColumns: `repeat(auto-fill, ${shortcutWindows.setting.w / shortcutWindows.setting.c}px)`, 
-                gridTemplateRows: `repeat(auto-fill, ${shortcutWindows.setting.h / shortcutWindows.setting.r}px)` }"
-                class="lnklist" v-model="shortcutWindows.shortcuts" :animation="150"
-                group="shortcut">
-                <div v-for="(item,i) in shortcutWindows.shortcuts" :key="item.lnkPath">
-                    <div class="imgdiv"
-                        @click="openshorcut(item)"
+            <VueDraggable :style="{
+                width: shortcutWindows.setting.w + 'px', height: shortcutWindows.setting.h + 'px',
+                gridTemplateColumns: `repeat(auto-fill, ${shortcutWindows.setting.w / shortcutWindows.setting.c}px)`,
+                gridTemplateRows: `repeat(auto-fill, ${shortcutWindows.setting.h / shortcutWindows.setting.r}px)`
+            }"
+                class="lnklist" v-model="shortcutWindows.shortcuts" :animation="150" :group="{
+                    name: 'shortcut'
+                }"
+                :setData="setdata"
+                >
+                <div v-for="(item, i) in shortcutWindows.shortcuts" :key="item.lnkPath" :data-lnk="JSON.stringify(item)">
+                    <div class="imgdiv" @click="openshorcut(item)"
                         :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 30 : 0)) + 'px' }">
-                        <img class="img"
-                            @mouseenter="mouseenter(i)"
-                            @mouseleave="mouseleave(i)"
-                            :id="'img'+i"
+                        <img class="img" @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i"
                             :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 20) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 50 : 20)) + 'px' }"
                             :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                     </div>
-                    <div v-show="shortcutWindows.setting.font"
-                        :style="{
-                            fontSize: '10px', height: '30px', textWrap: 'balance', textAlign: 'center', width: (shortcutWindows.setting.w / shortcutWindows.setting.c) + 'px',
-                            textOverflow: 'clip', overflow: 'hidden'
-                        }">
+                    <div v-show="shortcutWindows.setting.font" :style="{
+                        fontSize: '10px', height: '30px', textWrap: 'balance', textAlign: 'center', width: (shortcutWindows.setting.w / shortcutWindows.setting.c) + 'px',
+                        textOverflow: 'clip', overflow: 'hidden'
+                    }">
                         {{ item.name }}
                     </div>
                 </div>
@@ -184,7 +205,7 @@ const mouseleave = function(i:number){
     </div>
 </template>
 
-<style scoped >
+<style scoped>
 .wallpaper {
     width: 100vw;
     height: 100vh;
@@ -214,7 +235,7 @@ const mouseleave = function(i:number){
     display: flex;
     justify-content: center;
     align-items: center;
-    filter: drop-shadow(0px 0px 5px rgba(123,123,123,0.7));
+    filter: drop-shadow(0px 0px 5px rgba(123, 123, 123, 0.7));
 }
 
 .img {
