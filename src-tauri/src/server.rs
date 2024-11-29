@@ -1,7 +1,4 @@
-use std::{
-    fs::File,
-    path::Path,
-};
+use std::{fs::File, path::Path};
 use tiny_http::{Response, Server};
 
 #[tauri::command]

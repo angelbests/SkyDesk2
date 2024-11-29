@@ -17,6 +17,7 @@ import {
 } from "@tauri-apps/plugin-fs";
 import { uuid } from ".";
 import { invoke } from "@tauri-apps/api/core";
+import { info,error } from "@tauri-apps/plugin-log";
 
 export const setIcon = async function () {
   let defaultico = (await resourceDir()) + "/resources/program.png";
@@ -25,10 +26,10 @@ export const setIcon = async function () {
   let pattern = /%[^%]+%/;
   let lnks = await getlnks();
   // 替换环境变量
-  console.log("替换环境变量");
+  info("替换环境变量");
   for (let i = 0; i < lnks.length; i++) {
     if (pattern.test(lnks[i].iconLocationPeFile)) {
-      console.log("iconLocationPeFile有环境变量");
+      info("iconLocationPeFile有环境变量");
       let pexec = pattern.exec(lnks[i].iconLocationPeFile);
       if (pexec) {
         let systemPara = pexec[0];
@@ -41,7 +42,7 @@ export const setIcon = async function () {
       }
     }
     if (pattern.test(lnks[i].targetPath)) {
-      console.log("targetPath有环境变量");
+      info("targetPath有环境变量");
       let pexec = pattern.exec(lnks[i].targetPath);
       if (pexec) {
         let systemPara = pexec[0];
@@ -65,9 +66,9 @@ export const setIcon = async function () {
     let ext = await extname(name);
     ext = ext.toLocaleLowerCase();
     // 分别处理 lnk 和 url文件
+    info(lnks[i].name)
     if (ext == "lnk") {
-      console.log(lnks[i].name);
-      console.log("无图标文件");
+      info("无图标文件");
       if (lnks[i].iconLocationPeFile == "") {
         if (lnks[i].targetPath == "") {
           lnks[i].icoPath = defaultico;
@@ -75,7 +76,7 @@ export const setIcon = async function () {
           lnks[i].icoPath = await targetPathgetico(lnks[i].targetPath);
         }
       } else {
-        console.log("有图标文件");
+        info("有图标文件");
         lnks[i].icoPath = await iconLocationPeFilegetico(
           lnks[i].iconLocationPeFile,
           lnks[i].iconLocation
@@ -90,7 +91,7 @@ export const setIcon = async function () {
         await writeFile(icoPath, res);
         lnks[i].icoPath = icoPath;
       } else {
-        console.log(`url格式`);
+        info(`url格式`);
         let path = (await resourceDir()) + "/resources/url.png";
         lnks[i].icoPath = path;
       }
@@ -112,7 +113,7 @@ export const setIcon = async function () {
         if (res == 1) {
           lnks[i].icoPath = await resolve(icoPath.replace(".ico", ".png"));
         } else {
-          console.log(`${lnks[i].name} ：ico转png失败`);
+          error(`${lnks[i].name} ：ico转png失败`);
         }
       } else {
         let res = await invoke("ico_to_png", {
@@ -122,7 +123,7 @@ export const setIcon = async function () {
         if (res == 1) {
           lnks[i].icoPath = await resolve((lnks[i].icoPath as string).replace(".ico", ".png"))
         } else {
-          console.log(`${lnks[i].name} ：ico转png失败`);
+          error(`${lnks[i].name} ：ico转png失败`);
         }
       }
     }
@@ -140,20 +141,21 @@ const iconLocationPeFilegetico = async function (
   try {
     ext = await extname(await basename(pe));
     ext = ext.toLocaleLowerCase();
-  } catch (error) {
+  } catch (e) {
+    error("格式解析报错："+e);
     if (pe.indexOf("C:\\Windows\\Installer\\") >= 0) {
       if (await exists(pe)) {
         let icoPath = (await resolve(path, "other")) + "\\" + uuid() + ".ico";
         let res = await readFile(pe);
         await writeFile(icoPath, res);
-        console.log("安装路径图标文件夹：C:\\Windows\\Installer\\");
+        info("安装路径图标文件夹：C:\\Windows\\Installer\\");
         return icoPath;
       } else {
-        console.log("图标指向的路径不存在！");
+        info("图标指向的路径不存在！");
         return defaultico;
       }
     } else {
-      console.log("有图标路径，无格式文件");
+      info("有图标路径，无格式文件");
       return defaultico;
     }
   }
@@ -162,10 +164,10 @@ const iconLocationPeFilegetico = async function (
       let icoPath = (await resolve(path, "other")) + "\\" + uuid() + ".ico";
       let res = await readFile(pe);
       await writeFile(icoPath, res);
-      console.log("ico/png图标复制成功！");
+      info("ico/png图标复制成功！");
       return icoPath;
     } else {
-      console.log("ico/png图标指向的路径不存在！");
+      info("ico/png图标指向的路径不存在！");
       return defaultico;
     }
   } else if (ext == "exe" || ext == "dll" || ext == "ocx" || ext == "cpl") {
@@ -178,27 +180,27 @@ const iconLocationPeFilegetico = async function (
         });
         res = icoSort(res);
         if (Number(iconLocation) < res.length) {
-          console.log("解析图标成功");
+          info("解析图标成功");
           return icodir + res[Number(iconLocation)].name;
         } else {
-          console.log("解析的图标不存在");
+          info("解析的图标不存在");
           return defaultico;
         }
       } else if (Number(iconLocation) < 0) {
         let name = await basename(pe);
         try {
           name = name.replace("." + (await extname(name)), "");
-        } catch (error) {
-          console.log("格式解析报错");
+        } catch (e) {
+          error("格式解析报错："+e);
           return defaultico;
         }
         let path =
           icodir + name + "_" + Math.abs(Number(iconLocation)) + ".ico";
         if (await exists(path)) {
-          console.log("解析图标成功");
+          info("解析图标成功");
           return path;
         } else {
-          console.log("解析的图标不存在");
+          info("解析的图标不存在");
           return defaultico;
         }
       } else {
@@ -207,13 +209,13 @@ const iconLocationPeFilegetico = async function (
     } else {
       try {
         return await targetPathgetico(pe);
-      } catch (error) {
-        console.log("PE文件解析失败");
+      } catch (e) {
+        error("PE文件解析失败："+e);
         return defaultico;
       }
     }
   } else {
-    console.log("其它格式");
+    info("其它格式");
     return defaultico;
   }
 };
@@ -228,8 +230,8 @@ const targetPathgetico = async function (pe: string) {
     try {
       ext = await extname(pe);
       ext = ext.toLocaleLowerCase();
-    } catch (error) {
-      console.log("文件夹", error);
+    } catch (e:any) {
+      error("格式解析失败，为文件夹：" + e);
       return (await resourceDir()) + "/resources/dir.png";
     }
   } else {
@@ -243,21 +245,21 @@ const targetPathgetico = async function (pe: string) {
         return item.name.indexOf("ico") > 0;
       });
       res = icoSort(res);
-      console.log("PE图标提取成功");
+      info("PE图标提取成功");
       return icodir + res[0].name;
     } else {
-      console.log("PE提取失败");
+      info("PE提取失败");
       return defaultico;
       // 未找到图标文件 或 执行失败 返回false
     }
   } else if (ext == "chm") {
-    console.log(`chm格式`);
+    info(`chm格式`);
     return (await resourceDir()) + "/resources/chm.png";
   } else if (ext == "url") {
-    console.log(`url格式`);
+    info(`url格式`);
     return (await resourceDir()) + "/resources/url.png";
   } else if (ext == "html" || ext == "htm") {
-    console.log(`html格式`);
+    info(`html格式`);
     return (await resourceDir()) + "/resources/html.png";
   } else if (
     ext == "mp4" ||
@@ -267,7 +269,7 @@ const targetPathgetico = async function (pe: string) {
     ext == "wmv" ||
     ext == "webm"
   ) {
-    console.log(`视频格式`);
+    info(`视频格式`);
     return (await resourceDir()) + "/resources/video.png";
   } else if (
     ext == "png" ||
@@ -279,13 +281,13 @@ const targetPathgetico = async function (pe: string) {
     ext == "psd" ||
     ext == "bmp"
   ) {
-    console.log(`图片格式`);
+    info(`图片格式`);
     return (await resourceDir()) + "/resources/image.png";
   } else if (ext == "txt") {
-    console.log(`文本格式`);
+    info(`文本格式`);
     return (await resourceDir()) + "/resources/txt.png";
   } else {
-    console.log(`其它文件格式`);
+    info(`其它文件格式`);
     return (await resourceDir()) + "/resources/file.png";
   }
 };
@@ -318,7 +320,7 @@ const getSystemPath = async function (systemPara: string) {
     `${systemPara}`,
   ]).execute();
   if (res.code == 0) {
-    console.log(res.stdout);
+    info(res.stdout);
     return res.stdout.split("\r\n")[0];
   } else {
     return "";

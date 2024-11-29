@@ -1,3 +1,10 @@
+use lazy_static::lazy_static;
+use std::{
+    io::{self, Write},
+    sync::{Arc, Mutex},
+    time::Instant,
+};
+use tauri::{AppHandle, Listener, Manager};
 use windows_capture::{
     capture::GraphicsCaptureApiHandler,
     encoder::{AudioSettingsBuilder, ContainerSettingsBuilder, VideoEncoder, VideoSettingsBuilder},
@@ -6,13 +13,6 @@ use windows_capture::{
     monitor::Monitor,
     settings::{ColorFormat, CursorCaptureSettings, DrawBorderSettings, Settings},
 };
-use std::{
-    time::Instant,
-    io::{self, Write},
-    sync::{Arc, Mutex}
-};
-use lazy_static::lazy_static;
-use tauri::{AppHandle,Listener,Manager};
 struct Flagset {
     x: u32,
     y: u32,
@@ -29,7 +29,6 @@ struct Capture {
 lazy_static! {
     static ref CAPTURE_STATUS: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("")));
 }
-
 
 impl GraphicsCaptureApiHandler for Capture {
     type Flags = Flagset;
@@ -104,7 +103,7 @@ fn convert_rgba_to_bgra_and_flip(rgba_data: &[u8], width: usize, height: usize) 
 
 #[tauri::command]
 pub fn start_capture(
-    app:AppHandle,
+    app: AppHandle,
     x: u32,
     y: u32,
     width: u32,
@@ -171,5 +170,4 @@ pub fn get_window_capture(app: AppHandle, label: String) {
             image.save(format!("target/window.png",)).unwrap();
         }
     }
-    
 }

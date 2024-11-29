@@ -7,25 +7,26 @@ use windows::{
         Foundation::{BOOL, HWND, LPARAM, POINT, WPARAM},
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
-            self, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_LAYERED 
+            self, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP, SMTO_NORMAL, SWP_HIDEWINDOW,
+            SWP_SHOWWINDOW, WS_EX_LAYERED,
         },
     },
 };
 #[tauri::command]
-pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32,z:i32) {
+pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32, z: i32) {
     tauri::async_runtime::spawn(async move {
         let webview = app.get_webview_window(&label).unwrap();
         let hwnd = webview.hwnd().unwrap();
-        attach(hwnd, x, y, w, h,z);
+        attach(hwnd, x, y, w, h, z);
     });
 }
 
 #[tauri::command]
-pub fn cancelwallpaper(app: AppHandle, label: String,x: i32, y: i32, w: i32, h: i32) {
+pub fn cancelwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32) {
     tauri::async_runtime::spawn(async move {
         let webview = app.get_webview_window(&label).unwrap();
         let hwnd = webview.hwnd().unwrap();
-        detach(hwnd,x, y, w, h);
+        detach(hwnd, x, y, w, h);
     });
 }
 
@@ -64,7 +65,7 @@ extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     }
 }
 
-fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32,z:i32) {
+fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
     unsafe {
         let progman = WindowsAndMessaging::FindWindowA(s!("Progman"), None).unwrap();
 
@@ -109,8 +110,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32,z:i32) {
         WindowsAndMessaging::SetWindowLongPtrA(
             hwnd,
             GWL_EXSTYLE,
-            WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
-                | WS_EX_LAYERED.0 as isize
+            WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED.0 as isize,
         );
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
         thread::sleep(Duration::from_millis(300));
@@ -124,7 +124,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32,z:i32) {
                 h,
                 SWP_SHOWWINDOW,
             );
-        }else{
+        } else {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,
                 HWND_BOTTOM,
@@ -134,28 +134,18 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32,z:i32) {
                 h,
                 SWP_SHOWWINDOW,
             );
-        }
-;
+        };
     };
 }
 
-fn detach(hwnd: HWND,x:i32,y:i32,w:i32,h:i32) {
+fn detach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
     unsafe {
         let _ = WindowsAndMessaging::SetParent(hwnd, None);
         WindowsAndMessaging::SetWindowLongPtrA(
             hwnd,
             GWL_EXSTYLE,
-            WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
-                & WS_EX_LAYERED.0 as isize,
+            WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED.0 as isize,
         );
-        let _ = WindowsAndMessaging::SetWindowPos(
-            hwnd,
-            HWND_NOTOPMOST,
-            x,
-            y,
-            w,
-            h,
-            SWP_SHOWWINDOW,
-        );
+        let _ = WindowsAndMessaging::SetWindowPos(hwnd, HWND_NOTOPMOST, x, y, w, h, SWP_SHOWWINDOW);
     };
 }

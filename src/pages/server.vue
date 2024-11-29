@@ -4,7 +4,7 @@ import { onMounted } from 'vue';
 onMounted(async ()=>{
     await openserver()
 })
-</script >
+</script>
 
 <template>
     <div style="width: 100%;height: 100%;background: white;">

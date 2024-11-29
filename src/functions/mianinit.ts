@@ -5,6 +5,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { createtray,traystart } from '../functions/tray';
 import { initWindow } from '../functions/window';
 import { exit } from '@tauri-apps/plugin-process';
+import { info } from '@tauri-apps/plugin-log';
 export const maininit =async function(){
     // 检查并创建文件夹
     await mkdir("lnk",{"baseDir":BaseDirectory.AppData,"recursive":true})
@@ -19,6 +20,7 @@ export const maininit =async function(){
     await mkdir("skydesk2",{baseDir:BaseDirectory.Video,"recursive":true})
     await mkdir("ico", { baseDir:BaseDirectory.AppData,recursive: true });
     await mkdir("ico\\other", { baseDir:BaseDirectory.AppData,recursive: true });
+    info("文件夹初始化完成")
     // 注册快捷按键
     let res =await isRegistered('Control+1')   
     if(!res){
@@ -33,14 +35,17 @@ export const maininit =async function(){
             await getCurrentWebviewWindow().hide();
         })
     }
+    info("快捷键注册完成")
     // 开启网速事件
     await invoke("netspeed")
+    info("网速事务完成")
     // 创建托盘
     await createtray()
     // 检查托盘启动
     await traystart()
     // 初始化窗口
     await initWindow()
+    info("初始化窗口完成")
     // 任务栏关闭窗口
     getCurrentWebviewWindow().onCloseRequested(()=>{
         exit()

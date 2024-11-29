@@ -2,6 +2,7 @@ import { resourceDir } from '@tauri-apps/api/path';
 import { TrayIcon, TrayIconEvent } from '@tauri-apps/api/tray';
 import { getAllWebviewWindows, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { systemStore } from './../stores/window';
+import { info } from '@tauri-apps/plugin-log';
 export const createtray = async function(){
     let icodir =await resourceDir();
     await TrayIcon.new({ 
@@ -30,6 +31,7 @@ export const createtray = async function(){
             }
         }
     });
+    info("托盘初始化完成")
 }
 
 export const traystart = async function(){

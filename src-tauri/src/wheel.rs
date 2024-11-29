@@ -22,11 +22,9 @@ pub fn wheelclick(window: AppHandle) {
                     .emit("wheel-click", Payload { message: s.into() })
                     .unwrap();
                 None
-            } else if let EventType::MouseMove {x,y}= event.event_type {
-                let s = format!("{{\"x\":{:?},\"y\":{:?}}}", x,y);
-                window
-                    .emit("mouse-move", Payload { message: s})
-                    .unwrap();
+            } else if let EventType::MouseMove { x, y } = event.event_type {
+                let s = format!("{{\"x\":{:?},\"y\":{:?}}}", x, y);
+                window.emit("mouse-move", Payload { message: s }).unwrap();
                 return Some(event);
             } else {
                 Some(event)
