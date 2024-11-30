@@ -1,7 +1,7 @@
 {
   "productName": "skydesk2",
-  "version": "1.0.0",
-  "identifier": "com.tauri.skydesk2",
+  "version": "1.1.7",
+  "identifier": "com.skydesk2.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:2422",
@@ -136,6 +136,7 @@
     "withGlobalTauri": true
   },
   "bundle": {
+    "publisher": "angelbests1314@live.com",
     "active": true,
     "targets": "all",
     "icon": [
@@ -151,6 +152,18 @@
     "resources":[
       "icons/icon.ico",
       "resources/*"
-    ]
+    ],
+    "windows": {
+      "allowDowngrades": true,
+      "certificateThumbprint": null,
+      "digestAlgorithm": null,
+      "nsis": null,
+      "signCommand": null,
+      "timestampUrl": null,
+      "tsp": false,
+      "wix": {
+        "language": "zh-CN"
+      }
+    }
   }
 }

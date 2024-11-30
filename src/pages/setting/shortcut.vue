@@ -7,7 +7,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import { createWindow } from '../../functions/window';
 import { uuid } from '../../functions';
 import { open } from '@tauri-apps/plugin-dialog';
-import { Command } from '@tauri-apps/plugin-shell';
+import { exec } from '../../functions/open';
 import { resourceDir } from '@tauri-apps/api/path';
 import GridContainer from '../../components/GridContainer.vue';
 import { emit } from '@tauri-apps/api/event';
@@ -212,17 +212,6 @@ const submitshortcut = function () {
     cancelsubmit()
 }
 
-// 程序执行
-const exec = async function (item: any) {
-    if (item.lnkPath) {
-        console.log(item)
-        let res = await Command.create("powershell", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
-        console.log(res)
-    } else {
-        await Command.create("powershell", item.targetPath).execute()
-    }
-}
-
 const submitshortcut2 = function () {
     if(shortcut.value.targetPath && shortcut.value.lnkPath && shortcut.value.icoPath) {
         shortcuts.value[tab.value].shortcut.push({
@@ -327,7 +316,6 @@ const drop = function (e: DragEvent) {
     <div id="shortcut" style="width: 100%;height: 100%;position: relative;">
         <v-dialog max-width="500" v-model="deltabshow">
             <v-card title="是否删除此合集！">
-                
                 <template v-slot:actions>
                     <v-btn @click="deltabshow = false">
                         取消
@@ -407,31 +395,31 @@ const drop = function (e: DragEvent) {
                 <template v-slot:prepend>
                     <v-icon>mdi-magnify-scan</v-icon>
                 </template>
-                {{ scanbtn ? "扫描程序" : "关闭扫描" }}
+                {{ scanbtn ? "扫描" : "关闭" }}
             </v-btn>
             <v-btn @click="dialog2 = true" style="margin-right: 20px;">
                 <template v-slot:prepend>
                     <v-icon>mdi-view-grid-plus-outline</v-icon>
                 </template>
-                添加快捷
+                添加
             </v-btn>
             <v-btn @click="settingbtn" style="margin-right: 20px;">
                 <template v-slot:prepend>
                     <v-icon>mdi-cog-outline</v-icon>
                 </template>
-                设置快捷
+                设置
             </v-btn>
             <v-btn @click="tabshow=true" style="margin-right: 20px;">
                 <template v-slot:prepend>
                     <v-icon>mdi-tab-plus</v-icon>
                 </template>
-                添加合集
+                合集
             </v-btn>
             <v-btn @click="createDocker" >
                 <template v-slot:prepend>
-                    <v-icon>mdi-shape-rectangle-plus</v-icon>
+                    <v-icon>mdi-apps</v-icon>
                 </template>
-                添加桌面合集
+                桌面合集
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="scanbar"></v-progress-linear>

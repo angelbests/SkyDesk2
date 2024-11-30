@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, toRefs } from "vue";
+import { ref, watch, toRefs, onMounted } from "vue";
 import { wallpaperStore, weatherStore, windowStore } from "../../stores/window";
 import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
 import { open } from '@tauri-apps/plugin-dialog';
-import { appDataDir, basename, resolve, pictureDir } from '@tauri-apps/api/path'
+import { appDataDir, basename, resolve, pictureDir, resourceDir } from '@tauri-apps/api/path'
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
 import { LogicalSize, Monitor } from "@tauri-apps/api/window";
@@ -13,10 +13,18 @@ import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { downloadload } from "../../api/download";
 import wallpaperfall from "../../components/WallpaperFall.vue";
 import GridContainer from "../../components/GridContainer.vue";
-import  { getpoi } from "./../../api/weather"
+import { getpoi } from "./../../api/weather"
 const wallpapers = wallpaperStore()
 const waterfallshow = ref(false)
 const windowstore = windowStore()
+const video = ref()
+const image = ref()
+const html = ref()
+onMounted(async () => {
+    video.value = convertFileSrc(await resourceDir() + '\\resources\\video.png')
+    image.value = convertFileSrc(await resourceDir() + '\\resources\\image.png')
+    html.value = convertFileSrc(await resourceDir() + '\\resources\\html.png')
+})
 const textwallpaper = async function (item: any, monitor: Monitor) {
     let index = wallpapers.config.findIndex(item => {
         return monitor.name == item.monitor.name
@@ -49,13 +57,13 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         alwaysOnBottom: true,
         skipTaskbar: true,
         url: url,
-    },{
-        x:monitor.position.x,
-        y:monitor.position.y -5,
-        w:monitor.size.width,
-        h:monitor.size.height + 10,
-        z:0,
-        status:true
+    }, {
+        x: monitor.position.x,
+        y: monitor.position.y - 5,
+        w: monitor.size.width,
+        h: monitor.size.height + 10,
+        z: 0,
+        status: true
     })
     w?.setSize(new LogicalSize(100, 100));
     wallpapers.config.push({
@@ -66,8 +74,8 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
     })
     await setWindowToMonitor(
         label,
-        monitor.position.x as number ,
-        monitor.position.y as number -5,
+        monitor.position.x as number,
+        monitor.position.y as number - 5,
         monitor.size.width as number,
         monitor.size.height as number + 10
     )
@@ -203,10 +211,10 @@ const closewallpaper = async function () {
     })
 }
 
-const setwallpaper =async function(src:string){
+const setwallpaper = async function (src: string) {
     console.log(src)
-    let path =await downloadwallpaper(src)
-    if(path){
+    let path = await downloadwallpaper(src)
+    if (path) {
         addWallPaperData.value = {
             "type": "image",
             "title": "",
@@ -218,60 +226,59 @@ const setwallpaper =async function(src:string){
     }
 }
 
-const downloadwallpaper =async (src:string):Promise<string>=>{
-  let name = await basename(src);
-  let path = await pictureDir() + "\\skydesk2\\" + name;
-  if(!await exists(path)){
-    let res = await downloadload(path,src);
-    if(res){
-      return path
+const downloadwallpaper = async (src: string): Promise<string> => {
+    let name = await basename(src);
+    let path = await pictureDir() + "\\skydesk2\\" + name;
+    if (!await exists(path)) {
+        let res = await downloadload(path, src);
+        if (res) {
+            return path
+        }
     }
-  }
-  return "";
+    return "";
 }
 
 const weatherstore = weatherStore()
 const weathershow = ref(false)
-let { city,query,pois,apikey,citycode }  = toRefs(weatherstore)
-let timer:any;
-watch(query,()=>{
-    if(query.value){
-        timer =setTimeout(async() => {
+let { city, query, pois, apikey, citycode } = toRefs(weatherstore)
+let timer: any;
+watch(query, () => {
+    if (query.value) {
+        timer = setTimeout(async () => {
             clearTimeout(timer)
-            let res:any[] = await getpoi(query.value)
-            if(!res) return;
+            let res: any[] = await getpoi(query.value)
+            if (!res) return;
             pois.value = []
-            res.forEach((element:any) => {
+            res.forEach((element: any) => {
                 pois.value.push({
-                    title:element.country + " " + element.adm1 + " " + element.adm2 + " " +element.name,
-                    value:element.id,
-                    city:element.name
+                    title: element.country + " " + element.adm1 + " " + element.adm2 + " " + element.name,
+                    value: element.id,
+                    city: element.name
                 })
             });
         }, 300);
-    }else{
+    } else {
         pois.value = []
     }
 })
 
-const selectcity =async function(e:string){
+const selectcity = async function (e: string) {
     citycode.value = e
-    let index = pois.value.findIndex(item=>{
+    let index = pois.value.findIndex(item => {
         return item.value == e
     })
     city.value = pois.value[index].city
 }
 
-const delwallpaper = async function(index:number){
+const delwallpaper = async function (index: number) {
     console.log(wallpapers.wallpaperList[index])
     let name = await basename(wallpapers.wallpaperList[index].preview)
-    let path = wallpapers.wallpaperList[index].path.replace(name,"")
-    if(await exists(path)){
-        await remove(path,{recursive:true})
+    let path = wallpapers.wallpaperList[index].path.replace(name, "")
+    if (await exists(path)) {
+        await remove(path, { recursive: true })
     }
     wallpapers.wallpaperList.splice(index, 1)
 }
-
 </script>
 
 <template>
@@ -279,13 +286,16 @@ const delwallpaper = async function(index:number){
         <v-dialog max-width="500" v-model="weathershow">
             <v-list>
                 <v-list-item>
-                    <v-text-field v-model="apikey" density="compact" hide-details="auto" placeholder="填入和风天气key" label="和风天气apikey"</v-text-field>
+                    <v-text-field v-model="apikey" density="compact" hide-details="auto" placeholder="填入和风天气key"
+                        label="和风天气apikey" </v-text-field>
                 </v-list-item>
                 <v-list-item>
-                    <v-text-field v-model="query" density="compact" hide-details="auto" placeholder="查询城市名称" label="查询城市名称"></v-text-field>
+                    <v-text-field v-model="query" density="compact" hide-details="auto" placeholder="查询城市名称"
+                        label="查询城市名称"></v-text-field>
                 </v-list-item>
                 <v-list-item>
-                    <v-select :items="pois" density="compact" hide-details="auto" placeholder="选择城市" label="选择城市" @update:model-value="selectcity"></v-select> 
+                    <v-select :items="pois" density="compact" hide-details="auto" placeholder="选择城市" label="选择城市"
+                        @update:model-value="selectcity"></v-select>
                 </v-list-item>
             </v-list>
             <div
@@ -295,11 +305,12 @@ const delwallpaper = async function(index:number){
             </div>
         </v-dialog>
         <v-dialog v-model="waterfallshow" persistent>
-            <div style="width: 100%;height: 100vh;background: wheat;border-radius: 10px;">
+            <div style="width: 100%;height: 100%;background: wheat;border-radius: 10px;overflow: hidden;">
                 <v-btn style="height: 30px;width: 100%;" @click="waterfallshow = false">
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
-                <div style="overflow: hidden;overflow-y: scroll;width: 100%;height: calc(100vh - 50px);box-sizing: border-box;padding: 10px;">
+                <div
+                    style="overflow: hidden;overflow-y: scroll;width: 100%;height: calc(100vh - 50px);box-sizing: border-box;padding: 10px;">
                     <wallpaperfall @setwallpaper="setwallpaper" @download="downloadwallpaper"></wallpaperfall>
                 </div>
             </div>
@@ -342,42 +353,46 @@ const delwallpaper = async function(index:number){
             style="width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)">
             <v-btn style="margin-right: 20px;" @click="addWallpaperShow = true">
                 <template v-slot:prepend>
-                    <v-icon>mdi-wallpaper</v-icon>
+                    <v-icon>mdi-image-plus-outline</v-icon>
                 </template>
-                添加壁纸
+                添加
             </v-btn>
             <v-btn style="margin-right: 20px;" @click="closewallpaper">
                 <template v-slot:prepend>
-                    <v-icon>mdi-close</v-icon>
+                    <v-icon>mdi-image-remove-outline</v-icon>
                 </template>
-                关闭壁纸
+                关闭
             </v-btn>
             <v-btn style="margin-right: 20px;" @click="waterfallshow = true">
                 <template v-slot:prepend>
-                    <v-icon>mdi-image</v-icon>
+                    <v-icon>mdi-image-search-outline</v-icon>
                 </template>
                 在线壁纸
             </v-btn>
             <v-btn style="margin-right: 20px;" @click="weathershow = true">
                 <template v-slot:prepend>
-                    <v-icon>mdi-image</v-icon>
+                    <v-icon>mdi-image-filter-drama-outline</v-icon>
                 </template>
-                设置天气
+                天气
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-        <div style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;padding: 10px;box-sizing: border-box;">
-            <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="wallpapers.wallpaperList" :gridheight="240" :gridwidth="320" :padding="10">
-                <template v-slot="{item,index}">
+        <div
+            style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;padding: 10px;box-sizing: border-box;">
+            <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="wallpapers.wallpaperList"
+                :gridheight="240" :gridwidth="320" :padding="10">
+                <template v-slot="{ item, index }">
                     <v-card style="width: 100%;height: 100%;" variant="elevated" elevation="5">
                         <v-card-text style="width: 100%;height: 80%;padding: 0px;">
-                            <img :src="convertFileSrc(item.preview)" style="width: 100%;height: 100%;object-fit: cover;">
+                            <img :src="convertFileSrc(item.preview)"
+                                style="width: 100%;height: 100%;object-fit: cover;">
                         </v-card-text>
                         <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
-                                <v-btn size="small" >{{ item.type == 'video' ? '视频' : item.type == 'image' ? '图片' : '网页' }}</v-btn>
-                                <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in windowstore.monitors" @click="textwallpaper(item, monitor)" >{{
-                                    "屏幕"+(i+1) }}</v-btn>
-                                <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)" >删除</v-btn>
+                            <img style="width: 25px;height: 25px;border-radius: 50%;" :src="item.type == 'image' ? image : item.type == 'video' ? video : html">
+                            <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in windowstore.monitors"
+                                @click="textwallpaper(item, monitor)">{{
+                                    "屏幕" + (i + 1) }}</v-btn>
+                            <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)">删除</v-btn>
                         </v-card-actions>
                     </v-card>
                 </template>

@@ -2,10 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["*","wallpaper-*"],
-  "remote":{
-    "urls": ["http://127.0.0.1:8000"]
-  },
+  "windows": ["*","wallpaper-*","note-*"],
   "permissions": [
     "core:default",
     "shell:allow-open",

@@ -151,7 +151,7 @@ const notewallpaper = async function (note: any) {
                 <template v-slot:prepend>
                     <v-icon>mdi-note-plus-outline</v-icon>
                 </template>
-                添加便签
+                添加
             </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>

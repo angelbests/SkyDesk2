@@ -6,7 +6,7 @@ import RightBar from '../../components/RightBar.vue';
 import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { LogicalSize } from '@tauri-apps/api/dpi';
 import { listen } from '@tauri-apps/api/event';
-import { Command } from '@tauri-apps/plugin-shell';
+import { exec } from '../../functions/open';
 const show = ref(false)
 const shortcutWindows = ref(JSON.parse(localStorage.getItem(getCurrentWebviewWindow().label) || "{}"));
 getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
@@ -110,18 +110,6 @@ const deleteicon = function () {
     shortcutWindows.value.shortcuts.splice(0)
 }
 
-const openshorcut = async function (item: {
-    targetPath: any; lnkPath: string;
-}) {
-    if (item.lnkPath) {
-        console.log(item)
-        let res = await Command.create("powershell", `& "${item.lnkPath}"`, { "encoding": 'GBK' }).execute()
-        console.log(res)
-    } else {
-        await Command.create("powershell", item.targetPath).execute()
-    }
-}
-
 const mouseenter = function (i: number) {
     let el = document.getElementById('img' + i);
     if (el) {
@@ -166,7 +154,7 @@ const setdata = function (d: DataTransfer, h: HTMLElement) {
                 :setData="setdata"
                 >
                 <div v-for="(item, i) in shortcutWindows.shortcuts" :key="item.lnkPath" :data-lnk="JSON.stringify(item)">
-                    <div class="imgdiv" @click="openshorcut(item)"
+                    <div class="imgdiv" @click="exec(item)"
                         :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 30 : 0)) + 'px' }">
                         <img class="img" @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i"
                             :style="{ width: (shortcutWindows.setting.w / shortcutWindows.setting.c - 20) + 'px', height: (shortcutWindows.setting.h / shortcutWindows.setting.r - (shortcutWindows.setting.font ? 50 : 20)) + 'px' }"

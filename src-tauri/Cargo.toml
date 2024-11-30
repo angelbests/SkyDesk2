@@ -1,6 +1,6 @@
 [package]
 name = "skydesk2"
-version = "1.0.0"
+version = "1.1.7"
 description = "SkyDesk2"
 authors = ["angelbests1314@live.com"]
 edition = "2021"
@@ -13,9 +13,9 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.0.1", features = [] }
-# "devtools"
+# "devtools"  "windows7-compat"
 [dependencies]
-tauri = { version = "2.0.2", features = ["protocol-asset", "tray-icon", "image-png", "image-ico", "devtools"] }
+tauri = { version = "2.0.2", features = ["protocol-asset", "tray-icon", "image-png", "image-ico"] }
 tauri-plugin-shell = "2.0.1"
 tauri-plugin-process = "2.0.1"
 tauri-plugin-fs = "2.0.1"

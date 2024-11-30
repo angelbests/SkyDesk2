@@ -197,7 +197,7 @@ const delmsg =async function(){
                 <template v-slot:prepend>
                     <v-icon>mdi-delete-outline</v-icon>
                 </template>
-                清除会话
+                清空
             </v-btn>
         </v-card>
         <v-snackbar multi-line v-model="snackbar.bool" >
