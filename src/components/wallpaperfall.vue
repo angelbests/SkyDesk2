@@ -179,7 +179,7 @@ const setwallpaper = function(src:string){
 
 const download = function(src:string){
   emit("download",src)
-}
+} 
 </script>
 
 <template>

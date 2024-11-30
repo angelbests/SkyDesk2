@@ -6,7 +6,7 @@ const props = defineProps<{
         value: string
     }[]
 }>()
-const { boxs } = toRefs(props)
+const { boxs } = toRefs(props) 
 const value = defineModel<string>({
     required:true
 })

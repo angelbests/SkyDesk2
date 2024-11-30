@@ -10,7 +10,7 @@ const props = defineProps<{
         src:string, // 源图片
         thumbs:string, // 缩略图
         ratio:number, // 纵横比
-    }[],
+    }[], 
 }>()
 const { images } = toRefs(props)
 let height = ref<number[]>([]) // 每列高度的存储 用于计算最低列

@@ -6,7 +6,7 @@
             </div>
             <div style="border-right: 1px solid gray;border-top: 1px solid gray;text-align: center;">
                 星期二
-            </div>
+            </div> 
             <div style="border-right: 1px solid gray;border-top: 1px solid gray;text-align: center;">
                 星期三
             </div>
