@@ -25,13 +25,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'yarn' # Set this to npm, yarn or pnpm.
+          cache: 'npm' # Set this to npm, yarn or pnpm.
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
         with:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ''
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
