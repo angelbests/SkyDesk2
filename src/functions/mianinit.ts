@@ -36,6 +36,9 @@ export const maininit =async function(){
         })
     }
     info("快捷键注册完成")
+    // 初始化轮盘事件
+    invoke("wheelclick")
+    info("初始化轮盘事件")
     // 开启网速事件
     await invoke("netspeed")
     info("网速事务完成")

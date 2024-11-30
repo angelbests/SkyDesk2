@@ -1,6 +1,6 @@
 [package]
 name = "skydesk2"
-version = "1.1.7"
+version = "1.1.8"
 description = "SkyDesk2"
 authors = ["angelbests1314@live.com"]
 edition = "2021"

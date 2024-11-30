@@ -4769,7 +4769,7 @@ checksum = "38b58827f4464d87d377d175e90bf58eb00fd8716ff0a62f80356b5e61555d0d"
 
 [[package]]
 name = "skydesk2"
-version = "1.1.7"
+version = "1.1.8"
 dependencies = [
  "chrono",
  "cpal",
