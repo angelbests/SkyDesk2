@@ -1,71 +1,63 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { VueDraggable } from 'vue-draggable-plus'
 import RightBar from '../../components/RightBar.vue';
 import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { LogicalPosition, LogicalSize } from '@tauri-apps/api/dpi';
+import { LogicalSize } from '@tauri-apps/api/dpi';
 import { listen } from '@tauri-apps/api/event';
 import { Command } from '@tauri-apps/plugin-shell';
-import { windowStore } from '../../stores/window';
 const show = ref(false)
 const shortcutWindows = ref(JSON.parse(localStorage.getItem(getCurrentWebviewWindow().label) || "{}"));
-onMounted(async () => {
-    await getCurrentWebviewWindow().hide()
-    await getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
-    await getCurrentWebviewWindow().show();
-    show.value = true
-
-    await listen(getCurrentWebviewWindow().label + "-setting", (e: {
-        payload: { key: string, value: string }
-    }) => {
-        let { key, value } = e.payload
-        if (key == "background") {
-            shortcutWindows.value.setting[key] = value
-        } else if (key == 'blur') {
-            shortcutWindows.value.setting[key] = value
-        } else if (key == 'r') {
-            shortcutWindows.value.setting[key] = value
-        } else if (key == 'c') {
-            shortcutWindows.value.setting[key] = value
-        } else if (key == 'h' || key == 'w') {
-            shortcutWindows.value.setting[key] = value
-            shortcutWindows.value.setting.font = false
-            getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
-            shortcutWindows.value.setting.h = shortcutWindows.value.setting.h
-        } else if (key == 'font') {
-            shortcutWindows.value.setting[key] = value
-            if (shortcutWindows.value.setting.font) {
-                getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r))
-                shortcutWindows.value.setting.h = shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r
-            } else {
-                getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r))
-                shortcutWindows.value.setting.h = shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r
-            }
-        } else if (key == 'alwaysOnTop') {
-            if (value) {
-                getCurrentWebviewWindow().setAlwaysOnBottom(false)
-                getCurrentWebviewWindow().setAlwaysOnTop(true)
-            } else {
-
-                getCurrentWebviewWindow().setAlwaysOnTop(false),
-                getCurrentWebviewWindow().setAlwaysOnBottom(true)
-            }
-            shortcutWindows.value.setting[key] = value
+getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
+show.value = true
+listen(getCurrentWebviewWindow().label + "-setting", (e: {
+    payload: { key: string, value: string }
+}) => {
+    let { key, value } = e.payload
+    if (key == "background") {
+        shortcutWindows.value.setting[key] = value
+    } else if (key == 'blur') {
+        shortcutWindows.value.setting[key] = value
+    } else if (key == 'r') {
+        shortcutWindows.value.setting[key] = value
+    } else if (key == 'c') {
+        shortcutWindows.value.setting[key] = value
+    } else if (key == 'h' || key == 'w') {
+        shortcutWindows.value.setting[key] = value
+        shortcutWindows.value.setting.font = false
+        getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h))
+        shortcutWindows.value.setting.h = shortcutWindows.value.setting.h
+    } else if (key == 'font') {
+        shortcutWindows.value.setting[key] = value
+        if (shortcutWindows.value.setting.font) {
+            getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r))
+            shortcutWindows.value.setting.h = shortcutWindows.value.setting.h + 30 * shortcutWindows.value.setting.r
+        } else {
+            getCurrentWebviewWindow().setSize(new LogicalSize(shortcutWindows.value.setting.w, shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r))
+            shortcutWindows.value.setting.h = shortcutWindows.value.setting.h - 30 * shortcutWindows.value.setting.r
         }
-    })
-
-    await listen("dellnk",(e:{payload:{label:string,lnk:string}})=>{
-        console.log(e.payload)
-        if(e.payload.label == getCurrentWebviewWindow().label){
-            let lnk = JSON.parse(e.payload.lnk)
-            let i = shortcutWindows.value.shortcuts.findIndex((item: { targetPath: any; })=>{
-                return item.targetPath == lnk.targetPath
-            })
-            shortcutWindows.value.shortcuts.splice(i,1)
+    } else if (key == 'alwaysOnTop') {
+        if (value) {
+            getCurrentWebviewWindow().setAlwaysOnBottom(false)
+            getCurrentWebviewWindow().setAlwaysOnTop(true)
+        } else {
+            getCurrentWebviewWindow().setAlwaysOnTop(false),
+            getCurrentWebviewWindow().setAlwaysOnBottom(true)
         }
-    })
+        shortcutWindows.value.setting[key] = value
+    }
+})
 
+listen("dellnk",(e:{payload:{label:string,lnk:string}})=>{
+    console.log(e.payload)
+    if(e.payload.label == getCurrentWebviewWindow().label){
+        let lnk = JSON.parse(e.payload.lnk)
+        let i = shortcutWindows.value.shortcuts.findIndex((item: { targetPath: any; })=>{
+            return item.targetPath == lnk.targetPath
+        })
+        shortcutWindows.value.shortcuts.splice(i,1)
+    }
 })
 
 watch(shortcutWindows,()=>{
@@ -94,11 +86,7 @@ const drop = function (e: DragEvent) {
 // 关闭窗口
 const close =async function () {
     localStorage.removeItem(getCurrentWebviewWindow().label)
-    const windowstore = windowStore()
-    let i = windowstore.windows.findIndex(item=>{
-        return item.label == getCurrentWebviewWindow().label
-    })
-    getCurrentWebviewWindow().setPosition(new LogicalPosition(windowstore.windows[i].option.x as number,windowstore.windows[i].option.y as number))
+    getCurrentWebviewWindow().hide()
     getCurrentWebviewWindow().close()
 }
 
