@@ -119,7 +119,7 @@ export const allinit =async function(){
     }
     // 禁止文本选择
     if(getCurrentWebviewWindow().label.indexOf('note-')>=0) return
-    document.addEventListener("selectstart",(e)=>{
-        e.preventDefault();
-    })
+    // document.addEventListener("selectstart",(e)=>{
+    //     e.preventDefault();
+    // })
 }
