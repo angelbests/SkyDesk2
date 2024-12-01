@@ -15,7 +15,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.0.1", features = [] }
 # "devtools"  "windows7-compat"
 [dependencies]
-tauri = { version = "2.0.2", features = ["protocol-asset", "tray-icon", "image-png", "image-ico"] }
+tauri = { version = "2.0.2", features = ["protocol-asset", "tray-icon", "image-png", "image-ico" , "devtools"] }
 tauri-plugin-shell = "2.0.1"
 tauri-plugin-process = "2.0.1"
 tauri-plugin-fs = "2.0.1"

@@ -63,7 +63,7 @@ const delvideo = function (path: string) {
 <template>
   <div class="window">
     <v-card
-      :style="{ background: systemstore.btnbarbackground }"
+      :style="{ background: systemstore.btnbarbackground,backgroundSize:'cover' }"
       class="btnbar"
     >
       <v-btn style="margin-right: 20px" @click="selectcapture">

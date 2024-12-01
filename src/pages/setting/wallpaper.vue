@@ -356,7 +356,7 @@ const delwallpaper = async function (index: number) {
             </div>
         </v-dialog>
         <v-card
-            :style="{background:systemstore.btnbarbackground}" class="btnbar">
+            :style="{background:systemstore.btnbarbackground,backgroundSize:'cover'}" class="btnbar">
             <v-btn style="margin-right: 20px;" @click="addWallpaperShow = true">
                 <template v-slot:prepend>
                     <v-icon>mdi-image-plus-outline</v-icon>

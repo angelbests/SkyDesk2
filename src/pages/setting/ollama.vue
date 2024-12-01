@@ -229,7 +229,7 @@ const delmsg = async function () {
       </v-card>
     </v-dialog>
     <v-card
-      :style="{ background: systemstore.btnbarbackground }"
+      :style="{ background: systemstore.btnbarbackground,backgroundSize:'cover' }"
       class="btnbar"
     >
       <v-btn style="margin-right: 20px" @click="delmsg">
@@ -247,8 +247,8 @@ const delmsg = async function () {
       :indeterminate="loading"
     ></v-progress-linear>
     <div style="width: 100%; height: calc(100% - 64px); overflow: hidden">
-      <v-tabs-window v-model="model" style="width: 100%; height: 100%">
-        <v-tabs density="compact" show-arrows v-model="model" hide-slider>
+      <v-tabs-window v-model="model" style="width: 100%; height: 100%;">
+        <v-tabs density="compact" show-arrows v-model="model" hide-slider style="background: rgba(223,223,223,0.4);">
           <v-tab
             v-for="item in modellist"
             :key="item.name"

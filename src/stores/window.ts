@@ -44,10 +44,10 @@ const systemStore = defineStore("system", {
       },
       fontcolor:'black' as string,
       programbcakground:`white` as string,
-      leftbackground:'gray' as string,
+      leftbackground:'white' as string,
       topbackground:'wheat' as string,
       btnbackground:'white' as string,
-      shortcutbackground:'gray' as string,
+      shortcutbackground:'rgba(123,123,123,0.2)' as string,
       btnbarbackground:'white' as string
     };
   },

@@ -478,7 +478,7 @@ const drop = function (e: DragEvent) {
       </div>
     </v-dialog>
     <v-card
-      :style="{ background: systemstore.btnbarbackground }"
+      :style="{ background: systemstore.btnbarbackground,backgroundSize:'cover' }"
       class="btnbar"
     >
       <v-btn style="margin-right: 20px" @click="scanProgram">
@@ -592,7 +592,7 @@ const drop = function (e: DragEvent) {
           density="compact"
           v-model="tab"
           center-active
-          style="height: 36px; width: 100%"
+          style="height: 36px; width: 100%;background: rgba(223,223,223,0.4);"
           hide-slider
           show-arrows
         >

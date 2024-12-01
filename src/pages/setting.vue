@@ -9,6 +9,8 @@ import {
   noteStore,
   wallpaperStore,
   shortcutStore,
+  weatherStore,
+  captureStore
 } from "../stores/window";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/mianinit";
@@ -16,7 +18,7 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 const systemstore = systemStore();
 const drawer = ref(true);
-const colorshow = ref(true);
+const colorshow = ref(false);
 const settingshow = ref(false);
 const net = ref({
   speed_r: 0,
@@ -44,6 +46,17 @@ onMounted(async () => {
     ?.addEventListener("selectstart", function (e) {
       e.preventDefault();
     });
+  let dom = document.getElementById("app") as HTMLElement
+  if(systemstore.btnbackground){
+      dom.style.setProperty("--btn-background", systemstore.btnbackground);
+  }else{
+      dom.style.setProperty("--btn-background", 'transparent');
+  }
+  if(systemstore.fontcolor){
+      dom.style.setProperty("--font-color", systemstore.fontcolor);
+  }else{
+      dom.style.setProperty("--font-color", 'black');
+  }
 });
 
 const toggleMaximize = async function () {
@@ -72,10 +85,17 @@ const autostartsetting = function (e: any) {
 };
 
 const refresh = function () {
+  localStorage.clear();
   const system = systemStore();
   system.autostart = false;
   system.traystart = false;
-  localStorage.clear();
+  system.fontcolor = 'black';
+  system.programbcakground = 'white'
+  system.leftbackground = 'white'
+  system.topbackground = 'white'
+  system.btnbackground = 'white'
+  system.shortcutbackground = 'rgba(123,123,123,0.2)'
+  system.btnbarbackground = 'white'
   const window = windowStore();
   window.windows = [];
   window.monitors = [];
@@ -89,6 +109,14 @@ const refresh = function () {
   shortcut.shortcutsTemp = [];
   shortcut.shortcuts = [];
   shortcut.wheels = [];
+  const weather = weatherStore()
+  weather.apikey = "9cda7ed49a914d5eb6987706d642da65"
+  weather.city = ""
+  weather.citycode = ""
+  weather.query = ""
+  weather.pois = []
+  const capture = captureStore()
+  capture.video = []
   relaunch();
 };
 
@@ -114,6 +142,15 @@ const getImage = async function (i: number) {
       case 5:
         systemstore.btnbackground = `url('${convertFileSrc(res)}')`;
         break;
+      case 7:
+        systemstore.btnbarbackground = `url('${convertFileSrc(res)}')`;
+        break;
+    }
+    let dom = document.getElementById("app") as HTMLElement
+    if(systemstore.btnbackground){
+        dom.style.setProperty("--btn-background", systemstore.btnbackground);
+    }else{
+        dom.style.setProperty("--btn-background", 'transparent');
     }
   }
 };
@@ -525,6 +562,37 @@ const selectcolor = function () {
             <v-list-item>
               <template v-slot:append>
                 <v-text-field
+                  v-model="systemstore.btnbarbackground"
+                  @update:model-value="changebtn(2)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
+                  <template v-slot:prepend-inner>
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(7)"
+                      style="margin-right: 5px"
+                    >
+                      <template v-slot:append>
+                        <v-icon>mdi-image</v-icon>
+                      </template>
+                    </v-btn>
+                    <v-btn variant="tonal" size="mini" @click="palette(7)">
+                      <template v-slot:append>
+                        <v-icon>mdi-palette</v-icon>
+                      </template>
+                    </v-btn>
+                  </template>
+                </v-text-field>
+              </template>
+              <v-list-item-title>按钮栏</v-list-item-title>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item>
+              <template v-slot:append>
+                <v-text-field
                   v-model="systemstore.fontcolor"
                   @update:model-value="changebtn(2)"
                   width="280"
@@ -543,27 +611,7 @@ const selectcolor = function () {
               <v-list-item-title>文本</v-list-item-title>
             </v-list-item>
             <v-divider></v-divider>
-            <v-list-item>
-              <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.btnbarbackground"
-                  @update:model-value="changebtn(2)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
-                  <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="palette(7)">
-                      <template v-slot:append>
-                        <v-icon>mdi-palette</v-icon>
-                      </template>
-                    </v-btn>
-                  </template>
-                </v-text-field>
-              </template>
-              <v-list-item-title>按钮栏</v-list-item-title>
-            </v-list-item>
-            <v-divider></v-divider>
+
           </v-list>
         </v-card>
       </div>
@@ -648,6 +696,7 @@ const selectcolor = function () {
 .v-btn {
   color: var(--font-color) !important;
   background: var(--btn-background);
+  background-size: cover;
 }
 .v-text-field {
   color: var(--font-color) !important;
