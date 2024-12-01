@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, toRefs, onMounted } from "vue";
-import { wallpaperStore, weatherStore, windowStore } from "../../stores/window";
+import { systemStore, wallpaperStore, weatherStore, windowStore } from "../../stores/window";
 import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
@@ -17,10 +17,16 @@ import { getpoi } from "./../../api/weather"
 const wallpapers = wallpaperStore()
 const waterfallshow = ref(false)
 const windowstore = windowStore()
+const systemstore = systemStore()
 const video = ref()
 const image = ref()
 const html = ref()
 onMounted(async () => {
+    window.addEventListener("storage",(e)=>{
+        if(e.key == 'system'){
+            systemstore.$hydrate()
+        }
+    })
     video.value = convertFileSrc(await resourceDir() + '\\resources\\video.png')
     image.value = convertFileSrc(await resourceDir() + '\\resources\\image.png')
     html.value = convertFileSrc(await resourceDir() + '\\resources\\html.png')
@@ -350,7 +356,7 @@ const delwallpaper = async function (index: number) {
             </div>
         </v-dialog>
         <v-card
-            style="width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)">
+            :style="{background:systemstore.btnbarbackground}" class="btnbar">
             <v-btn style="margin-right: 20px;" @click="addWallpaperShow = true">
                 <template v-slot:prepend>
                     <v-icon>mdi-image-plus-outline</v-icon>
@@ -378,7 +384,7 @@ const delwallpaper = async function (index: number) {
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
         <div
-            style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;background: white;padding: 10px;box-sizing: border-box;">
+            style="width: 100%;height: calc(100% - 64px);display: flex;overflow: hidden;padding: 10px;box-sizing: border-box;">
             <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="wallpapers.wallpaperList"
                 :gridheight="240" :gridwidth="320" :padding="10">
                 <template v-slot="{ item, index }">
@@ -408,7 +414,9 @@ const delwallpaper = async function (index: number) {
     width: 100%;
     height: 100%;
 }
-
+.btnbar{
+    width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)
+}
 .wallpaper {
     width: 100%;
     background: white;

@@ -41,12 +41,17 @@ const systemStore = defineStore("system", {
       szie:{
         width:0,
         height:0
-      }
+      },
+      fontcolor:'black' as string,
+      programbcakground:`white` as string,
+      leftbackground:'gray' as string,
+      topbackground:'wheat' as string,
+      btnbackground:'white' as string,
+      shortcutbackground:'gray' as string,
+      btnbarbackground:'white' as string
     };
   },
-  persist: {
-    paths: ["autostart", "traystart", "netspeed"],
-  },
+  persist: true
 });
 
 const noteStore = defineStore("note", {

@@ -21,6 +21,10 @@ html,body {
   border: none !important;
 }
 
+#app {
+  background: transparent;
+}
+
 ::-webkit-scrollbar {
     width: 2px;
 }
