@@ -725,7 +725,7 @@ const drop = function (e: DragEvent) {
     <!-- 下 -->
     <VueDraggable
       v-model="wheels"
-      :group="{ name: 'shortcut', pull: 'clone' }"
+      :group="{ name: 'shortcut'}"
       :animation="150"
       class="VueDraggable-wheel"
       :onAdd="adddown"
