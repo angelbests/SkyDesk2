@@ -36,8 +36,8 @@ onMounted(() => {
 const createnote = function () {
   let label = "note-" + uuid();
   createWindow(label, {
-    x: 0,
-    y: 0,
+    x: 200,
+    y: 200,
     width: 330,
     height: 330,
     minWidth: 330,
@@ -46,6 +46,7 @@ const createnote = function () {
     decorations: false,
     transparent: true,
     skipTaskbar: true,
+    center:true,
     url: "/#/pages/desktop/note",
   });
 };
