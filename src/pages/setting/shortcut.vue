@@ -35,6 +35,9 @@ onMounted(async () => {
     if (e.key == "system") {
       systemstore.$hydrate();
     }
+    if(e.key == 'shortcut'){
+      shortcutstore.$hydrate()
+    }
   });
   let respath = await resourceDir();
   systemprogram.value = [
