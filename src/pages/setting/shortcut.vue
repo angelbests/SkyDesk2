@@ -27,7 +27,8 @@ const shortcut = ref({
   icoPath: "",
   name: "",
 });
-const { shortcuts, shortcutsTemp, wheels } = toRefs(shortcutStore());
+const shortcutstore = shortcutStore()
+const { shortcuts, shortcutsTemp, wheels } = toRefs( shortcutstore );
 const scanbtn = ref<boolean>(true);
 const scanbar = ref(false);
 onMounted(async () => {
@@ -730,7 +731,7 @@ const drop = function (e: DragEvent) {
     </div>
     <!-- 下 -->
     <VueDraggable
-      v-model="wheels"
+      v-model="shortcutstore.wheels"
       :group="{ name: 'shortcut'}"
       :animation="150"
       class="VueDraggable-wheel"
@@ -742,7 +743,8 @@ const drop = function (e: DragEvent) {
           background: systemstore.shortcutbackground,
           backgroundSize: 'cover',
         }"
-        v-for="item in wheels"
+        v-for="item in shortcutstore.wheels"
+        :key="item.name"
         :data-lnk="JSON.stringify(item)"
         class="shortcut-container"
       >

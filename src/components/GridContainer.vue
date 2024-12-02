@@ -39,7 +39,7 @@ const gridcontainerheight = computed(() => {
         <VueDraggable v-model="array" class="gridcontainer" :animation="150" :group="group" :setData="setData"
             :onAdd="onAdd" :clone="clone"
             :style="{ gridTemplateColumns: `repeat(auto-fill,${gridwidth}px)`, gridTemplateRows: `repeat(auto-fit,${gridheight}px)`, height: `${gridcontainerheight}px`,gap:`${padding}px`}">
-            <div :data-lnk="JSON.stringify(item)" v-for="(item, index) in array" :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }">
+            <div :data-lnk="JSON.stringify(item)" v-for="(item, index) in array" :key="item" :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }">
                 <slot :item=item :index="index" :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }"></slot>
             </div>
         </VueDraggable>
