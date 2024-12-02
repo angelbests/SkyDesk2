@@ -26,7 +26,8 @@ export const maininit =async function(){
     if(!res){
         register('Control+1',async ()=>{
             await getCurrentWebviewWindow().show();
-            await getCurrentWebviewWindow().setFocus()
+            await getCurrentWebviewWindow().unminimize();
+            await getCurrentWebviewWindow().setFocus();
         })
     }
     res =await isRegistered('Control+2')
