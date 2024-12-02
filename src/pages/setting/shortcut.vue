@@ -8,9 +8,10 @@ import { createWindow } from "../../functions/window";
 import { uuid } from "../../functions";
 import { open } from "@tauri-apps/plugin-dialog";
 import { exec } from "../../functions/open";
-import { resourceDir } from "@tauri-apps/api/path";
+import { appDataDir, basename, resourceDir } from "@tauri-apps/api/path";
 import GridContainer from "../../components/GridContainer.vue";
 import { emit } from "@tauri-apps/api/event";
+import { readFile, writeFile } from "@tauri-apps/plugin-fs";
 const systemprogram = ref<any[]>([]);
 const systemstore = systemStore();
 const tab = ref();
@@ -212,14 +213,18 @@ const editshortcut = function (i: any) {
   };
 };
 
-const submitshortcut = function () {
+const submitshortcut =async function () {
   if (
     shortcut.value.targetPath &&
     shortcut.value.lnkPath &&
-    shortcut.value.icoPath
+    shortcut.value.icoPath &&
+    shortcut.value.name
   ) {
-    shortcuts.value[tab.value].shortcut[index.value].icoPath =
-      shortcut.value.icoPath;
+
+    let read = await readFile(shortcut.value.icoPath);
+    let path = await appDataDir() + "\\ico\\other\\" + (await basename(shortcut.value.icoPath))
+    await writeFile(path,read)
+    shortcuts.value[tab.value].shortcut[index.value].icoPath = path
     shortcuts.value[tab.value].shortcut[index.value].lnkPath =
       shortcut.value.lnkPath;
     shortcuts.value[tab.value].shortcut[index.value].targetPath =
@@ -229,18 +234,21 @@ const submitshortcut = function () {
   cancelsubmit();
 };
 
-const submitshortcut2 = function () {
+const submitshortcut2 =async function () {
   if (
     shortcut.value.targetPath &&
-    shortcut.value.lnkPath &&
+    shortcut.value.name &&
     shortcut.value.icoPath
   ) {
+    let read = await readFile(shortcut.value.icoPath);
+    let path = await appDataDir() + "\\ico\\other\\" + (await basename(shortcut.value.icoPath))
+    await writeFile(path,read)
     shortcuts.value[tab.value].shortcut.push({
       targetPath: shortcut.value.targetPath,
       iconLocationPeFile: "",
       iconLocation: "",
       lnkPath: shortcut.value.lnkPath,
-      icoPath: shortcut.value.icoPath,
+      icoPath: path,
       name: shortcut.value.name,
     });
   }
