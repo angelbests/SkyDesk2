@@ -319,6 +319,9 @@ const addtab = function () {
 const deltab = function () {
   shortcuts.value.splice(tab.value, 1);
   tab.value = shortcuts.value.length - 1;
+  for(let i=0;i<shortcuts.value.length;i++){
+    shortcuts.value[i].index = i
+  }
   deltabshow.value = false;
 };
 
