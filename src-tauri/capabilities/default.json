@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["*","wallpaper-*","note-*"],
+  "windows": ["wallpapersetting","wallpaper-*","note-*","main","shortcut-*","*"],
   "permissions": [
     "core:default",
     "shell:allow-open",

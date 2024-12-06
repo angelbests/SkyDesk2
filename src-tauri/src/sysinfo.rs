@@ -1,5 +1,9 @@
+
 use std::{thread, time};
-use sysinfo::Networks;
+use sysinfo::{
+    Networks,
+    System
+};
 use tauri::{AppHandle, Emitter};
 #[tauri::command]
 pub fn netspeed(app: AppHandle) {
@@ -9,7 +13,7 @@ pub fn netspeed(app: AppHandle) {
         let mut networks = Networks::new_with_refreshed_list();
         loop {
             thread::sleep(time::Duration::from_secs(1));
-            networks.refresh();
+            networks.refresh(true);
             r = 0;
             t = 0;
             for (name, network) in &networks {
@@ -23,7 +27,6 @@ pub fn netspeed(app: AppHandle) {
                 {
                     r = r + network.received();
                     t = t + network.transmitted();
-                    // println!("{}:{}:{}",name,network.received(),network.transmitted());
                 }
             }
             let str = format!("{{\"speed_r\":{},\"speed_s\":{}}}", r, t);
@@ -31,3 +34,23 @@ pub fn netspeed(app: AppHandle) {
         }
     });
 }
+
+
+#[tauri::command]
+pub fn system(app: AppHandle){
+    tauri::async_runtime::spawn(async move {
+        let mut system = System::new_all();
+        loop{
+            // cpu
+            system.refresh_all();
+            let _ = app.emit("cpu",system.global_cpu_usage().to_string());
+            // memory
+            let used_memory = system.used_memory();
+            let total_memory = system.total_memory();
+            let _ = app.emit("memory", (used_memory as f32/total_memory as f32).to_string());
+            thread::sleep(time::Duration::from_millis(1000));
+        }
+    });
+}
+
+

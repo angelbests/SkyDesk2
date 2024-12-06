@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, toRefs, onMounted } from "vue";
-import { systemStore, wallpaperStore, weatherStore, windowStore } from "../../stores/window";
+import { systemStore, wallpaperStore, weatherStore } from "../../stores/window";
 import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
@@ -8,15 +8,15 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { appDataDir, basename, resolve, pictureDir, resourceDir } from '@tauri-apps/api/path'
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
-import { LogicalSize, Monitor } from "@tauri-apps/api/window";
-import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
+import { availableMonitors, LogicalSize, Monitor } from "@tauri-apps/api/window";
+import { getAllWebviewWindows, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { downloadload } from "../../api/download";
 import wallpaperfall from "../../components/WallpaperFall.vue";
 import GridContainer from "../../components/GridContainer.vue";
 import { getpoi } from "./../../api/weather"
 const wallpapers = wallpaperStore()
 const waterfallshow = ref(false)
-const windowstore = windowStore()
+const monitors = ref<Monitor[]>([])
 const systemstore = systemStore()
 const video = ref()
 const image = ref()
@@ -26,23 +26,54 @@ onMounted(async () => {
         if(e.key == 'system'){
             systemstore.$hydrate()
         }
+        if(e.key == "wallpaper"){
+            wallpapers.$hydrate()
+        }
     })
     video.value = convertFileSrc(await resourceDir() + '\\resources\\video.png')
     image.value = convertFileSrc(await resourceDir() + '\\resources\\image.png')
     html.value = convertFileSrc(await resourceDir() + '\\resources\\html.png')
-})
-const textwallpaper = async function (item: any, monitor: Monitor) {
-    let index = wallpapers.config.findIndex(item => {
-        return monitor.name == item.monitor.name
-    })
-    if (index >= 0) {
-        (await getAllWebviewWindows()).filter(async item => {
-            if (item.label == wallpapers.config[index].label) {
-                await item.close()
-                wallpapers.config.splice(index, 1)
-            }
-        })
+    monitors.value = await availableMonitors()
+    if(wallpapers.wallpaperConfig.length == 0){
+        for(let i =0;i<monitors.value.length;i++){
+            wallpapers.wallpaperConfig.push({
+                label:"",
+                monitor:monitors.value[i].name as string,
+                config:{
+                    audio:0,
+                    date:true,
+                    datex:0,
+                    datey:0,
+                    datefontsize:0,
+                    time:true,
+                    timex:0,
+                    timey:0,
+                    timefontsize:0,
+                    weather:false,
+                    weatherx:0,
+                    weathery:0,
+                    weatherfontsize:0,
+                    netspeed:true,
+                    netspeedx:0,
+                    netspeedy:0,
+                    netspeedfontsize:0,
+                    cpu:true,
+                    cpux:0,
+                    cpuy:0,
+                    cpufontsize:0,
+                    memory:true,
+                    memoryx:0,
+                    memoryy:0,
+                    memoryfontsize:0,
+                }
+            })
+        }
     }
+})
+
+// 设置壁纸
+const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
+    // 配置url
     let label = "wallpaper-" + uuid()
     let url = ""
     if (item.type == "html") {
@@ -50,6 +81,7 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
     } else {
         url = "/#/pages/desktop/wallpaper?type=" + item.type + "&path=" + item.path
     }
+    // 创建窗口到壁纸层
     let w = await createWindow(label, {
         x: 9999999,
         y: 9999999,
@@ -69,15 +101,10 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         w: monitor.size.width,
         h: monitor.size.height + 10,
         z: 0,
-        status: true
+        status: true,
+        monitor:monitor
     })
     w?.setSize(new LogicalSize(100, 100));
-    wallpapers.config.push({
-        label: label,
-        monitor: monitor,
-        type: item.type,
-        url: url,
-    })
     await setWindowToMonitor(
         label,
         monitor.position.x as number,
@@ -85,7 +112,18 @@ const textwallpaper = async function (item: any, monitor: Monitor) {
         monitor.size.width as number,
         monitor.size.height as number + 10
     )
+    let i = wallpapers.wallpaperConfig.findIndex(item => item.monitor == monitor.name)
+    if(wallpapers.wallpaperConfig[i].label){
+        let all = await getAllWebviewWindows()
+        all.filter(item=>{
+            if(item.label == wallpapers.wallpaperConfig[i].label){
+                item.close()
+            }
+        })
+    }
+    wallpapers.wallpaperConfig[i].label = label
 }
+
 
 const addWallPaperData = ref<{
     "type": "image" | "video" | "html"
@@ -103,6 +141,7 @@ const addWallPaperData = ref<{
 
 const addWallpaperShow = ref(false)
 
+// 获取预览图
 const getpreview = async function () {
     if (addWallPaperData.value.type == "image") return
     let res = await open({
@@ -118,6 +157,7 @@ const getpreview = async function () {
     }
 }
 
+// 获取壁纸路径
 const getpath = async function () {
     let extensions: string[] = []
     let name = ""
@@ -148,6 +188,7 @@ const getpath = async function () {
     }
 }
 
+// 类型改变时，清空内容
 const typechange = function (value: any) {
     addWallPaperData.value = {
         "type": value,
@@ -158,6 +199,7 @@ const typechange = function (value: any) {
     }
 }
 
+// 新增壁纸
 const addWallpaper = async function () {
     let path = ""
     let dirid = uuid()
@@ -203,20 +245,17 @@ const addWallpaper = async function () {
     addWallpaperShow.value = false
 }
 
+// 关闭所有壁纸
 const closewallpaper = async function () {
     let all = await getAllWebviewWindows()
-    wallpapers.config = []
     all.filter(item => {
         if (item.label.indexOf("wallpaper-") >= 0) {
             item.close()
         }
     })
-
-    windowstore.windows = windowstore.windows.filter(item => {
-        return item.label.indexOf('wallpaper') < 0
-    })
 }
 
+// 设置图片为壁纸
 const setwallpaper = async function (src: string) {
     console.log(src)
     let path = await downloadwallpaper(src)
@@ -232,6 +271,7 @@ const setwallpaper = async function (src: string) {
     }
 }
 
+// 下载壁纸
 const downloadwallpaper = async (src: string): Promise<string> => {
     let name = await basename(src);
     let path = await pictureDir() + "\\skydesk2\\" + name;
@@ -244,6 +284,7 @@ const downloadwallpaper = async (src: string): Promise<string> => {
     return "";
 }
 
+// 天气
 const weatherstore = weatherStore()
 const weathershow = ref(false)
 let { city, query, pois, apikey, citycode } = toRefs(weatherstore)
@@ -284,6 +325,23 @@ const delwallpaper = async function (index: number) {
         await remove(path, { recursive: true })
     }
     wallpapers.wallpaperList.splice(index, 1)
+}
+
+const wallpapersetting = function(){
+    new WebviewWindow('wallpapersetting',{
+        width: 400,
+        height: 600,
+        decorations: false,
+        transparent: true,
+        dragDropEnabled: false,
+        shadow: false,
+        alwaysOnTop: true,
+        maximizable: false,
+        resizable: false,
+        skipTaskbar: true,
+        center:true,
+        url:'/#/pages/desktop/wallpapersetting'
+    })
 }
 </script>
 
@@ -381,6 +439,12 @@ const delwallpaper = async function (index: number) {
                 </template>
                 天气
             </v-btn>
+            <v-btn style="margin-right: 20px;" @click="wallpapersetting">
+                <template v-slot:prepend>
+                    <v-icon>mdi-tune</v-icon>
+                </template>
+                设置
+            </v-btn>
         </v-card>
         <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
         <div
@@ -395,8 +459,8 @@ const delwallpaper = async function (index: number) {
                         </v-card-text>
                         <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
                             <img style="width: 25px;height: 25px;border-radius: 50%;" :src="item.type == 'image' ? image : item.type == 'video' ? video : html">
-                            <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in windowstore.monitors"
-                                @click="textwallpaper(item, monitor)">{{
+                            <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in  monitors"
+                                @click="setmonitorwallpaper(item, monitor)">{{
                                     "屏幕" + (i + 1) }}</v-btn>
                             <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)">删除</v-btn>
                         </v-card-actions>

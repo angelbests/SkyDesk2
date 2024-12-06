@@ -5,6 +5,8 @@ import {
 import { WindowOptions } from "@tauri-apps/api/window";
 import { WebviewOptions } from "@tauri-apps/api/webview";
 import { windowStore } from "../stores/window";
+import { Monitor } from "@tauri-apps/api/window";
+import { setWindowToMonitor } from "../functions/monitor";
 export const createWindow = async function (
   label: string,
   option: Omit<WebviewOptions, "x" | "y" | "width" | "height"> & WindowOptions,
@@ -15,6 +17,7 @@ export const createWindow = async function (
     h: 0,
     z: 0,
     status: false,
+    monitor:undefined as   Monitor | undefined
   }
 ) {
   const windowstore = windowStore();
@@ -38,7 +41,8 @@ export const createWindow = async function (
     return null;
   }
 };
-import { setWindowToMonitor } from "../functions/monitor";
+
+
 export const initWindow = async function () {
   const windowstore = windowStore();
   windowstore.windows.forEach((e) => {

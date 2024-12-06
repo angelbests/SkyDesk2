@@ -2727,9 +2727,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.159"
+version = "0.2.167"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "561d97a539a36e26a9a5fad1ea11a3039a67714694aaa379433e580854bc3dc5"
+checksum = "09d6582e104315a817dff97f75133544b2e094ee22447d2acf4a74e189ba06fc"
 
 [[package]]
 name = "libdbus-sys"
@@ -4769,7 +4769,7 @@ checksum = "38b58827f4464d87d377d175e90bf58eb00fd8716ff0a62f80356b5e61555d0d"
 
 [[package]]
 name = "skydesk2"
-version = "1.1.8"
+version = "1.1.9"
 dependencies = [
  "chrono",
  "cpal",
@@ -4780,7 +4780,7 @@ dependencies = [
  "rdev",
  "serde",
  "serde_json",
- "sysinfo 0.32.0",
+ "sysinfo 0.33.0",
  "tauri",
  "tauri-build",
  "tauri-plugin-autostart",
@@ -5001,9 +5001,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.32.0"
+version = "0.33.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3b5ae3f4f7d64646c46c4cae4e3f01d1c5d255c7406fdd7c7f999a94e488791"
+checksum = "948512566b1895f93b1592c7574baeb2de842f224f2aab158799ecadb8ebbb46"
 dependencies = [
  "core-foundation-sys 0.8.7",
  "libc",

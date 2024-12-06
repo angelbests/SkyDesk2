@@ -64,6 +64,9 @@ export const maininit =async function(){
         }
         localStorage.setItem("size",JSON.stringify(size))
     })
+
+    // 初始化壁纸数据
+    invoke("system")
 }
 
 export const allinit =async function(){

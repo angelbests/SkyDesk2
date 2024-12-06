@@ -17,7 +17,8 @@ const windowStore = defineStore("window", {
           w:number,
           h:number,
           z:number,
-          status:boolean
+          status:boolean,
+          monitor:Monitor | undefined
         }
       }[],
       monitors: monitors as Monitor[],
@@ -75,13 +76,37 @@ const noteStore = defineStore("note", {
 const wallpaperStore = defineStore("wallpaper", {
   state: function () {
     return {
-      config: [] as {
-        label: string;
-        monitor: Monitor;
-        type: "image" | "html" | "video";
-        url: string;
+      wallpaperConfig:[] as {
+        monitor:string,
+        label:string,
+        config:{
+          audio:number
+          date:boolean
+          datex:number
+          datey:number
+          datefontsize:number
+          time:boolean
+          timex:number
+          timey:number
+          timefontsize:number
+          weather:boolean
+          weatherx:number
+          weathery:number
+          weatherfontsize:number
+          netspeed:boolean
+          netspeedx:number
+          netspeedy:number
+          netspeedfontsize:number
+          cpu:boolean
+          cpux:number
+          cpuy:number
+          cpufontsize:number
+          memory:boolean
+          memoryx:number
+          memoryy:number
+          memoryfontsize:number
+        }
       }[],
-      status: false,
       wallpaperList: [] as {
         type: "image" | "video" | "html";
         title: string;

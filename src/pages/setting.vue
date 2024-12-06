@@ -102,9 +102,8 @@ const refresh = function () {
   const note = noteStore();
   note.note = [];
   const wallpaper = wallpaperStore();
-  wallpaper.config = [];
+  wallpaper.wallpaperConfig = [];
   wallpaper.wallpaperList = [];
-  wallpaper.status = false;
   const shortcut = shortcutStore();
   shortcut.shortcutsTemp = [];
   shortcut.shortcuts = [];
@@ -616,6 +615,7 @@ const selectcolor = function () {
         </v-card>
       </div>
     </v-dialog>
+    <!-- 设置 -->
     <v-dialog v-model="settingshow">
       <div
         style="display: flex; justify-content: center"

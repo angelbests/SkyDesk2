@@ -2,7 +2,7 @@ use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
 mod capture;
 mod icotopng;
-mod netspeed;
+mod sysinfo;
 mod server;
 mod taskbar;
 mod wallpaper;
@@ -47,7 +47,8 @@ pub fn run() {
             capture::get_display_capture,
             capture::get_window_capture,
             capture::start_capture,
-            netspeed::netspeed,
+            sysinfo::netspeed,
+            sysinfo::system,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

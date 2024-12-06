@@ -79,6 +79,10 @@ const routes:RouteRecordRaw[] = [
             {
                 path:'netspeed',
                 component:()=>import('./../pages/desktop/netspeed.vue')
+            },
+            {
+                path:"wallpapersetting",
+                component:()=>import("./../pages/desktop/wallpapersetting.vue")
             }
         ]
     },

@@ -1,5 +1,5 @@
-use std::thread;
-use std::time::Duration;
+// use std::thread;
+// use std::time::Duration;
 use tauri::{AppHandle, Manager};
 use windows::{
     core::s,
@@ -113,7 +113,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED.0 as isize,
         );
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
-        thread::sleep(Duration::from_millis(300));
+        // thread::sleep(Duration::from_millis(100));
         if z == 1 {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,
