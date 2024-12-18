@@ -19,8 +19,8 @@
         "shadow": false,
         "decorations": false,
         "label": "main",
-        "fullscreen": false, 
-        "transparent":true,
+        "fullscreen": false,
+        "transparent": true,
         "center": true,
         "dragDropEnabled": false,
         "alwaysOnTop": false,
@@ -28,19 +28,19 @@
       },
       {
         "title": "server",
-        "width": 0, 
+        "width": 0,
         "height": 0,
         "shadow": false,
         "decorations": false,
         "label": "server",
-        "fullscreen": false, 
-        "transparent":true,
+        "fullscreen": false,
+        "transparent": true,
         "visible": false,
         "url": "/#/pages/server"
-      }, 
+      },
       {
-        "x":0,
-        "y":0,
+        "x": 0,
+        "y": 0,
         "width": 300,
         "height": 300,
         "shadow": false,
@@ -50,12 +50,12 @@
         "url": "/#/pages/desktop/captureWindow",
         "title": "captureWindow",
         "label": "captureWindow",
-        "skipTaskbar":true,
+        "skipTaskbar": true,
         "visible": false
       },
       {
-        "x":0,
-        "y":0,
+        "x": 0,
+        "y": 0,
         "width": 50,
         "height": 30,
         "shadow": false,
@@ -65,15 +65,15 @@
         "url": "/#/pages/desktop/captureBtn",
         "title": "captureBtn",
         "label": "captureBtn",
-        "skipTaskbar":true,
+        "skipTaskbar": true,
         "visible": false,
         "resizable": false,
         "minimizable": false,
         "maximizable": false
       },
       {
-        "x":0,
-        "y":0,
+        "x": 0,
+        "y": 0,
         "width": 240,
         "height": 240,
         "shadow": false,
@@ -83,33 +83,33 @@
         "url": "/#/pages/desktop/wheel",
         "title": "wheel",
         "label": "wheel",
-        "skipTaskbar":true,
+        "skipTaskbar": true,
         "resizable": false,
         "minimizable": false,
         "maximizable": false,
         "visible": false
       },
       {
-        "x":0,
-        "y":0,
+        "x": 0,
+        "y": 0,
         "width": 100,
-        "height": 30,
-        "shadow": true,
+        "height": 60,
+        "shadow": false,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
         "url": "/#/pages/desktop/tray",
         "title": "tray",
         "label": "tray",
-        "skipTaskbar":true,
+        "skipTaskbar": true,
         "resizable": false,
         "minimizable": false,
         "maximizable": false,
         "visible": false
       },
       {
-        "x":0,
-        "y":0,
+        "x": 0,
+        "y": 0,
         "width": 80,
         "height": 45,
         "shadow": true,
@@ -119,18 +119,40 @@
         "url": "/#/pages/desktop/netspeed",
         "title": "netspeed",
         "label": "netspeed",
-        "skipTaskbar":true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "minimizable": false,
+        "maximizable": false,
+        "visible": false
+      },
+      {
+        "x": 99,
+        "y": 99,
+        "width": 80,
+        "height": 45,
+        "shadow": false,
+        "decorations": false,
+        "transparent": true,
+        "url": "/#/pages/taskbar",
+        "title": "taskbar",
+        "label": "taskbar",
+        "skipTaskbar": true,
         "resizable": false,
         "minimizable": false,
         "maximizable": false,
         "visible": false
       }
-    ], 
-    "security": { 
+    ],
+    "security": {
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": ["$APPDATA/**","$RESOURCE/**","$VIDEO/**","$PICTURE/**"]
+        "scope": [
+          "$APPDATA/**",
+          "$RESOURCE/**",
+          "$VIDEO/**",
+          "$PICTURE/**"
+        ]
       }
     },
     "withGlobalTauri": true
@@ -149,9 +171,10 @@
     "externalBin": [
       "bin/ResourcesExtract"
     ],
-    "resources":[
+    "resources": [
       "icons/icon.ico",
-      "resources/*"
+      "resources/*",
+      "lib/*"
     ],
     "windows": {
       "allowDowngrades": true,

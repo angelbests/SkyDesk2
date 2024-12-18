@@ -10,7 +10,7 @@ import {
   wallpaperStore,
   shortcutStore,
   weatherStore,
-  captureStore
+  captureStore,
 } from "../stores/window";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/mianinit";
@@ -46,16 +46,16 @@ onMounted(async () => {
     ?.addEventListener("selectstart", function (e) {
       e.preventDefault();
     });
-  let dom = document.getElementById("app") as HTMLElement
-  if(systemstore.btnbackground){
-      dom.style.setProperty("--btn-background", systemstore.btnbackground);
-  }else{
-      dom.style.setProperty("--btn-background", 'transparent');
+  let dom = document.getElementById("app") as HTMLElement;
+  if (systemstore.btnbackground) {
+    dom.style.setProperty("--btn-background", systemstore.btnbackground);
+  } else {
+    dom.style.setProperty("--btn-background", "transparent");
   }
-  if(systemstore.fontcolor){
-      dom.style.setProperty("--font-color", systemstore.fontcolor);
-  }else{
-      dom.style.setProperty("--font-color", 'black');
+  if (systemstore.fontcolor) {
+    dom.style.setProperty("--font-color", systemstore.fontcolor);
+  } else {
+    dom.style.setProperty("--font-color", "black");
   }
 });
 
@@ -89,13 +89,13 @@ const refresh = function () {
   const system = systemStore();
   system.autostart = false;
   system.traystart = false;
-  system.fontcolor = 'black';
-  system.programbcakground = 'white'
-  system.leftbackground = 'white'
-  system.topbackground = 'white'
-  system.btnbackground = 'white'
-  system.shortcutbackground = 'rgba(123,123,123,0.2)'
-  system.btnbarbackground = 'white'
+  system.fontcolor = "black";
+  system.programbcakground = "white";
+  system.leftbackground = "white";
+  system.topbackground = "white";
+  system.btnbackground = "white";
+  system.shortcutbackground = "rgba(123,123,123,0.2)";
+  system.btnbarbackground = "white";
   const window = windowStore();
   window.windows = [];
   window.monitors = [];
@@ -108,14 +108,14 @@ const refresh = function () {
   shortcut.shortcutsTemp = [];
   shortcut.shortcuts = [];
   shortcut.wheels = [];
-  const weather = weatherStore()
-  weather.apikey = "9cda7ed49a914d5eb6987706d642da65"
-  weather.city = ""
-  weather.citycode = ""
-  weather.query = ""
-  weather.pois = []
-  const capture = captureStore()
-  capture.video = []
+  const weather = weatherStore();
+  weather.apikey = "9cda7ed49a914d5eb6987706d642da65";
+  weather.city = "";
+  weather.citycode = "";
+  weather.query = "";
+  weather.pois = [];
+  const capture = captureStore();
+  capture.video = [];
   relaunch();
 };
 
@@ -145,28 +145,28 @@ const getImage = async function (i: number) {
         systemstore.btnbarbackground = `url('${convertFileSrc(res)}')`;
         break;
     }
-    let dom = document.getElementById("app") as HTMLElement
-    if(systemstore.btnbackground){
-        dom.style.setProperty("--btn-background", systemstore.btnbackground);
-    }else{
-        dom.style.setProperty("--btn-background", 'transparent');
+    let dom = document.getElementById("app") as HTMLElement;
+    if (systemstore.btnbackground) {
+      dom.style.setProperty("--btn-background", systemstore.btnbackground);
+    } else {
+      dom.style.setProperty("--btn-background", "transparent");
     }
   }
 };
 
 const changebtn = function (i: number) {
-let dom = document.getElementById("app") as HTMLElement
+  let dom = document.getElementById("app") as HTMLElement;
   if (i == 1) {
-    if(systemstore.btnbackground){
-        dom.style.setProperty("--btn-background", systemstore.btnbackground);
-    }else{
-        dom.style.setProperty("--btn-background", 'transparent');
+    if (systemstore.btnbackground) {
+      dom.style.setProperty("--btn-background", systemstore.btnbackground);
+    } else {
+      dom.style.setProperty("--btn-background", "transparent");
     }
   } else if (i == 2) {
-    if(systemstore.fontcolor){
-        dom.style.setProperty("--font-color", systemstore.fontcolor);
-    }else{
-        dom.style.setProperty("--font-color", 'black');
+    if (systemstore.fontcolor) {
+      dom.style.setProperty("--font-color", systemstore.fontcolor);
+    } else {
+      dom.style.setProperty("--font-color", "black");
     }
   }
 };
@@ -200,24 +200,23 @@ const selectcolor = function () {
         systemstore.fontcolor = colorv.value;
         break;
       case 7:
-        systemstore.btnbarbackground = colorv.value
+        systemstore.btnbarbackground = colorv.value;
     }
     // let dom = document.getElementsByTagName("body");
-    let dom = document.getElementById("app") as HTMLElement
+    let dom = document.getElementById("app") as HTMLElement;
     if (colori.value == 5) {
-        console.log( systemstore.btnbackground)
-        if(systemstore.btnbackground){
-            dom.style.setProperty("--btn-background", systemstore.btnbackground);
-        }else{
-            dom.style.setProperty("--btn-background", 'transparent');
-        }
-      
+      console.log(systemstore.btnbackground);
+      if (systemstore.btnbackground) {
+        dom.style.setProperty("--btn-background", systemstore.btnbackground);
+      } else {
+        dom.style.setProperty("--btn-background", "transparent");
+      }
     } else if (colori.value == 6) {
-        if(systemstore.fontcolor){
-            dom.style.setProperty("--font-color", systemstore.fontcolor);
-        }else{
-            dom.style.setProperty("--font-color", 'transparent');
-        }
+      if (systemstore.fontcolor) {
+        dom.style.setProperty("--font-color", systemstore.fontcolor);
+      } else {
+        dom.style.setProperty("--font-color", "transparent");
+      }
     }
   }, 50);
 };
@@ -610,7 +609,6 @@ const selectcolor = function () {
               <v-list-item-title>文本</v-list-item-title>
             </v-list-item>
             <v-divider></v-divider>
-
           </v-list>
         </v-card>
       </div>

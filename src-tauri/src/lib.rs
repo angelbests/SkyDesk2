@@ -2,25 +2,27 @@ use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
 mod capture;
 mod icotopng;
-mod sysinfo;
+mod libre_hardware_monitor;
 mod server;
+mod sysinfo;
 mod taskbar;
 mod wallpaper;
 mod wheel;
 use chrono::prelude::*;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    libre_hardware_monitor::loadhardware();
     let local: DateTime<Local> = Local::now();
     let t = local.format("%Y-%m-%d");
     tauri::Builder::default()
         .plugin(
             tauri_plugin_log::Builder::new()
-            .target(tauri_plugin_log::Target::new(
-                tauri_plugin_log::TargetKind::LogDir {
-                    file_name: Some(t.to_string()),
-                },
-            ))
-            .build()
+                .target(tauri_plugin_log::Target::new(
+                    tauri_plugin_log::TargetKind::LogDir {
+                        file_name: Some(t.to_string()),
+                    },
+                ))
+                .build(),
         )
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -49,6 +51,7 @@ pub fn run() {
             capture::start_capture,
             sysinfo::netspeed,
             sysinfo::system,
+            taskbar::listentaskbar
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

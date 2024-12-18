@@ -1,13 +1,13 @@
 {
-    "$schema": "../gen/schemas/desktop-schema.json",
-    "identifier": "wallpaper",
-    "description": "Capability for the wallpaper window",
-    "windows": ["wallpaper-*"],
-    "remote":{
-      "urls": ["http://127.0.0.1:8000"]
-    },
-    "permissions": [
-      "core:default"
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "server",
+  "description": "Capability for the server window",
+  "remote": {
+    "urls": [
+      "http://127.0.0.1:8000"
     ]
-  }
-  
+  },
+  "permissions": [
+    "core:default"
+  ]
+}

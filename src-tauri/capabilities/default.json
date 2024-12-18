@@ -2,7 +2,14 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["wallpapersetting","wallpaper-*","note-*","main","shortcut-*","*"],
+  "windows": [
+    "wallpapersetting",
+    "wallpaper-*",
+    "note-*",
+    "main",
+    "shortcut-*",
+    "*"
+  ],
   "permissions": [
     "core:default",
     "shell:allow-open",
@@ -11,7 +18,7 @@
     "core:window:allow-unminimize",
     "core:webview:deny-create-webview",
     "core:window:allow-set-ignore-cursor-events",
-    "core:webview:allow-create-webview-window", 
+    "core:webview:allow-create-webview-window",
     "core:window:allow-create",
     "core:window:allow-set-shadow",
     "core:window:allow-set-skip-taskbar",
@@ -52,47 +59,83 @@
     "clipboard-manager:allow-write-text",
     "log:default",
     {
-      "identifier":"fs:write-files",
-      "allow": [{ "path": "$APPDATA/**" },{"path": "$PICTURE/**"},{"path": "$VIDEO/**"}]
+      "identifier": "fs:write-files",
+      "allow": [
+        {
+          "path": "$APPDATA/**"
+        },
+        {
+          "path": "$PICTURE/**"
+        },
+        {
+          "path": "$VIDEO/**"
+        }
+      ]
     },
     {
-      "identifier":"fs:allow-mkdir",
-      "allow": [{ "path": "$APPDATA/**" },{"path": "$PICTURE/**"},{"path": "$VIDEO/**"}]
+      "identifier": "fs:allow-mkdir",
+      "allow": [
+        {
+          "path": "$APPDATA/**"
+        },
+        {
+          "path": "$PICTURE/**"
+        },
+        {
+          "path": "$VIDEO/**"
+        }
+      ]
     },
     {
-      "identifier":"fs:read-dirs",
-      "allow": [{"path": "**"}]
+      "identifier": "fs:read-dirs",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
-      "identifier":"fs:read-files",
-      "allow": [{"path": "**"}]
+      "identifier": "fs:read-files",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
-      "identifier":"fs:allow-copy-file",
-      "allow": [{"path": "**"}]
+      "identifier": "fs:allow-copy-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
-      "identifier":"fs:allow-read-text-file",
-      "allow": [{"path": "**"}]
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     "dialog:allow-open",
     {
-      "identifier":"shell:allow-execute",
+      "identifier": "shell:allow-execute",
       "allow": [
         {
           "name": "powershell",
           "cmd": "powershell",
-          "args":true
+          "args": true
         },
         {
-          "name":"ollama",
-          "cmd":"ollama",
-          "args":true
+          "name": "ollama",
+          "cmd": "ollama",
+          "args": true
         },
         {
-          "name":"systemPath",
-          "cmd":"cmd",
-          "args":[
+          "name": "systemPath",
+          "cmd": "cmd",
+          "args": [
             "/c",
             "echo",
             {
@@ -101,30 +144,30 @@
           ]
         },
         {
-          "name":"bin/ResourcesExtract",
-          "args":true,
+          "name": "bin/ResourcesExtract",
+          "args": true,
           "sidecar": true
         },
         {
-          "name":"bin/shman",
-          "args":true,
+          "name": "bin/shman",
+          "args": true,
           "sidecar": true
         }
       ]
     },
     {
-      "identifier":"shell:allow-spawn",
+      "identifier": "shell:allow-spawn",
       "allow": [
         {
-          "name":"cmd",
-          "cmd":"cmd",
-          "args":true
+          "name": "cmd",
+          "cmd": "cmd",
+          "args": true
         }
       ]
     },
     "shell:allow-stdin-write",
     {
-      "identifier":"http:default",
+      "identifier": "http:default",
       "allow": [
         {
           "url": "https://www.skymiao.info"

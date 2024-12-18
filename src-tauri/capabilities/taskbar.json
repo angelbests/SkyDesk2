@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "taskbar",
+  "description": "Capability for the taskbar window",
+  "windows": [
+    "server"
+  ],
+  "permissions": [
+    "core:default"
+  ]
+}
