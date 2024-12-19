@@ -270,13 +270,10 @@ watch(
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.netspeedx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.netspeedy}%`,
-        fontSize:`${wallpaperstore.wallpaperConfig[index].config.netspeedfontsize}px`
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.netspeedfontsize}px`,
       }"
     >
-      <div
-        data-tauri-drag-region
-        style="display: flex; align-items: center"
-      >
+      <div data-tauri-drag-region style="display: flex; align-items: center">
         <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon
         >{{
           Math.trunc(net.speed_r / 1024) < 1024
@@ -300,7 +297,7 @@ watch(
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.timex}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.timey}%`,
-        fontSize:`${wallpaperstore.wallpaperConfig[index].config.timefontsize}px`
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.timefontsize}px`,
       }"
     >
       <div class="hour">
@@ -313,10 +310,10 @@ watch(
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
-        fontSize:`${wallpaperstore.wallpaperConfig[index].config.datefontsize}px`,
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.datefontsize}px`,
       }"
     >
-      <div style="margin-right: 10px;">
+      <div style="margin-right: 10px">
         {{ time.year }}
         {{ time.month }}
         {{ time.day }}
@@ -332,7 +329,7 @@ watch(
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.cpux}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.cpuy}%`,
-        fontSize:`${wallpaperstore.wallpaperConfig[index].config.cpufontsize}px`,
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.cpufontsize}px`,
       }"
     >
       CPU：{{ cpu }}%
@@ -343,7 +340,7 @@ watch(
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.memoryx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.memoryy}%`,
-        fontSize:`${wallpaperstore.wallpaperConfig[index].config.memoryfontsize}px`,
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.memoryfontsize}px`,
       }"
     >
       内存：{{ memory }}%
@@ -353,11 +350,11 @@ watch(
 
 <style scoped>
 @font-face {
-    font-family:HarmonyOS_Sans_TC_Light;
-    src:url("fonts/HarmonyOS_Sans_TC_Light.ttf") format('truetype');
+  font-family: HarmonyOS_Sans_TC_Light;
+  src: url("fonts/HarmonyOS_Sans_TC_Light.ttf") format("truetype");
 }
 .window {
-  font-family:HarmonyOS_Sans_TC_Light simsun ;
+  font-family: HarmonyOS_Sans_TC_Light simsun;
   width: 100vw;
   height: 100vh;
   position: relative;

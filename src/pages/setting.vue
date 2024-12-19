@@ -672,6 +672,18 @@ const selectcolor = function () {
             <v-list lines="one" select-strategy="classic">
               <v-list-item>
                 <template v-slot:append>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.taskbar"
+                    hide-details
+                  ></v-switch>
+                </template>
+                <v-list-item-title>任务栏</v-list-item-title>
+              </v-list-item>
+            </v-list>
+            <v-list lines="one" select-strategy="classic">
+              <v-list-item>
+                <template v-slot:append>
                   <v-btn @click="refresh">
                     <template v-slot:prepend>
                       <v-icon>mdi-refresh</v-icon>

@@ -2,7 +2,9 @@
 import { listen } from "@tauri-apps/api/event";
 import { onMounted, ref } from "vue";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { systemStore } from "../stores/window";
 getCurrentWebviewWindow().show();
+const system = systemStore();
 const net = ref({
   speed_r: 0,
   speed_s: 0,
@@ -23,6 +25,21 @@ onMounted(async () => {
     let str = e.payload;
     memory.value = Math.trunc(Number(str) * 100);
   });
+  if (system.taskbar) {
+    getCurrentWebviewWindow().show();
+  } else {
+    getCurrentWebviewWindow().hide();
+  }
+});
+window.addEventListener("storage", (e) => {
+  if (e.key == "system") {
+    system.$hydrate();
+    if (system.taskbar) {
+      getCurrentWebviewWindow().show();
+    } else {
+      getCurrentWebviewWindow().hide();
+    }
+  }
 });
 </script>
 
@@ -56,6 +73,9 @@ onMounted(async () => {
 </template>
 
 <style>
+:root {
+  --margin-top: 4px;
+}
 .window {
   background: transparent;
   width: 100vw;
@@ -66,13 +86,13 @@ onMounted(async () => {
   flex-direction: row;
   flex-wrap: wrap;
   cursor: default;
+  padding: var(--margin-top);
 }
 .item {
-  width: 50vw;
-  height: 50vh;
+  width: calc(50vw - var(--margin-top));
+  height: calc(50vh - var(--margin-top));
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  /* border: 1px solid black; */
 }
 </style>

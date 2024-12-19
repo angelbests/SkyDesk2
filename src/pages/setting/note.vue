@@ -46,7 +46,7 @@ const createnote = function () {
     decorations: false,
     transparent: true,
     skipTaskbar: true,
-    center:true,
+    center: true,
     url: "/#/pages/desktop/note",
   });
 };
@@ -166,7 +166,10 @@ const notewallpaper = async function (note: any) {
 <template>
   <div class="window">
     <v-card
-      :style="{ background: systemstore.btnbarbackground,backgroundSize:'cover' }"
+      :style="{
+        background: systemstore.btnbarbackground,
+        backgroundSize: 'cover',
+      }"
       class="btnbar"
     >
       <v-btn style="margin-right: 20px" @click="createnote">

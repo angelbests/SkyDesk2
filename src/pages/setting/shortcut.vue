@@ -28,8 +28,8 @@ const shortcut = ref({
   icoPath: "",
   name: "",
 });
-const shortcutstore = shortcutStore()
-const { shortcuts, shortcutsTemp, wheels } = toRefs( shortcutstore );
+const shortcutstore = shortcutStore();
+const { shortcuts, shortcutsTemp, wheels } = toRefs(shortcutstore);
 const scanbtn = ref<boolean>(true);
 const scanbar = ref(false);
 onMounted(async () => {
@@ -37,8 +37,8 @@ onMounted(async () => {
     if (e.key == "system") {
       systemstore.$hydrate();
     }
-    if(e.key == 'shortcut'){
-      shortcutstore.$hydrate()
+    if (e.key == "shortcut") {
+      shortcutstore.$hydrate();
     }
   });
   let respath = await resourceDir();
@@ -213,18 +213,20 @@ const editshortcut = function (i: any) {
   };
 };
 
-const submitshortcut =async function () {
+const submitshortcut = async function () {
   if (
     shortcut.value.targetPath &&
     shortcut.value.lnkPath &&
     shortcut.value.icoPath &&
     shortcut.value.name
   ) {
-
     let read = await readFile(shortcut.value.icoPath);
-    let path = await appDataDir() + "\\ico\\other\\" + (await basename(shortcut.value.icoPath))
-    await writeFile(path,read)
-    shortcuts.value[tab.value].shortcut[index.value].icoPath = path
+    let path =
+      (await appDataDir()) +
+      "\\ico\\other\\" +
+      (await basename(shortcut.value.icoPath));
+    await writeFile(path, read);
+    shortcuts.value[tab.value].shortcut[index.value].icoPath = path;
     shortcuts.value[tab.value].shortcut[index.value].lnkPath =
       shortcut.value.lnkPath;
     shortcuts.value[tab.value].shortcut[index.value].targetPath =
@@ -234,15 +236,18 @@ const submitshortcut =async function () {
   cancelsubmit();
 };
 
-const submitshortcut2 =async function () {
+const submitshortcut2 = async function () {
   if (
     shortcut.value.targetPath &&
     shortcut.value.name &&
     shortcut.value.icoPath
   ) {
     let read = await readFile(shortcut.value.icoPath);
-    let path = await appDataDir() + "\\ico\\other\\" + (await basename(shortcut.value.icoPath))
-    await writeFile(path,read)
+    let path =
+      (await appDataDir()) +
+      "\\ico\\other\\" +
+      (await basename(shortcut.value.icoPath));
+    await writeFile(path, read);
     shortcuts.value[tab.value].shortcut.push({
       targetPath: shortcut.value.targetPath,
       iconLocationPeFile: "",
@@ -331,8 +336,8 @@ const addtab = function () {
 const deltab = function () {
   shortcuts.value.splice(tab.value, 1);
   tab.value = shortcuts.value.length - 1;
-  for(let i=0;i<shortcuts.value.length;i++){
-    shortcuts.value[i].index = i
+  for (let i = 0; i < shortcuts.value.length; i++) {
+    shortcuts.value[i].index = i;
   }
   deltabshow.value = false;
 };
@@ -493,7 +498,10 @@ const drop = function (e: DragEvent) {
       </div>
     </v-dialog>
     <v-card
-      :style="{ background: systemstore.btnbarbackground,backgroundSize:'cover' }"
+      :style="{
+        background: systemstore.btnbarbackground,
+        backgroundSize: 'cover',
+      }"
       class="btnbar"
     >
       <v-btn style="margin-right: 20px" @click="scanProgram">
@@ -607,7 +615,11 @@ const drop = function (e: DragEvent) {
           density="compact"
           v-model="tab"
           center-active
-          style="height: 36px; width: 100%;background: rgba(223,223,223,0.4);"
+          style="
+            height: 36px;
+            width: 100%;
+            background: rgba(223, 223, 223, 0.4);
+          "
           hide-slider
           show-arrows
         >
@@ -740,7 +752,7 @@ const drop = function (e: DragEvent) {
     <!-- 下 -->
     <VueDraggable
       v-model="shortcutstore.wheels"
-      :group="{ name: 'shortcut'}"
+      :group="{ name: 'shortcut' }"
       :animation="150"
       class="VueDraggable-wheel"
       :onAdd="adddown"

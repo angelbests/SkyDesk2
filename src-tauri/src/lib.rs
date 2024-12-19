@@ -11,7 +11,6 @@ mod wheel;
 use chrono::prelude::*;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    libre_hardware_monitor::loadhardware();
     let local: DateTime<Local> = Local::now();
     let t = local.format("%Y-%m-%d");
     tauri::Builder::default()

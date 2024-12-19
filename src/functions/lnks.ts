@@ -1,7 +1,7 @@
 import { Command } from "@tauri-apps/plugin-shell";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { basename, extname, homeDir, resolve } from "@tauri-apps/api/path";
-import { info,error } from "@tauri-apps/plugin-log";
+import { info, error } from "@tauri-apps/plugin-log";
 export const getlnks = async function () {
   let lnks = [];
   let lnkFiles = await getLnkFile();
@@ -55,7 +55,7 @@ export const getlnks = async function () {
       ),
     });
   }
-  info("完成快捷方式信息提取！")
+  info("完成快捷方式信息提取！");
   return lnks;
 };
 
@@ -93,8 +93,8 @@ const getLnkFile = async function () {
       ) {
         lnkFiles.push(files[i]);
       }
-    } catch (e:any) {
-      error("getLnkFile："+e)
+    } catch (e: any) {
+      error("getLnkFile：" + e);
     }
   }
   // 去掉有关卸载的程序lnk

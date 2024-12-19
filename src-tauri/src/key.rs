@@ -5,7 +5,7 @@ use enigo::{
 };
 
 #[tauri::command]
-pub fn keyinput(){
+pub fn keyinput() {
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
     // Paste
     enigo.key(Key::Control, Press);

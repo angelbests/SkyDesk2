@@ -5,8 +5,8 @@ use tauri::{AppHandle, Emitter, Manager};
 use windows::{
     core::s,
     Win32::{
-        Foundation::RECT,
-        UI::WindowsAndMessaging::{self, HWND_TOP, SWP_SHOWWINDOW},
+        Foundation::{BOOL, RECT},
+        UI::WindowsAndMessaging,
     },
 };
 
@@ -85,15 +85,7 @@ pub fn listentaskbar(app: AppHandle) {
                 }
                 let json = serde_json::to_string(&p).unwrap();
                 let _ = app.emit("taskbar", json);
-                let _ = WindowsAndMessaging::SetWindowPos(
-                    h,
-                    HWND_TOP,
-                    p.x,
-                    p.y,
-                    p.width,
-                    p.height,
-                    SWP_SHOWWINDOW,
-                );
+                let _ = WindowsAndMessaging::MoveWindow(h, p.x, p.y, p.width, p.height, BOOL(0));
                 thread::sleep(Duration::from_millis(300));
             }
         }

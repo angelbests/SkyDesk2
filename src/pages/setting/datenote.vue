@@ -441,7 +441,10 @@ const endupdate = function (e: any) {
     </v-dialog>
     <v-card
       @wheel.self="wheelmonth"
-      :style="{ background: systemstore.btnbarbackground ,backgroundSize:'cover'}"
+      :style="{
+        background: systemstore.btnbarbackground,
+        backgroundSize: 'cover',
+      }"
       class="btnbar"
     >
       <div

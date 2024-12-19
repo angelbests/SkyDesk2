@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { allinit } from './functions/mianinit';
-onMounted(async ()=>{
-  await allinit()
-})
+import { onMounted } from "vue";
+import { allinit } from "./functions/mianinit";
+onMounted(async () => {
+  await allinit();
+});
 </script>
 
 <template>
@@ -11,7 +11,8 @@ onMounted(async ()=>{
 </template>
 
 <style>
-html,body {
+html,
+body {
   overflow: hidden !important;
   width: 100vw;
   height: 100vh;
@@ -27,14 +28,14 @@ html,body {
 }
 
 ::-webkit-scrollbar {
-    width: 2px;
+  width: 2px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(123,123,123,0.5);
+  background: rgba(123, 123, 123, 0.5);
   border-radius: 5px;
 }
-::-webkit-scrollbar-button{
+::-webkit-scrollbar-button {
   display: none;
 }
 

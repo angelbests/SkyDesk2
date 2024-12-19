@@ -1,9 +1,5 @@
-
 use std::{thread, time};
-use sysinfo::{
-    Networks,
-    System
-};
+use sysinfo::{Networks, System};
 use tauri::{AppHandle, Emitter};
 #[tauri::command]
 pub fn netspeed(app: AppHandle) {
@@ -35,22 +31,22 @@ pub fn netspeed(app: AppHandle) {
     });
 }
 
-
 #[tauri::command]
-pub fn system(app: AppHandle){
+pub fn system(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
         let mut system = System::new_all();
-        loop{
+        loop {
             // cpu
             system.refresh_all();
-            let _ = app.emit("cpu",system.global_cpu_usage().to_string());
+            let _ = app.emit("cpu", system.global_cpu_usage().to_string());
             // memory
             let used_memory = system.used_memory();
             let total_memory = system.total_memory();
-            let _ = app.emit("memory", (used_memory as f32/total_memory as f32).to_string());
+            let _ = app.emit(
+                "memory",
+                (used_memory as f32 / total_memory as f32).to_string(),
+            );
             thread::sleep(time::Duration::from_millis(1000));
         }
     });
 }
-
-

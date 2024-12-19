@@ -17,7 +17,7 @@ import {
 } from "@tauri-apps/plugin-fs";
 import { uuid } from ".";
 import { invoke } from "@tauri-apps/api/core";
-import { info,error } from "@tauri-apps/plugin-log";
+import { info, error } from "@tauri-apps/plugin-log";
 
 export const setIcon = async function () {
   let defaultico = (await resourceDir()) + "/resources/program.png";
@@ -66,7 +66,7 @@ export const setIcon = async function () {
     let ext = await extname(name);
     ext = ext.toLocaleLowerCase();
     // 分别处理 lnk 和 url文件
-    info(lnks[i].name)
+    info(lnks[i].name);
     if (ext == "lnk") {
       info("无图标文件");
       if (lnks[i].iconLocationPeFile == "") {
@@ -100,11 +100,11 @@ export const setIcon = async function () {
 
   // ico转PNG
   for (let i = 0; i < lnks.length; i++) {
-    let ext = await extname(lnks[i].icoPath)
-    if(ext != "ico") continue;
+    let ext = await extname(lnks[i].icoPath);
+    if (ext != "ico") continue;
     if (await exists(lnks[i].icoPath)) {
       if (containsChinese(lnks[i].icoPath)) {
-        let icoPath = await resolve(path, "other",uuid()+'.ico',);
+        let icoPath = await resolve(path, "other", uuid() + ".ico");
         await copyFile(lnks[i].icoPath, icoPath);
         let res = await invoke("ico_to_png", {
           from: icoPath,
@@ -118,10 +118,14 @@ export const setIcon = async function () {
       } else {
         let res = await invoke("ico_to_png", {
           from: await resolve(lnks[i].icoPath),
-          to: await resolve((lnks[i].icoPath as string).replace(".ico", ".png")),
+          to: await resolve(
+            (lnks[i].icoPath as string).replace(".ico", ".png")
+          ),
         });
         if (res == 1) {
-          lnks[i].icoPath = await resolve((lnks[i].icoPath as string).replace(".ico", ".png"))
+          lnks[i].icoPath = await resolve(
+            (lnks[i].icoPath as string).replace(".ico", ".png")
+          );
         } else {
           error(`${lnks[i].name} ：ico转png失败`);
         }
@@ -142,7 +146,7 @@ const iconLocationPeFilegetico = async function (
     ext = await extname(await basename(pe));
     ext = ext.toLocaleLowerCase();
   } catch (e) {
-    error("格式解析报错："+e);
+    error("格式解析报错：" + e);
     if (pe.indexOf("C:\\Windows\\Installer\\") >= 0) {
       if (await exists(pe)) {
         let icoPath = (await resolve(path, "other")) + "\\" + uuid() + ".ico";
@@ -191,7 +195,7 @@ const iconLocationPeFilegetico = async function (
         try {
           name = name.replace("." + (await extname(name)), "");
         } catch (e) {
-          error("格式解析报错："+e);
+          error("格式解析报错：" + e);
           return defaultico;
         }
         let path =
@@ -210,7 +214,7 @@ const iconLocationPeFilegetico = async function (
       try {
         return await targetPathgetico(pe);
       } catch (e) {
-        error("PE文件解析失败："+e);
+        error("PE文件解析失败：" + e);
         return defaultico;
       }
     }
@@ -230,7 +234,7 @@ const targetPathgetico = async function (pe: string) {
     try {
       ext = await extname(pe);
       ext = ext.toLocaleLowerCase();
-    } catch (e:any) {
+    } catch (e: any) {
       error("格式解析失败，为文件夹：" + e);
       return (await resourceDir()) + "/resources/dir.png";
     }
