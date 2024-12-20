@@ -122,4 +122,4 @@ chrono
 #### sidecar 
 [resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
 ## License
-This project is licensed under the [MIT License](./LICENSE).
+This project is licensed under the [MIT License](LICENSE).
