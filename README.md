@@ -4,12 +4,12 @@
 ![Static Badge](https://img.shields.io/badge/Rust-1.81.0-blue?logo=rust)
 ![Static Badge](https://img.shields.io/badge/vue3-vuetifyjs-gray)
 
-### 下载
+## 下载
 
 [下载](https://github.com/angelbests/SkyDesk2/releases) 程序 SkyDesk2
 
 
-### 开发
+## 开发
 此项目需要安装 rust 环境
 
 ```
@@ -20,7 +20,7 @@ npm run tauri dev
 // build
 npm run tauri build
 ```
-
+## 功能介绍
 ### 快捷
 
 扫描程序：扫描电脑内的快捷文件，并抓取对应程序的程序图标和名称。通过拖拽的方法拖拽到右侧的快捷栏。
@@ -94,7 +94,7 @@ npm run tauri build
 
 ![](./screenshot/14.png)
 
-### 感谢
+## 感谢
 
 #### 前端库
 
