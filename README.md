@@ -121,4 +121,5 @@ tiny_http
 chrono
 #### sidecar 
 [resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
-### 此程序用于个人使用和学习使用，不可用于商业行为。
+## License
+This project is licensed under the [MIT License](LICENSE).
