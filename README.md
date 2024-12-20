@@ -28,7 +28,7 @@ npm run tauri build
 
 ![2](./screenshot/2.png)
 
-![1](screenshot\1.png)
+![1](./screenshot/1.png)
 
 添加桌面合集：将快捷栏中的程序拖拽的桌面合集中即可，拖回主程序删除图标，通过鼠标右键点击弹起自定义配置，自定义桌面合集的样式和大小
 
