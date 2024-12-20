@@ -32,23 +32,23 @@ npm run tauri build
 
 添加桌面合集：将快捷栏中的程序拖拽的桌面合集中即可，拖回主程序删除图标，通过鼠标右键点击弹起自定义配置，自定义桌面合集的样式和大小
 
-![](screenshot\13.png)
+![](./screenshot/13.png)
 
 鼠标轮盘：点按鼠标中键启动，滑向对应的程序图标既可启动程序。
 
-![](screenshot\3.png)
+![](./screenshot/3.png)
 
 ### 壁纸
 
 1.可以添加图片壁纸、视频壁纸、html 网页壁纸。可实现分屏壁纸<br/>
 
-![](screenshot\4.png)
+![](./screenshot/4.png)
 
 2.在线壁纸设置和下载，可配置天气等信息，显示在壁纸上层。
 
 3.在线壁纸鼠标右键调起查询选项，添加壁纸后会自动添加到壁纸列表。<br/>
 
-![](screenshot\7.png)
+![](./screenshot/7.png)
 
 壁纸源：[wallhaven](https://wallhaven.cc/) <br/>
 天气 api：[和风天气](https://www.qweather.com/)<br/>
@@ -57,27 +57,27 @@ npm run tauri build
 
 添加桌面便签，输入内容或拖拽图片进入即可保存对应信息，鼠标右键点击弹起自定义配置选项。
 
-![](screenshot\5.png)
+![](./screenshot/5.png)
 
-![](screenshot\6.png)
+![](./screenshot/6.png)
 
 ### 日历
 
 鼠标在日历区域滚动滑轮切换月份，悬浮在年份上滚动切换年份
 
-![](screenshot\12.png)
+![](./screenshot/12.png)
 
 ### AI
 
 需要安装 ollama，并下载安装对应的 AI 模型。
 
-![](screenshot\10.png)
+![](./screenshot/10.png)
 
 ### 录屏
 
 录屏可以随意框选录屏范围，由于个人能力问题，录屏暂无法录制声音。
 
-![](screenshot\11.png)
+![](./screenshot/11.png)
 
 ### 快捷按键
 
@@ -85,15 +85,15 @@ npm run tauri build
 
 ### 任务栏和网速
 
-![](screenshot\8.png)
+![](./screenshot/8.png)
 
-![](screenshot\9.png)
+![](./screenshot/9.png)
 
 ### 设置主程序界面和配置
 
-![](screenshot\15.png)
+![](./screenshot/15.png)
 
-![](screenshot\14.png)
+![](./screenshot/14.png)
 
 ### 感谢
 
