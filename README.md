@@ -26,7 +26,7 @@ npm run tauri build
 
 扫描程序：扫描电脑内的快捷文件，并抓取对应程序的程序图标和名称。通过拖拽的方法拖拽到右侧的快捷栏。
 
-![2](screenshot\2.png)
+![2](./screenshot/2.png)
 
 ![1](screenshot\1.png)
 
