@@ -3,7 +3,7 @@
 ![Static Badge](https://img.shields.io/badge/Tauri-2.0.1-blue?logo=tauri)
 ![Static Badge](https://img.shields.io/badge/Rust-1.81.0-blue?logo=rust)
 ![Static Badge](https://img.shields.io/badge/vue3-vuetifyjs-gray)
-sidecar 使用 [resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
+<br/>sidecar 使用 [resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
 
 ### 下载
 
