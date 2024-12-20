@@ -8,7 +8,7 @@ import { createWindow } from "../../functions/window";
 import { uuid } from "../../functions";
 import { open } from "@tauri-apps/plugin-dialog";
 import { exec } from "../../functions/open";
-import { appDataDir, basename, resourceDir } from "@tauri-apps/api/path";
+import { appDataDir, extname, resourceDir } from "@tauri-apps/api/path";
 import GridContainer from "../../components/GridContainer.vue";
 import { emit } from "@tauri-apps/api/event";
 import { readFile, writeFile } from "@tauri-apps/plugin-fs";
@@ -221,10 +221,8 @@ const submitshortcut = async function () {
     shortcut.value.name
   ) {
     let read = await readFile(shortcut.value.icoPath);
-    let path =
-      (await appDataDir()) +
-      "\\ico\\other\\" +
-      (await basename(shortcut.value.icoPath));
+    let icoext = await extname(shortcut.value.icoPath);
+    let path = (await appDataDir()) + "\\ico\\other\\" + uuid() + "." + icoext;
     await writeFile(path, read);
     shortcuts.value[tab.value].shortcut[index.value].icoPath = path;
     shortcuts.value[tab.value].shortcut[index.value].lnkPath =
@@ -243,10 +241,8 @@ const submitshortcut2 = async function () {
     shortcut.value.icoPath
   ) {
     let read = await readFile(shortcut.value.icoPath);
-    let path =
-      (await appDataDir()) +
-      "\\ico\\other\\" +
-      (await basename(shortcut.value.icoPath));
+    let icoext = await extname(shortcut.value.icoPath);
+    let path = (await appDataDir()) + "\\ico\\other\\" + uuid() + "." + icoext;
     await writeFile(path, read);
     shortcuts.value[tab.value].shortcut.push({
       targetPath: shortcut.value.targetPath,

@@ -1,13 +1,5 @@
-import { convertFileSrc } from "@tauri-apps/api/core";
-import { appDataDir, resolve } from "@tauri-apps/api/path";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import {
-  BaseDirectory,
-  writeFile,
-  mkdir,
-  readDir,
-} from "@tauri-apps/plugin-fs";
-import html2canvas from "html2canvas";
+import { resolve } from "@tauri-apps/api/path";
+import { readDir } from "@tauri-apps/plugin-fs";
 
 // UUID
 export const uuid = function (): string {
@@ -19,29 +11,6 @@ export const uuid = function (): string {
     }) +
     "-" +
     new Date().getTime()
-  );
-};
-
-// DOM截屏
-export const screenshot = async function () {
-  await mkdir("window", { baseDir: BaseDirectory.AppData, recursive: true });
-  let canvas = await html2canvas(document.body);
-  canvas.toBlob(async (e) => {
-    console.log(e);
-    if (e) {
-      writeFile(
-        "window/screenshot-" + getCurrentWebviewWindow().label + ".png",
-        new Uint8Array(await e.arrayBuffer()),
-        { baseDir: BaseDirectory.AppData, create: true }
-      );
-    }
-  });
-  return convertFileSrc(
-    await resolve(
-      await appDataDir(),
-      "window",
-      "screenshot-" + getCurrentWebviewWindow().label + ".png"
-    )
   );
 };
 

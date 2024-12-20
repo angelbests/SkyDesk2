@@ -4,7 +4,7 @@ use std::{
     sync::{Arc, Mutex},
     time::Instant,
 };
-use tauri::{AppHandle, Listener, Manager};
+use tauri::{AppHandle, Listener};
 use windows_capture::{
     capture::GraphicsCaptureApiHandler,
     encoder::{AudioSettingsBuilder, ContainerSettingsBuilder, VideoEncoder, VideoSettingsBuilder},
@@ -141,33 +141,4 @@ pub fn start_capture(
         });
         // Capture::start(settings).expect("Screen Capture Failed");
     });
-}
-
-use xcap::Monitor as xMonitor;
-#[tauri::command]
-pub fn get_display_capture(display: String, path: String) {
-    tauri::async_runtime::spawn(async move {
-        let monitors = xMonitor::all().unwrap();
-        for monitor in monitors {
-            if display == monitor.name() {
-                let image = monitor.capture_image().unwrap();
-                image.save(path.clone()).unwrap();
-            }
-        }
-    });
-}
-
-#[tauri::command]
-pub fn get_window_capture(app: AppHandle, label: String) {
-    let webview = app.get_webview_window(&label).unwrap();
-    let hwnd = webview.hwnd().unwrap();
-    let windows = xcap::Window::all().unwrap();
-    for w in windows {
-        println!("{:?},{:?},{:?}", w.id(), hwnd.0, w.title());
-        if w.id() == hwnd.0 as u32 {
-            println!("{label}");
-            let image = w.capture_image().unwrap();
-            image.save(format!("target/window.png",)).unwrap();
-        }
-    }
 }

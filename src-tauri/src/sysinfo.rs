@@ -4,14 +4,14 @@ use tauri::{AppHandle, Emitter};
 #[tauri::command]
 pub fn netspeed(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
-        let mut r: u64 = 0;
-        let mut t: u64 = 0;
+        let mut _r: u64 = 0;
+        let mut _t: u64 = 0;
         let mut networks = Networks::new_with_refreshed_list();
         loop {
             thread::sleep(time::Duration::from_secs(1));
             networks.refresh(true);
-            r = 0;
-            t = 0;
+            _r = 0;
+            _t = 0;
             for (name, network) in &networks {
                 // 排除 vEthernet Bridge Virtual Filter Qos 网络
                 if (name.contains("vEthernet")
@@ -21,11 +21,11 @@ pub fn netspeed(app: AppHandle) {
                     || name.contains("Qos"))
                     == false
                 {
-                    r = r + network.received();
-                    t = t + network.transmitted();
+                    _r = _r + network.received();
+                    _t = _t + network.transmitted();
                 }
             }
-            let str = format!("{{\"speed_r\":{},\"speed_s\":{}}}", r, t);
+            let str = format!("{{\"speed_r\":{},\"speed_s\":{}}}", _r, _t);
             let _ = app.emit("netspeed", str);
         }
     });

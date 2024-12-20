@@ -173,8 +173,7 @@
     ],
     "resources": [
       "icons/icon.ico",
-      "resources/*",
-      "lib/*"
+      "resources/*"
     ],
     "windows": {
       "allowDowngrades": true,

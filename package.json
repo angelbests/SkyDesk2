@@ -12,9 +12,6 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@antv/g2": "^5.2.7",
-    "@fullcalendar/core": "^6.1.15",
-    "@fullcalendar/vue3": "^6.1.15",
     "@tauri-apps/api": "^2.0.2",
     "@tauri-apps/plugin-autostart": "^2.0.0",
     "@tauri-apps/plugin-clipboard-manager": "^2.0.0",
@@ -27,12 +24,9 @@
     "@tauri-apps/plugin-shell": "^2.0.0",
     "@wangeditor-next/editor-for-vue": "^5.1.12",
     "@wangeditor/editor": "^5.1.23",
-    "axios": "^1.7.7",
     "fabric": "^6.4.2",
-    "fullcalendar": "^6.1.15",
     "github-markdown-css": "^5.7.0",
     "highlight.js": "^11.10.0",
-    "html2canvas": "^1.4.1",
     "js-calendar-converter": "^0.0.6",
     "js-md5": "^0.8.3",
     "markdown-it": "^14.1.0",
