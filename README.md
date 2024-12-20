@@ -3,7 +3,6 @@
 ![Static Badge](https://img.shields.io/badge/Tauri-2.0.1-blue?logo=tauri)
 ![Static Badge](https://img.shields.io/badge/Rust-1.81.0-blue?logo=rust)
 ![Static Badge](https://img.shields.io/badge/vue3-vuetifyjs-gray)
-<br/>sidecar 使用 [resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
 
 ### 下载
 
@@ -120,5 +119,6 @@ image
 windows-capture
 tiny_http
 chrono
-
+#### sidecar 
+[resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
 ### 此程序用于个人使用和学习使用，不可用于商业行为。
