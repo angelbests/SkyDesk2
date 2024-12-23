@@ -277,6 +277,7 @@ const delmsg = async function () {
             box-sizing: border-box;
             padding: 10px;
             transition: all 0.3s linear;
+            user-select: text !important;
           "
         >
           <template v-for="item in messages">
