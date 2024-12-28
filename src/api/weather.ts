@@ -1,6 +1,7 @@
 import { fetch } from "@tauri-apps/plugin-http";
 // 9cda7ed49a914d5eb6987706d642da65
 import { weatherStore } from "../stores/window";
+import { info } from "@tauri-apps/plugin-log";
 export const getpoi = async function (city: string): Promise<any> {
   const w = weatherStore();
   if (w.apikey && city) {
@@ -32,19 +33,26 @@ export const getWeather = async function (location: string): Promise<any> {
   );
   console.log(respone);
   try {
+    let isgzip = false;
     if (respone.ok) {
       // 解压gzip数据
-      // for (const pair of respone.headers.entries()) {
-      //     console.log(`${pair[0]}: ${pair[1]}`);
-      // }
-      let json = await respone.json();
-      console.log(json);
+      for (const pair of respone.headers.entries()) {
+        info(`${pair[0]}: ${pair[1]}`);
+        if (pair[0] == "content-encoding" && pair[1] == "gzip") {
+          isgzip = true;
+        }
+      }
       // 解压Gzip
-      // let blob = await respone.blob()
-      // let ds = new DecompressionStream("gzip")
-      // const de = blob.stream().pipeThrough(ds);
-      // let res = await new Response(de).json()
-      return json;
+      if (isgzip) {
+        let blob = await respone.blob();
+        let ds = new DecompressionStream("gzip");
+        const de = blob.stream().pipeThrough(ds);
+        let json = await new Response(de).json();
+        return json;
+      } else {
+        let json = await respone.json();
+        return json;
+      }
     }
   } catch (error) {
     console.log(error);
