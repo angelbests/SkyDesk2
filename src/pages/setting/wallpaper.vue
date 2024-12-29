@@ -6,7 +6,7 @@ import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
 import { open } from '@tauri-apps/plugin-dialog';
 import { appDataDir, basename, resolve, pictureDir, resourceDir } from '@tauri-apps/api/path'
-import { convertFileSrc } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
 import { availableMonitors, LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows, WebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -153,7 +153,13 @@ const getpreview = async function () {
         ]
     })
     if (res) {
-        addWallPaperData.value.preview = res
+        let name = await basename(res);
+        let path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+        invoke('zipimage', {
+            imgpath: res,
+            savepath:path
+        });
+        addWallPaperData.value.preview = path
     }
 }
 
@@ -184,7 +190,13 @@ const getpath = async function () {
         addWallPaperData.value.filename = await basename(res)
     }
     if (addWallPaperData.value.type == "image" && res) {
-        addWallPaperData.value.preview = res
+        let name = await basename(res);
+        let path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+        invoke('zipimage', {
+            imgpath: res,
+            savepath:path
+        });
+        addWallPaperData.value.preview = path
     }
 }
 
@@ -259,11 +271,17 @@ const closewallpaper = async function () {
 const setwallpaper = async function (src: string) {
     console.log(src)
     let path = await downloadwallpaper(src)
+    let name = await basename(path);
+    let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+    await invoke('zipimage', {
+        imgpath: path,
+        savepath:p_path
+    });
     if (path) {
         addWallPaperData.value = {
             "type": "image",
             "title": "",
-            "preview": path,
+            "preview": p_path,
             "filename": await basename(path),
             "path": path
         }
@@ -481,25 +499,5 @@ const wallpapersetting = function(){
 .btnbar{
     width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)
 }
-.wallpaper {
-    width: 100%;
-    background: white;
-    display: flex;
-    justify-content: center;
-    overflow-x: hidden;
-    overflow-y: scroll;
-}
 
-.wallpaper-list {
-    width: 100%;
-    height: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 420px);
-    grid-template-rows: repeat(auto-fit, 320px);
-    grid-auto-flow: row;
-    justify-items: center;
-    align-items: center;
-    justify-content: center;
-    min-height: '100%'
-}
 </style>

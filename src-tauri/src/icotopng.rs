@@ -1,4 +1,4 @@
-use image::ImageReader;
+use image::{imageops::FilterType, ImageReader};
 #[tauri::command]
 pub async fn ico_to_png(from: String, to: String) -> i32 {
     let mut bool = 0;
@@ -14,4 +14,21 @@ pub async fn ico_to_png(from: String, to: String) -> i32 {
         }
     }
     bool
+}
+
+#[tauri::command]
+pub async fn zipimage(imgpath: String, savepath: String) {
+    let img = ImageReader::open(imgpath).unwrap();
+    let de = img.decode();
+    match de {
+        Ok(d) => {
+            let w = d.width();
+            let h = d.height();
+            let e = d.resize(400, w / 400 * h as u32, FilterType::Triangle);
+            e.save(savepath).unwrap();
+        }
+        Err(e) => {
+            println!("{:?}", e);
+        }
+    }
 }

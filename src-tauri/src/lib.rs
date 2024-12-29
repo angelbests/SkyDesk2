@@ -43,6 +43,7 @@ pub fn run() {
             wallpaper::cancelwallpaper,
             server::open_server,
             icotopng::ico_to_png,
+            icotopng::zipimage,
             wheel::wheelclick,
             capture::start_capture,
             sysinfo::netspeed,
