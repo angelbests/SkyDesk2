@@ -4,11 +4,11 @@ use tauri::{AppHandle, Manager};
 use windows::{
     core::s,
     Win32::{
-        Foundation::{BOOL, HWND, LPARAM, POINT, WPARAM},
+        Foundation::{BOOL, COLORREF, HWND, LPARAM, POINT, WPARAM},
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
-            self, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP, SMTO_NORMAL, SWP_HIDEWINDOW,
-            SWP_SHOWWINDOW, WS_EX_LAYERED,
+            self, SetLayeredWindowAttributes, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP,
+            LWA_ALPHA, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_LAYERED,
         },
     },
 };
@@ -88,7 +88,11 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             LPARAM(&mut worker_w as *mut HWND as isize),
         );
         if worker_w == HWND(std::ptr::null_mut()) {
-            panic!("Could not find worker_w window");
+            worker_w =
+                WindowsAndMessaging::FindWindowExA(progman, None, s!("WorkerW"), None).unwrap();
+            if worker_w == HWND(std::ptr::null_mut()) {
+                panic!("Could not find worker_w window");
+            }
         }
 
         // 获取 worker_w的窗口坐标
@@ -112,6 +116,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             GWL_EXSTYLE,
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED.0 as isize,
         );
+        let _ = SetLayeredWindowAttributes(hwnd, COLORREF(0), 255, LWA_ALPHA);
         let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
         // thread::sleep(Duration::from_millis(100));
         if z == 1 {
