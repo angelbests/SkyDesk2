@@ -1,3 +1,5 @@
+use std::{thread, time::Duration};
+
 // use std::thread;
 // use std::time::Duration;
 use tauri::{AppHandle, Manager};
@@ -8,7 +10,8 @@ use windows::{
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
             self, SetLayeredWindowAttributes, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP,
-            LWA_ALPHA, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, WS_EX_LAYERED,
+            LWA_ALPHA, SMTO_NORMAL, SWP_HIDEWINDOW, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNORMAL,
+            WS_EX_LAYERED,
         },
     },
 };
@@ -140,6 +143,12 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
                 SWP_SHOWWINDOW,
             );
         };
+        let shell_dll_def_view =
+            WindowsAndMessaging::FindWindowExA(progman, None, s!("SHELLDLL_DefView"), None)
+                .unwrap();
+        let _ = WindowsAndMessaging::ShowWindow(shell_dll_def_view, SW_HIDE);
+        thread::sleep(Duration::from_millis(0));
+        let _ = WindowsAndMessaging::ShowWindow(shell_dll_def_view, SW_SHOWNORMAL);
     };
 }
 
