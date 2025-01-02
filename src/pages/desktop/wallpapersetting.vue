@@ -8,11 +8,11 @@ onMounted(() => {
   document
     .querySelector(".v-slide-group__content")
     ?.setAttribute("data-tauri-drag-region", "true");
-  window.addEventListener("storage", (e) => {
-    if (e.key == "wallpaper") {
-      wallpaperstore.$hydrate();
-    }
-  });
+  // window.addEventListener("storage", (e) => {
+  //   if (e.key == "wallpaper") {
+  //     wallpaperstore.$hydrate();
+  //   }
+  // });
 });
 
 // const config = ref({
