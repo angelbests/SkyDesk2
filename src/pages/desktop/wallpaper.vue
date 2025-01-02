@@ -9,7 +9,7 @@ import "qweather-icons/font/qweather-icons.css";
 import { currentMonitor } from "@tauri-apps/api/window";
 const weatherstore = weatherStore();
 const wallpaperstore = wallpaperStore();
-const index = ref(1);
+const index = ref(0);
 const { city, apikey, citycode } = toRefs(weatherstore);
 const route = useRoute();
 const show = ref(false);
