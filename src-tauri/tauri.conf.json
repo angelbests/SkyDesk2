@@ -126,8 +126,8 @@
         "visible": false
       },
       {
-        "x": 99,
-        "y": 99,
+        "x": 9999999,
+        "y": 9999999,
         "width": 80,
         "height": 45,
         "shadow": false,
