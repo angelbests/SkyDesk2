@@ -84,7 +84,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.audio"
+                    v-model.lazy="item.config.audio"
                     min="0"
                     max="100"
                     step="1"
@@ -105,7 +105,7 @@ onMounted(() => {
                 <v-switch
                   color="info"
                   hide-details
-                  v-model="item.config.date"
+                  v-model.lazy="item.config.date"
                 ></v-switch>
               </template>
             </v-list-item>
@@ -114,7 +114,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.datex"
+                    v-model.lazy="item.config.datex"
                     min="0"
                     max="100"
                     step="1"
@@ -129,7 +129,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.datey"
+                    v-model.lazy="item.config.datey"
                     min="0"
                     max="100"
                     step="1"
@@ -144,7 +144,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.datefontsize"
+                    v-model.lazy="item.config.datefontsize"
                     min="0"
                     max="100"
                     step="1"
@@ -164,7 +164,7 @@ onMounted(() => {
                 <v-switch
                   color="info"
                   hide-details
-                  v-model="item.config.time"
+                  v-model.lazy="item.config.time"
                 ></v-switch>
               </template>
             </v-list-item>
@@ -173,7 +173,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.timex"
+                    v-model.lazy="item.config.timex"
                     min="0"
                     max="100"
                     step="1"
@@ -188,7 +188,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.timey"
+                    v-model.lazy="item.config.timey"
                     min="0"
                     max="100"
                     step="1"
@@ -203,7 +203,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.timefontsize"
+                    v-model.lazy="item.config.timefontsize"
                     min="0"
                     max="100"
                     step="1"
@@ -223,7 +223,7 @@ onMounted(() => {
                 <v-switch
                   color="info"
                   hide-details
-                  v-model="item.config.weather"
+                  v-model.lazy="item.config.weather"
                 ></v-switch>
               </template>
             </v-list-item>
@@ -232,7 +232,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.weatherx"
+                    v-model.lazy="item.config.weatherx"
                     min="0"
                     max="100"
                     step="1"
@@ -247,7 +247,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.weathery"
+                    v-model.lazy="item.config.weathery"
                     min="0"
                     max="100"
                     step="1"
@@ -261,7 +261,7 @@ onMounted(() => {
                                 <v-list-item-title>字体大小</v-list-item-title>
                                 <template v-slot:append>
                                     <div style="width: 280px;">
-                                        <v-slider v-model="item.config.weatherfontsize" min="0" max="100" step="1" thumb-label hide-details></v-slider>
+                                        <v-slider v-model.lazy="item.config.weatherfontsize" min="0" max="100" step="1" thumb-label hide-details></v-slider>
                                     </div>
                                 </template>
                             </v-list-item> -->
@@ -275,7 +275,7 @@ onMounted(() => {
                 <v-switch
                   color="info"
                   hide-details
-                  v-model="item.config.netspeed"
+                  v-model.lazy="item.config.netspeed"
                 ></v-switch>
               </template>
             </v-list-item>
@@ -284,7 +284,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.netspeedx"
+                    v-model.lazy="item.config.netspeedx"
                     min="0"
                     max="100"
                     step="1"
@@ -299,7 +299,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.netspeedy"
+                    v-model.lazy="item.config.netspeedy"
                     min="0"
                     max="100"
                     step="1"
@@ -314,7 +314,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.netspeedfontsize"
+                    v-model.lazy="item.config.netspeedfontsize"
                     min="0"
                     max="100"
                     step="1"
@@ -332,7 +332,7 @@ onMounted(() => {
                 <v-switch
                   color="info"
                   hide-details
-                  v-model="item.config.cpu"
+                  v-model.lazy="item.config.cpu"
                 ></v-switch>
               </template>
             </v-list-item>
@@ -341,7 +341,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.cpux"
+                    v-model.lazy="item.config.cpux"
                     min="0"
                     max="100"
                     step="1"
@@ -356,7 +356,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.cpuy"
+                    v-model.lazy="item.config.cpuy"
                     min="0"
                     max="100"
                     step="1"
@@ -371,7 +371,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.cpufontsize"
+                    v-model.lazy="item.config.cpufontsize"
                     min="0"
                     max="100"
                     step="1"
@@ -391,7 +391,7 @@ onMounted(() => {
                 <v-switch
                   color="info"
                   hide-details
-                  v-model="item.config.memory"
+                  v-model.lazy="item.config.memory"
                 ></v-switch>
               </template>
             </v-list-item>
@@ -400,7 +400,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.memoryx"
+                    v-model.lazy="item.config.memoryx"
                     min="0"
                     max="100"
                     step="1"
@@ -415,7 +415,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.memoryy"
+                    v-model.lazy="item.config.memoryy"
                     min="0"
                     max="100"
                     step="1"
@@ -430,7 +430,7 @@ onMounted(() => {
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider
-                    v-model="item.config.memoryfontsize"
+                    v-model.lazy="item.config.memoryfontsize"
                     min="0"
                     max="100"
                     step="1"
