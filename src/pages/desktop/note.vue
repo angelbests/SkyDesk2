@@ -162,7 +162,7 @@ const editorConfig: Partial<IEditorConfig> = {
       lineHeightList: ["1", "1.5", "2", "2.5"],
     },
   },
-  placeholder: "请输入内容...",
+  placeholder: "",
   hoverbarKeys: {
     text: {
       menuKeys: ["insertLink", "through", "bold", "clearStyle"],
