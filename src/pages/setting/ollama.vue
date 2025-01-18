@@ -5,17 +5,20 @@ import hljs from "highlight.js";
 import { fetch } from "@tauri-apps/plugin-http";
 import "github-markdown-css/github-markdown.css";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { appDataDir, resolve } from "@tauri-apps/api/path";
+import { appDataDir, extname, resolve } from "@tauri-apps/api/path";
 import {
   exists,
   readTextFile,
   writeTextFile,
   remove,
+  writeFile,
 } from "@tauri-apps/plugin-fs";
 import { md5 } from "js-md5";
 import { Command } from "@tauri-apps/plugin-shell";
 import { useRouter } from "vue-router";
 import { systemStore } from "../../stores/window";
+import { fileToBase64, uuid } from "../../functions";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 const systemstore = systemStore();
 const router = useRouter();
 // https://github.com/ollama/ollama/releases/download/v0.4.0-rc5/OllamaSetup.exe
@@ -24,12 +27,16 @@ const model = ref();
 const messages = ref<
   {
     role: "user" | "system" | "assistant";
+    md: string;
     content: string;
+    images?: string[];
   }[]
 >([]);
 const message = ref("");
 const loading = ref(false);
-const md = markdownit().use(highlightjs, {
+const md = markdownit({
+  html: true,
+}).use(highlightjs, {
   hljs: hljs,
 });
 let baseurl = "http://127.0.0.1:11434/api";
@@ -40,6 +47,7 @@ const loadsetup = computed(() => {
 onMounted(async () => {
   await checkollama();
   let list = await getmodellist();
+  console.log(list);
   if (list) {
     modellist.value = list;
     model.value = modellist.value[0];
@@ -88,7 +96,7 @@ const getmodellist = async function () {
 };
 
 const sendmessage = async function () {
-  if (!message.value) return;
+  // if (!message.value) return;
   if (!model.value) {
     message.value = "";
     snackbar.value = {
@@ -104,11 +112,36 @@ const sendmessage = async function () {
   let m: {
     role: "user" | "system" | "assistant";
     content: string;
+    md: string;
+    images?: string[];
   } = {
     role: "user",
+    md: message.value,
     content: message.value,
   };
   message.value = "";
+  let basestr = "";
+  let upfile = document.getElementById("upfile") as HTMLInputElement;
+  if (upfile.files && upfile.files.length > 0) {
+    let file: File = upfile.files[0];
+    let ext = await extname(file.name);
+    let dir = (await appDataDir()) + "\\ollama\\temp\\" + uuid() + "." + ext;
+    await writeFile(dir, new Uint8Array(await file.arrayBuffer()));
+    invoke("zipimage", {
+      imgpath: dir,
+      savepath: dir,
+    });
+    upfile.value = "";
+    let base64 = await fileToBase64(file);
+    basestr = base64.split(",")[1];
+    m["images"] = [basestr];
+    m.md =
+      m.md +
+      `\n <img src="${convertFileSrc(
+        dir
+      )}" width="50%" style="margin-left:50%">`;
+  }
+
   messages.value.push(m);
   let res = await fetch(baseurl + "/chat", {
     method: "post",
@@ -119,16 +152,19 @@ const sendmessage = async function () {
       stream: false,
     }),
   });
+
   let json = await res.json();
   if (json.error != undefined) {
     messages.value.push({
       role: "assistant",
+      md: "系统错误！,此问题我无法回答！",
       content: "系统错误！,此问题我无法回答！",
     });
   } else {
-    console.log(json.message);
+    messages.value[messages.value.length - 1].images = [];
     messages.value.push({
       role: "assistant",
+      md: json.message.content,
       content: json.message.content,
     });
   }
@@ -194,6 +230,12 @@ const delmsg = async function () {
   );
   await remove(path);
   messages.value = [];
+};
+
+const upfile = function () {
+  let dom = document.getElementById("upfile") as HTMLInputElement;
+  dom.value = "";
+  dom.click();
 };
 </script>
 
@@ -309,7 +351,7 @@ const delmsg = async function () {
                     background: 'rgba(220,220,220,0.4)',
                     color: systemstore.fontcolor,
                   }"
-                  v-html="md.render(item.content)"
+                  v-html="md.render(item.md)"
                 ></div>
               </div>
             </div>
@@ -332,7 +374,7 @@ const delmsg = async function () {
               >
                 <div
                   class="markdown-body"
-                  v-html="md.render(item.content)"
+                  v-html="md.render(item.md)"
                   :style="{
                     background: 'rgba(220,220,220,0.4)',
                     color: systemstore.fontcolor,
@@ -368,6 +410,17 @@ const delmsg = async function () {
             v-on:keyup.enter="sendmessage"
           >
             <template v-slot:append>
+              <input
+                type="file"
+                id="upfile"
+                accept="image/png, image/jpeg"
+                style="width: 0px"
+              />
+              <v-icon
+                @click="upfile"
+                style="margin-right: 15px; font-size: 40px"
+                >mdi-image</v-icon
+              >
               <v-btn style="height: 40px" @click="sendmessage">
                 <template v-slot:prepend>
                   <v-icon>mdi-send-variant-outline</v-icon>

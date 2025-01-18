@@ -41,3 +41,20 @@ export const gettime = function () {
   let s = date.getSeconds();
   return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + s;
 };
+
+export const fileToBase64 = function (file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      if (reader.result) {
+        resolve(reader.result as string);
+      } else {
+        reject("Failed to load file");
+      }
+    };
+    reader.onerror = function () {
+      reject("Failed to load file");
+    };
+  });
+};

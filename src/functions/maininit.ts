@@ -2,8 +2,8 @@ import { BaseDirectory, mkdir } from "@tauri-apps/plugin-fs";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { register, isRegistered } from "@tauri-apps/plugin-global-shortcut";
 import { invoke } from "@tauri-apps/api/core";
-import { createtray, traystart } from "../functions/tray";
-import { initWindow } from "../functions/window";
+import { createtray, traystart } from "./tray";
+import { initWindow } from "./window";
 import { exit } from "@tauri-apps/plugin-process";
 import { info } from "@tauri-apps/plugin-log";
 export const maininit = async function () {
@@ -32,6 +32,10 @@ export const maininit = async function () {
   });
   await mkdir("note", { baseDir: BaseDirectory.AppData, recursive: true });
   await mkdir("ollama", { baseDir: BaseDirectory.AppData, recursive: true });
+  await mkdir("ollama\\temp", {
+    baseDir: BaseDirectory.AppData,
+    recursive: true,
+  });
   await mkdir("skydesk2", { baseDir: BaseDirectory.Picture, recursive: true });
   await mkdir("skydesk2", { baseDir: BaseDirectory.Video, recursive: true });
   await mkdir("ico", { baseDir: BaseDirectory.AppData, recursive: true });

@@ -13,7 +13,7 @@ import {
   captureStore,
 } from "../stores/window";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
-import { maininit } from "../functions/mianinit";
+import { maininit } from "../functions/maininit";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 const systemstore = systemStore();
