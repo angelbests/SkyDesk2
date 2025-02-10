@@ -186,17 +186,10 @@ const getpath = async function () {
     if (res) {
         addWallPaperData.value.path = res
         addWallPaperData.value.filename = await basename(res)
+    }
+    if (addWallPaperData.value.type == "image" && res) {
         addWallPaperData.value.preview = res
     }
-    // if (addWallPaperData.value.type == "image" && res) {
-    //     let name = await basename(res);
-    //     let path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
-    //     invoke('zipimage', {
-    //         imgpath: res,
-    //         savepath:path
-    //     });
-    //     addWallPaperData.value.preview = path
-    // }
 } 
 
 // 类型改变时，清空内容
