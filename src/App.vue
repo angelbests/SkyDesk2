@@ -46,4 +46,10 @@ body {
 ::-webkit-scrollbar-corner {
   display: none;
 }
+
+@keyframes music {
+  100% {
+    transform: rotate(360deg);
+  }
+}
 </style>

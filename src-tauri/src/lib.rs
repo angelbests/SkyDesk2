@@ -8,6 +8,9 @@ mod taskbar;
 mod wallpaper;
 mod wheel;
 use chrono::prelude::*;
+mod audio;
+mod music;
+mod smtc;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let local: DateTime<Local> = Local::now();
@@ -48,7 +51,10 @@ pub fn run() {
             capture::start_capture,
             sysinfo::netspeed,
             sysinfo::system,
-            taskbar::listentaskbar
+            taskbar::listentaskbar,
+            music::get_cliudmusic_name,
+            smtc::smtc_listen,
+            audio::process_audio_capture,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

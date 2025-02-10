@@ -33,6 +33,10 @@ const routes: RouteRecordRaw[] = [
         path: "ollama",
         component: () => import("./../pages/setting/ollama.vue"),
       },
+      {
+        path: "test",
+        component: () => import("./../pages/setting/test.vue"),
+      },
     ],
   },
   {

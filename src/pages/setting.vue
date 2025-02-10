@@ -361,6 +361,12 @@ const selectcolor = function () {
             title="日历"
             :href="'/#/pages/setting/datenote'"
           ></v-list-item>
+          <!-- <v-list-item
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-calendar-range"
+            title="test"
+            :href="'/#/pages/setting/test'"
+          ></v-list-item> -->
         </v-list>
       </v-navigation-drawer>
       <router-view

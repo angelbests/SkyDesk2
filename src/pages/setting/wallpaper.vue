@@ -64,7 +64,11 @@ onMounted(async () => {
                     memory:true,
                     memoryx:0,
                     memoryy:0,
-                    memoryfontsize:0,
+                    memoryfontsize: 0,
+                    music: false,
+                    musicx: 0,
+                    musicy: 0,
+                    musicfontsize: 0,
                 }
             })
         }
@@ -153,13 +157,7 @@ const getpreview = async function () {
         ]
     })
     if (res) {
-        let name = await basename(res);
-        let path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
-        invoke('zipimage', {
-            imgpath: res,
-            savepath:path
-        });
-        addWallPaperData.value.preview = path
+        addWallPaperData.value.preview = res
     }
 }
 
@@ -188,17 +186,18 @@ const getpath = async function () {
     if (res) {
         addWallPaperData.value.path = res
         addWallPaperData.value.filename = await basename(res)
+        addWallPaperData.value.preview = res
     }
-    if (addWallPaperData.value.type == "image" && res) {
-        let name = await basename(res);
-        let path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
-        invoke('zipimage', {
-            imgpath: res,
-            savepath:path
-        });
-        addWallPaperData.value.preview = path
-    }
-}
+    // if (addWallPaperData.value.type == "image" && res) {
+    //     let name = await basename(res);
+    //     let path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+    //     invoke('zipimage', {
+    //         imgpath: res,
+    //         savepath:path
+    //     });
+    //     addWallPaperData.value.preview = path
+    // }
+} 
 
 // 类型改变时，清空内容
 const typechange = function (value: any) {
@@ -212,9 +211,18 @@ const typechange = function (value: any) {
 }
 
 // 新增壁纸
+const overlay = ref(false)
 const addWallpaper = async function () {
+    overlay.value = true
     let path = ""
     let dirid = uuid()
+    let name = await basename(addWallPaperData.value.preview);
+    let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+    await invoke('zipimage', {
+        imgpath: addWallPaperData.value.preview,
+        savepath:p_path
+    });
+    addWallPaperData.value.preview = p_path
     if (addWallPaperData.value.type == "image") {
         path = await resolve(await appDataDir(), "wallpapers\\image", dirid)
         await mkdir(path)
@@ -255,6 +263,7 @@ const addWallpaper = async function () {
         "path": ""
     }
     addWallpaperShow.value = false
+    overlay.value = false
 }
 
 // 关闭所有壁纸
@@ -271,17 +280,11 @@ const closewallpaper = async function () {
 const setwallpaper = async function (src: string) {
     console.log(src)
     let path = await downloadwallpaper(src)
-    let name = await basename(path);
-    let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
-    await invoke('zipimage', {
-        imgpath: path,
-        savepath:p_path
-    });
     if (path) {
         addWallPaperData.value = {
             "type": "image",
             "title": "",
-            "preview": p_path,
+            "preview": path,
             "filename": await basename(path),
             "path": path
         }
@@ -338,7 +341,8 @@ const selectcity = async function (e: string) {
 const delwallpaper = async function (index: number) {
     console.log(wallpapers.wallpaperList[index])
     let name = await basename(wallpapers.wallpaperList[index].preview)
-    let path = wallpapers.wallpaperList[index].path.replace(name, "")
+    let path = wallpapers.wallpaperList[index].preview.replace(name, "")
+    console.log(name,path)
     if (await exists(path)) {
         await remove(path, { recursive: true })
     }
@@ -398,6 +402,17 @@ const wallpapersetting = function(){
             </div>
         </v-dialog>
         <v-dialog max-width="500" v-model="addWallpaperShow">
+            <v-overlay
+            :model-value="overlay"
+            :persistent="true"
+            class="align-center justify-center"
+            >
+            <v-progress-circular
+                color="primary"
+                size="64"
+                indeterminate
+            ></v-progress-circular>
+            </v-overlay>
             <v-list>
                 <v-list-item>
                     <v-radio-group @update:model-value="typechange" v-model="addWallPaperData.type" inline

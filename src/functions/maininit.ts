@@ -92,6 +92,11 @@ export const maininit = async function () {
   invoke("system");
   // 初始化任务栏监听
   invoke("listentaskbar");
+  // 通过读取进程的方式获取音乐名称
+  // invoke("get_cliudmusic_name");
+  // windows smtc支持
+  invoke("smtc_listen");
+  // invoke("process_audio_capture");
 };
 
 export const allinit = async function () {

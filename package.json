@@ -1,7 +1,7 @@
 {
   "name": "skydesk2",
   "private": true,
-  "version": "1.1.9",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "tauri dev": "tauri dev",
@@ -39,6 +39,7 @@
     "qweather-icons": "^1.6.0",
     "sortablejs": "^1.15.4",
     "vue": "^3.3.4",
+    "vue-audio-visual": "^3.0.9",
     "vue-draggable-plus": "^0.5.3",
     "vue-router": "^4.4.3",
     "vuetify": "^3.7.1"

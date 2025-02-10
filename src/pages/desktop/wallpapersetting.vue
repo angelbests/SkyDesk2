@@ -440,6 +440,65 @@ onMounted(() => {
                 </div>
               </template>
             </v-list-item>
+            <v-divider></v-divider>
+            <v-list-subheader style="background: #d1c4e9"
+              >网易云音乐</v-list-subheader
+            >
+            <v-list-item>
+              <v-list-item-title>显示</v-list-item-title>
+              <template v-slot:append>
+                <v-switch
+                  color="info"
+                  hide-details
+                  v-model.lazy="item.config.music"
+                ></v-switch>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>X坐标</v-list-item-title>
+              <template v-slot:append>
+                <div style="width: 280px">
+                  <v-slider
+                    v-model.lazy="item.config.musicx"
+                    min="0"
+                    max="100"
+                    step="1"
+                    thumb-label
+                    hide-details
+                  ></v-slider>
+                </div>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>Y坐标</v-list-item-title>
+              <template v-slot:append>
+                <div style="width: 280px">
+                  <v-slider
+                    v-model.lazy="item.config.musicy"
+                    min="0"
+                    max="100"
+                    step="1"
+                    thumb-label
+                    hide-details
+                  ></v-slider>
+                </div>
+              </template>
+            </v-list-item>
+            <!-- <v-list-item>
+              <v-list-item-title>字体大小</v-list-item-title>
+              <template v-slot:append>
+                <div style="width: 280px">
+                  <v-slider
+                    v-model.lazy="item.config.musicfontsize"
+                    min="0"
+                    max="100"
+                    step="1"
+                    thumb-label
+                    hide-details
+                  ></v-slider>
+                </div>
+              </template>
+            </v-list-item> -->
           </v-list>
         </div>
       </v-tabs-window-item>

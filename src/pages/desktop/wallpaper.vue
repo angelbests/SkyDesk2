@@ -7,6 +7,10 @@ import { getWeather } from "../../api/weather";
 import { listen } from "@tauri-apps/api/event";
 import "qweather-icons/font/qweather-icons.css";
 import { currentMonitor } from "@tauri-apps/api/window";
+import { appDataDir } from "@tauri-apps/api/path";
+import { writeFile } from "@tauri-apps/plugin-fs";
+import { uuid } from "../../functions";
+import { info } from "@tauri-apps/plugin-log";
 const weatherstore = weatherStore();
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
@@ -68,6 +72,157 @@ const time = ref<{
   second:
     date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds() + "",
 });
+
+// import { fetch } from "@tauri-apps/plugin-http";
+// const musicname = ref("");
+// const picture = ref("");
+// listen("musicname", async ({ payload }) => {
+//   if (musicname.value != payload) {
+//     musicname.value = payload as string;
+
+//     let f = await fetch(
+//       "http://120.46.68.50:3000/search?keywords=" + musicname.value,
+//       {
+//         method: "post",
+//         mode: "cors",
+//       }
+//     );
+//     let json = await f.json();
+//     if (json.code == 200) {
+//       console.log(json, musicname.value);
+//       console.log(json.result.songs[0].id);
+//       f = await fetch(
+//         "http://120.46.68.50:3000/song/detail?ids=" + json.result.songs[0].id,
+//         {
+//           method: "post",
+//           mode: "cors",
+//         }
+//       );
+//       json = await f.json();
+//       if (json.code == 200) {
+//         console.log(json.songs[0].al.picUrl);
+//         picture.value = json.songs[0].al.picUrl;
+//         info(picture.value);
+//       }
+//     }
+//   }
+// });
+
+const timeline = ref<{
+  start: number;
+  position: number;
+  end: number;
+}>({
+  start: 0,
+  position: 0,
+  end: 0,
+});
+listen(
+  "timeline",
+  (e: {
+    payload: {
+      start: number;
+      position: number;
+      end: number;
+    };
+  }) => {
+    timeline.value = e.payload;
+    info(
+      "时间线：" +
+        e.payload.start +
+        "-" +
+        e.payload.position +
+        "-" +
+        e.payload.end
+    );
+  }
+);
+
+const playstatus = ref(5);
+listen("playstatus", (e: { payload: number }) => {
+  // 0 已关闭 1 已打开 2 正在更改 3 已停止 4 正在播放 5 已暂停
+  let status = "";
+  switch (e.payload) {
+    case 0:
+      status = "已关闭";
+      break;
+    case 1:
+      status = "已打开";
+      break;
+    case 2:
+      status = "正在更改";
+      break;
+    case 3:
+      status = "已停止";
+      break;
+    case 4:
+      status = "正在播放";
+      break;
+    case 5:
+      status = "已暂停";
+      break;
+    default:
+      status = "未知";
+  }
+  playstatus.value = e.payload;
+  console.log(status);
+  info(musicappname.value + "播放状态：" + e.payload);
+});
+
+const musicappname = ref("");
+listen("musicappname", (e: { payload: string }) => {
+  console.log(e.payload);
+  playstatus.value = 5;
+  musicappname.value = e.payload;
+  info("播放app：" + e.payload);
+});
+
+const media = ref<{
+  title: string;
+  artist: string;
+  album_title: string;
+  media_type: number;
+  thumb: string;
+}>({
+  title: "",
+  artist: "",
+  album_title: "",
+  media_type: 0,
+  thumb: "",
+});
+listen(
+  "media",
+  async (e: {
+    payload: {
+      title: string;
+      artist: string;
+      album_title: string;
+      media_type: number;
+      thumb: number[];
+    };
+  }) => {
+    let musicthumb =
+      (await appDataDir()) + "\\wallpapers\\temp\\" + "musicthumb.jpg";
+    if (e.payload.thumb.length > 0) {
+      const uint8 = new Uint8Array(e.payload.thumb as number[]);
+      await writeFile(musicthumb, uint8);
+      media.value = {
+        title: e.payload.title,
+        artist: e.payload.artist,
+        album_title: e.payload.album_title,
+        media_type: e.payload.media_type,
+        thumb: convertFileSrc(musicthumb) + "?id=" + uuid(),
+      };
+    } else {
+      media.value.title = e.payload.title;
+      media.value.artist = e.payload.artist;
+      media.value.album_title = e.payload.album_title;
+      media.value.media_type = e.payload.media_type;
+    }
+    playstatus.value = 4;
+  }
+);
+
 onMounted(async () => {
   const monitor = await currentMonitor();
   index.value = wallpaperstore.wallpaperConfig.findIndex(
@@ -345,6 +500,26 @@ watch(
     >
       内存：{{ memory }}%
     </div>
+
+    <div
+      class="music"
+      v-show="wallpaperstore.wallpaperConfig[index].config.music"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
+      }"
+    >
+      <div class="music_title">{{ media.title }} - {{ media.artist }}</div>
+      <div
+        class="music_pic"
+        :style="{
+          animationPlayState: playstatus == 4 ? 'running' : 'paused',
+        }"
+      >
+        <img v-if="media.thumb" :src="media.thumb" class="music_pic_img" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -416,5 +591,40 @@ watch(
   z-index: 100;
   width: 200px;
   height: 300px;
+}
+.music {
+  position: absolute;
+  z-index: 215;
+  left: 50vw;
+  top: 10vh;
+  width: 300px;
+}
+.music_title {
+  font-size: 16px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-wrap: balance;
+  text-align: center;
+  text-overflow: clip;
+  overflow: hidden;
+}
+.music_pic {
+  position: relative;
+  transform-origin: 50% 50%;
+  animation: 15s normal 0s infinite linear music;
+  width: 100%;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.music_pic_img {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 35px solid rgba(123, 123, 123, 0.2);
+  transition: all 1s linear;
 }
 </style>
