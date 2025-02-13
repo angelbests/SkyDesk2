@@ -101,9 +101,9 @@ export const maininit = async function () {
 
 export const allinit = async function () {
   // 禁止右键
-  // document.addEventListener("contextmenu", (e) => {
-  //   e.preventDefault();
-  // });
+  document.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+  });
   // 禁止快捷按键
   document.onkeydown = function (e) {
     if (e.key == "F7") {
