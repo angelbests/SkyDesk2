@@ -3,7 +3,6 @@ import App from "./App.vue";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import router from "./router/index";
-import { AVPlugin } from "vue-audio-visual";
 // Vuetify
 import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
@@ -46,5 +45,4 @@ pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 app.use(router);
 app.use(vuetify);
-app.use(AVPlugin);
 app.mount("#app");

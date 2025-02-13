@@ -1,18 +1,13 @@
 use std::collections::VecDeque;
 use std::error::{self};
 use std::ffi::OsStr;
-// use std::fs::File;
-// use std::io::prelude::*;
 use std::sync::mpsc;
 
-use rustfft::num_complex::Complex;
-use rustfft::FftPlanner;
 use std::thread;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System};
 use wasapi::*;
 
 type Res<T> = Result<T, Box<dyn error::Error>>;
-
 // Capture loop, capture samples and send in chunks of "chunksize" frames to channel
 fn capture_loop(
     tx_capt: std::sync::mpsc::SyncSender<Vec<u8>>,
@@ -23,7 +18,7 @@ fn capture_loop(
     // 初始化 COM 以供多线程单元 （MTA） 的调用线程使用。
     initialize_mta().ok().unwrap();
     //WAVEFORMAT 结构描述波形音频数据的格式。 此结构中仅包含所有波形音频数据格式通用的格式信息。
-    let desired_format = WaveFormat::new(32, 32, &SampleType::Float, 48000, 2, None);
+    let desired_format = WaveFormat::new(16, 16, &SampleType::Int, 32000, 2, None);
     // BlockAlign： 2字节小端序。大小等于NumChannels * BitsPerSample / 8， 表示每帧的多通道总字节数。
     let blockalign = desired_format.get_blockalign();
     let autoconvert = true;
@@ -84,28 +79,15 @@ fn capture_loop(
     Ok(())
 }
 
-fn get_fft(arr: Vec<u8>) {
-    let mut farr: Vec<Complex<f32>> = arr.iter().map(|&x| Complex::new(x as f32, 0.0)).collect();
-    // println!("{:?}", farr);
-    let mut planner = FftPlanner::<f32>::new();
-    let fft = planner.plan_fft_forward(farr.len());
-
-    // 执行FFT
-    fft.process(&mut farr);
-
-    // 输出结果
-    // for complex in farr {
-    //     println!("{} + {}i", complex.re, complex.im);
-    // }
-}
-
 use tauri::{Emitter, Window};
 #[tauri::command]
-pub fn process_audio_capture(window: Window) {
+pub fn process_audio_capture(window: Window, appname: String) {
     tauri::async_runtime::spawn(async move {
         let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
         let system = System::new_with_specifics(refreshes);
-        let process_ids = system.processes_by_name(OsStr::new("msedge.exe"));
+        // QQMusic.exe cloudmusic.exe
+        let binding = appname.clone();
+        let process_ids = system.processes_by_name(OsStr::new(&binding));
         let mut process_id = 0;
         for process in process_ids {
             process_id = process.parent().unwrap_or(process.pid()).as_u32();
@@ -123,18 +105,39 @@ pub fn process_audio_capture(window: Window) {
             .spawn(move || {
                 let result = capture_loop(tx_capt, chunksize, process_id);
                 if let Err(err) = result {
-                    println!("{:?}", err);
+                    println!("{:?}1", err);
                 }
             });
-
+        let (tx_app, rx_app): (
+            std::sync::mpsc::SyncSender<i32>,
+            std::sync::mpsc::Receiver<i32>,
+        ) = mpsc::sync_channel(2);
+        let _handle = thread::Builder::new()
+            .name("Capture".to_string())
+            .spawn(move || {
+                loop {
+                    let refreshes =
+                        RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
+                    let system = System::new_with_specifics(refreshes);
+                    // QQMusic.exe cloudmusic.exe
+                    let binding = appname.clone();
+                    let process_ids = system.processes_by_name(OsStr::new(&binding));
+                    let count = process_ids.count();
+                    tx_app.send(count.try_into().unwrap()).unwrap();
+                }
+            });
         loop {
             match rx_capt.recv() {
                 Ok(chunk) => {
-                    get_fft(chunk.clone());
                     let _ = window.emit("audio_chunk", chunk);
+                    let num = rx_app.recv().unwrap();
+                    if num == 0 {
+                        break;
+                    }
                 }
                 Err(err) => {
-                    println!("{:?}", err);
+                    println!("{:?}2", err);
+                    break;
                 }
             }
         }

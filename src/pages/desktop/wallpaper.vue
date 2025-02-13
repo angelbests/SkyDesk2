@@ -11,6 +11,7 @@ import { appDataDir } from "@tauri-apps/api/path";
 import { writeFile } from "@tauri-apps/plugin-fs";
 import { uuid } from "../../functions";
 import { info } from "@tauri-apps/plugin-log";
+import PCMPlayer from "pcm-player";
 const weatherstore = weatherStore();
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
@@ -72,42 +73,6 @@ const time = ref<{
   second:
     date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds() + "",
 });
-
-// import { fetch } from "@tauri-apps/plugin-http";
-// const musicname = ref("");
-// const picture = ref("");
-// listen("musicname", async ({ payload }) => {
-//   if (musicname.value != payload) {
-//     musicname.value = payload as string;
-
-//     let f = await fetch(
-//       "http://120.46.68.50:3000/search?keywords=" + musicname.value,
-//       {
-//         method: "post",
-//         mode: "cors",
-//       }
-//     );
-//     let json = await f.json();
-//     if (json.code == 200) {
-//       console.log(json, musicname.value);
-//       console.log(json.result.songs[0].id);
-//       f = await fetch(
-//         "http://120.46.68.50:3000/song/detail?ids=" + json.result.songs[0].id,
-//         {
-//           method: "post",
-//           mode: "cors",
-//         }
-//       );
-//       json = await f.json();
-//       if (json.code == 200) {
-//         console.log(json.songs[0].al.picUrl);
-//         picture.value = json.songs[0].al.picUrl;
-//         info(picture.value);
-//       }
-//     }
-//   }
-// });
-
 const timeline = ref<{
   start: number;
   position: number;
@@ -305,15 +270,17 @@ onMounted(async () => {
     };
   }, 1000);
 
-  listen("cpu", (e) => {
-    let str = e.payload;
-    cpu.value = Math.trunc(Math.round(Number(str)));
-  });
+  draw();
+});
 
-  listen("memory", (e) => {
-    let str = e.payload;
-    memory.value = Math.trunc(Number(str) * 100);
-  });
+listen("cpu", (e) => {
+  let str = e.payload;
+  cpu.value = Math.trunc(Math.round(Number(str)));
+});
+
+listen("memory", (e) => {
+  let str = e.payload;
+  memory.value = Math.trunc(Number(str) * 100);
 });
 const w = ref<{
   temp: string; // 温度
@@ -359,6 +326,62 @@ watch(
     immediate: true,
   }
 );
+
+///////music////////////////
+
+const player = new PCMPlayer({
+  inputCodec: "Int16",
+  channels: 2,
+  sampleRate: 32000,
+  flushTime: 0,
+  fftSize: 512,
+});
+player.volume(0);
+listen("audio_chunk", (e: { payload: number[] }) => {
+  player.feed(new Uint8Array(e.payload));
+});
+
+const bufferLength = player.analyserNode.frequencyBinCount / 2;
+const dataArray = new Uint8Array(bufferLength);
+function draw() {
+  requestAnimationFrame(draw);
+  // 时域数据
+  // player.analyserNode.getByteTimeDomainData(dataArray);
+  player.analyserNode.getByteFrequencyData(dataArray);
+  console.log(dataArray);
+  const canvas = document.getElementById("music_canvas") as HTMLCanvasElement;
+  if (canvas == null) {
+    console.log("canvas error");
+    return;
+  }
+  const canvasCtx = canvas.getContext("2d");
+  if (canvasCtx == null) {
+    console.log("canvasctx error");
+    return;
+  }
+
+  const WIDTH = canvas.width,
+    HEIGHT = canvas.height;
+  canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  canvasCtx.fillStyle = "rgba(220,220,220,1)";
+  const angle = (Math.PI * 2) / bufferLength;
+  canvasCtx.save();
+  canvasCtx.translate(canvas.width / 2, canvas.height / 2);
+  for (let i = 0; i < bufferLength; i++) {
+    canvasCtx.save();
+    canvasCtx.rotate(angle * i + Math.PI);
+    canvasCtx.beginPath();
+
+    const h = (dataArray[i] / 256) * 60;
+    // canvasCtx.fillStyle = `rgba(${dataArray[i] * Math.random()},${
+    //   dataArray[i] * Math.random()
+    // },${dataArray[i] * Math.random()},0.8)`;
+    canvasCtx.roundRect(0, 140, 4, h < 4 ? 4 : h, 4);
+    canvasCtx.fill();
+    canvasCtx.restore();
+  }
+  canvasCtx.restore();
+}
 </script>
 
 <template>
@@ -519,6 +542,12 @@ watch(
       >
         <img v-if="media.thumb" :src="media.thumb" class="music_pic_img" />
       </div>
+      <canvas
+        id="music_canvas"
+        class="music_canvas"
+        width="400"
+        height="400"
+      ></canvas>
     </div>
   </div>
 </template>
@@ -598,6 +627,7 @@ watch(
   left: 50vw;
   top: 10vh;
   width: 300px;
+  /* background-color: gray; */
 }
 .music_title {
   font-size: 16px;
@@ -626,5 +656,14 @@ watch(
   border-radius: 50%;
   border: 35px solid rgba(123, 123, 123, 0.2);
   transition: all 1s linear;
+}
+.music_canvas {
+  position: absolute;
+  z-index: 220;
+  left: -50px;
+  top: 55px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

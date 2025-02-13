@@ -12,6 +12,8 @@ use windows::{
     },
     Storage::Streams::{DataReader, IRandomAccessStreamWithContentType},
 };
+
+use crate::audio;
 // static mut COUNTER: u32 = 0;
 #[derive(Clone, serde::Serialize)]
 struct Mediapayload {
@@ -78,8 +80,10 @@ fn get_sessions(gsmtc: &GlobalSystemMediaTransportControlsSessionManager, window
         let appname = session.SourceAppUserModelId().unwrap().to_os_string();
         if appname == "cloudmusic.exe" {
             cloudmusicstatus = true;
+            audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
         } else if appname == "QQMusic.exe" {
             qqmusicstatus = true;
+            audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
         }
     }
     if cloudmusicstatus == false {

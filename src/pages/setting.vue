@@ -366,6 +366,12 @@ const selectcolor = function () {
             prepend-icon="mdi-calendar-range"
             title="test"
             :href="'/#/pages/setting/test'"
+          ></v-list-item>
+          <v-list-item
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-calendar-range"
+            title="three"
+            :href="'/#/pages/setting/three'"
           ></v-list-item> -->
         </v-list>
       </v-navigation-drawer>
@@ -375,9 +381,9 @@ const selectcolor = function () {
         style="width: auto; height: 100%; box-sizing: border-box; padding: 10px"
       >
         <transition name="fade" mode="out-in" appear>
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
+          <!-- <keep-alive> -->
+          <component :is="Component" />
+          <!-- </keep-alive> -->
         </transition>
       </router-view>
     </v-main>
