@@ -81,9 +81,11 @@ fn get_sessions(gsmtc: &GlobalSystemMediaTransportControlsSessionManager, window
         if appname == "cloudmusic.exe" {
             cloudmusicstatus = true;
             audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
+            audio::checkapp(appname.to_str().unwrap().to_string());
         } else if appname == "QQMusic.exe" {
             qqmusicstatus = true;
             audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
+            audio::checkapp(appname.to_str().unwrap().to_string());
         }
     }
     if cloudmusicstatus == false {

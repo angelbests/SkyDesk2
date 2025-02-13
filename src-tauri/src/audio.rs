@@ -2,13 +2,14 @@ use std::collections::VecDeque;
 use std::error::{self};
 use std::ffi::OsStr;
 use std::sync::mpsc;
-
 use std::thread;
+use std::time::Duration;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System};
+use tauri::{Emitter, Window};
 use wasapi::*;
-
+static mut APP_STATUS: i32 = 3;
 type Res<T> = Result<T, Box<dyn error::Error>>;
-// Capture loop, capture samples and send in chunks of "chunksize" frames to channel
+
 fn capture_loop(
     tx_capt: std::sync::mpsc::SyncSender<Vec<u8>>,
     chunksize: usize,
@@ -79,7 +80,6 @@ fn capture_loop(
     Ok(())
 }
 
-use tauri::{Emitter, Window};
 #[tauri::command]
 pub fn process_audio_capture(window: Window, appname: String) {
     tauri::async_runtime::spawn(async move {
@@ -108,31 +108,14 @@ pub fn process_audio_capture(window: Window, appname: String) {
                     println!("{:?}1", err);
                 }
             });
-        let (tx_app, rx_app): (
-            std::sync::mpsc::SyncSender<i32>,
-            std::sync::mpsc::Receiver<i32>,
-        ) = mpsc::sync_channel(2);
-        let _handle = thread::Builder::new()
-            .name("Capture".to_string())
-            .spawn(move || {
-                loop {
-                    let refreshes =
-                        RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
-                    let system = System::new_with_specifics(refreshes);
-                    // QQMusic.exe cloudmusic.exe
-                    let binding = appname.clone();
-                    let process_ids = system.processes_by_name(OsStr::new(&binding));
-                    let count = process_ids.count();
-                    tx_app.send(count.try_into().unwrap()).unwrap();
-                }
-            });
         loop {
             match rx_capt.recv() {
                 Ok(chunk) => {
                     let _ = window.emit("audio_chunk", chunk);
-                    let num = rx_app.recv().unwrap();
-                    if num == 0 {
-                        break;
+                    unsafe {
+                        if APP_STATUS == 0 {
+                            break;
+                        }
                     }
                 }
                 Err(err) => {
@@ -140,6 +123,23 @@ pub fn process_audio_capture(window: Window, appname: String) {
                     break;
                 }
             }
+        }
+    });
+}
+
+pub fn checkapp(appname: String) {
+    tauri::async_runtime::spawn(async move {
+        loop {
+            let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
+            let system = System::new_with_specifics(refreshes);
+            // QQMusic.exe cloudmusic.exe
+            let binding = appname.clone();
+            let process_ids = system.processes_by_name(OsStr::new(&binding));
+            let count = process_ids.count();
+            unsafe {
+                APP_STATUS = count.try_into().unwrap();
+            }
+            thread::sleep(Duration::from_secs(1));
         }
     });
 }
