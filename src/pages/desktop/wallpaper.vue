@@ -338,7 +338,9 @@ const player = new PCMPlayer({
 });
 player.volume(0);
 listen("audio_chunk", (e: { payload: number[] }) => {
-  player.feed(new Uint8Array(e.payload));
+  if (playstatus.value == 4) {
+    player.feed(new Uint8Array(e.payload));
+  }
 });
 
 const bufferLength = player.analyserNode.frequencyBinCount / 2;
