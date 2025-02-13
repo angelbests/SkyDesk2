@@ -7,7 +7,7 @@ use std::time::Duration;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System};
 use tauri::{Emitter, Window};
 use wasapi::*;
-static mut APP_STATUS: i32 = 3;
+static mut APP_STATUS: bool = false;
 type Res<T> = Result<T, Box<dyn error::Error>>;
 
 fn capture_loop(
@@ -82,6 +82,7 @@ fn capture_loop(
 
 #[tauri::command]
 pub fn process_audio_capture(window: Window, appname: String) {
+    let appname1 = appname.clone();
     tauri::async_runtime::spawn(async move {
         let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
         let system = System::new_with_specifics(refreshes);
@@ -112,19 +113,22 @@ pub fn process_audio_capture(window: Window, appname: String) {
             match rx_capt.recv() {
                 Ok(chunk) => {
                     let _ = window.emit("audio_chunk", chunk);
-                    unsafe {
-                        if APP_STATUS == 0 {
-                            break;
-                        }
-                    }
                 }
                 Err(err) => {
                     println!("{:?}2", err);
                     break;
                 }
             }
+            unsafe {
+                // print!("{:?}", APP_STATUS);
+                if APP_STATUS {
+                    APP_STATUS = false;
+                    break;
+                }
+            }
         }
     });
+    checkapp(appname1);
 }
 
 pub fn checkapp(appname: String) {
@@ -136,9 +140,14 @@ pub fn checkapp(appname: String) {
             let binding = appname.clone();
             let process_ids = system.processes_by_name(OsStr::new(&binding));
             let count = process_ids.count();
-            println!("{:?}", count);
             unsafe {
-                APP_STATUS = count.try_into().unwrap();
+                println!("{:?}", count);
+                if count > 0 {
+                    APP_STATUS = false;
+                } else {
+                    APP_STATUS = true;
+                    break;
+                }
             }
             thread::sleep(Duration::from_secs(1));
         }
