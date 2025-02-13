@@ -76,13 +76,20 @@ fn capture_loop(
             audio_client.stop_stream().unwrap();
             break;
         }
+        unsafe {
+            // print!("{:?}", APP_STATUS);
+            if APP_STATUS {
+                APP_STATUS = false;
+                break;
+            }
+        }
     }
     Ok(())
 }
 
 #[tauri::command]
 pub fn process_audio_capture(window: Window, appname: String) {
-    let appname1 = appname.clone();
+    checkapp(appname.clone());
     tauri::async_runtime::spawn(async move {
         let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
         let system = System::new_with_specifics(refreshes);
@@ -119,16 +126,8 @@ pub fn process_audio_capture(window: Window, appname: String) {
                     break;
                 }
             }
-            unsafe {
-                // print!("{:?}", APP_STATUS);
-                if APP_STATUS {
-                    APP_STATUS = false;
-                    break;
-                }
-            }
         }
     });
-    checkapp(appname1);
 }
 
 pub fn checkapp(appname: String) {
