@@ -97,7 +97,7 @@ pub fn process_audio_capture(window: Window, appname: String) {
             std::sync::mpsc::SyncSender<Vec<u8>>,
             std::sync::mpsc::Receiver<Vec<u8>>,
         ) = mpsc::sync_channel(2);
-        let chunksize = 4096;
+        let chunksize = 256;
 
         // Capture
         let _handle = thread::Builder::new()

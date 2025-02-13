@@ -18,6 +18,7 @@ const player = new PCMPlayer({
 player.volume(0);
 listen("audio_chunk", (e: { payload: number[] }) => {
   player.feed(new Uint8Array(e.payload));
+  console.log(e.payload);
 });
 const bufferLength = player.analyserNode.frequencyBinCount / 2;
 const dataArray = new Uint8Array(bufferLength);
