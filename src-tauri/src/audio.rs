@@ -136,6 +136,7 @@ pub fn checkapp(appname: String) {
             let binding = appname.clone();
             let process_ids = system.processes_by_name(OsStr::new(&binding));
             let count = process_ids.count();
+            println!("{:?}", count);
             unsafe {
                 APP_STATUS = count.try_into().unwrap();
             }
