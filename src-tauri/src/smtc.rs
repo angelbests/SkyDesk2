@@ -36,6 +36,7 @@ static mut QQMUSIC: bool = false;
 #[tauri::command]
 pub fn smtc_listen(window: Window) {
     tauri::async_runtime::spawn(async move {
+        audio::default_audio_capture(window.clone());
         let agsmtc = GlobalSystemMediaTransportControlsSessionManager::RequestAsync().unwrap();
         let gsmtc = agsmtc.get().unwrap();
         get_sessions(&gsmtc, window.clone());
@@ -80,10 +81,10 @@ fn get_sessions(gsmtc: &GlobalSystemMediaTransportControlsSessionManager, window
         let appname = session.SourceAppUserModelId().unwrap().to_os_string();
         if appname == "cloudmusic.exe" {
             cloudmusicstatus = true;
-            audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
+            // audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
         } else if appname == "QQMusic.exe" {
             qqmusicstatus = true;
-            audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
+            // audio::process_audio_capture(window.clone(), appname.to_str().unwrap().to_string());
         }
     }
     if cloudmusicstatus == false {

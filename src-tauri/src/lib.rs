@@ -55,7 +55,6 @@ pub fn run() {
             taskbar::listentaskbar,
             music::get_cliudmusic_name,
             smtc::smtc_listen,
-            audio::process_audio_capture,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

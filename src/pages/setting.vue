@@ -366,8 +366,8 @@ const selectcolor = function () {
             prepend-icon="mdi-calendar-range"
             title="test"
             :href="'/#/pages/setting/test'"
-          ></v-list-item>
-          <v-list-item
+          ></v-list-item> -->
+          <!-- <v-list-item
             :style="{ color: systemstore.fontcolor }"
             prepend-icon="mdi-calendar-range"
             title="three"

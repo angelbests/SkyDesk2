@@ -9,10 +9,10 @@ import { listen } from "@tauri-apps/api/event";
 import PCMPlayer from "pcm-player";
 import { onMounted } from "vue";
 const player = new PCMPlayer({
-  inputCodec: "Int16",
+  inputCodec: "Float32",
   channels: 2,
-  sampleRate: 32000,
-  flushTime: 0,
+  sampleRate: 48000,
+  flushTime: 100,
   fftSize: 512,
 });
 player.volume(0);
@@ -20,9 +20,9 @@ listen("audio_chunk", (e: { payload: number[] }) => {
   player.feed(new Uint8Array(e.payload));
   console.log(e.payload);
 });
+
 const bufferLength = player.analyserNode.frequencyBinCount / 2;
 const dataArray = new Uint8Array(bufferLength);
-
 function draw() {
   requestAnimationFrame(draw);
   // 时域数据
@@ -43,15 +43,19 @@ function draw() {
   const WIDTH = canvas.width,
     HEIGHT = canvas.height;
   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-  canvasCtx.fillStyle = "rgb(200,200,200)";
+  canvasCtx.fillStyle = "rgba(220,220,220,1)";
   const angle = (Math.PI * 2) / bufferLength;
   canvasCtx.save();
   canvasCtx.translate(canvas.width / 2, canvas.height / 2);
   for (let i = 0; i < bufferLength; i++) {
     canvasCtx.save();
-    canvasCtx.rotate(angle * i);
+    canvasCtx.rotate(angle * i + Math.PI);
     canvasCtx.beginPath();
+
     const h = (dataArray[i] / 256) * 60;
+    // canvasCtx.fillStyle = `rgba(${dataArray[i] * Math.random()},${
+    //   dataArray[i] * Math.random()
+    // },${dataArray[i] * Math.random()},0.8)`;
     canvasCtx.roundRect(0, 140, 4, h < 4 ? 4 : h, 4);
     canvasCtx.fill();
     canvasCtx.restore();

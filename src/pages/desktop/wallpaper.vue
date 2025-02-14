@@ -330,7 +330,7 @@ watch(
 ///////music////////////////
 
 const player = new PCMPlayer({
-  inputCodec: "Int16",
+  inputCodec: "Float32",
   channels: 2,
   sampleRate: 32000,
   flushTime: 0,
@@ -338,9 +338,7 @@ const player = new PCMPlayer({
 });
 player.volume(0);
 listen("audio_chunk", (e: { payload: number[] }) => {
-  if (playstatus.value == 4) {
-    player.feed(new Uint8Array(e.payload));
-  }
+  player.feed(new Uint8Array(e.payload));
 });
 
 const bufferLength = player.analyserNode.frequencyBinCount / 2;
