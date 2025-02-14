@@ -330,7 +330,7 @@ watch(
 ///////music////////////////
 
 const player = new PCMPlayer({
-  inputCodec: "Float32",
+  inputCodec: "Int16",
   channels: 2,
   sampleRate: 32000,
   flushTime: 0,

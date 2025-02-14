@@ -35,8 +35,8 @@ static mut CLOUDMUSIC: bool = false;
 static mut QQMUSIC: bool = false;
 #[tauri::command]
 pub fn smtc_listen(window: Window) {
+    audio::default_audio_capture(window.clone());
     tauri::async_runtime::spawn(async move {
-        audio::default_audio_capture(window.clone());
         let agsmtc = GlobalSystemMediaTransportControlsSessionManager::RequestAsync().unwrap();
         let gsmtc = agsmtc.get().unwrap();
         get_sessions(&gsmtc, window.clone());

@@ -19,23 +19,22 @@ type Res<T> = Result<T, Box<dyn error::Error>>;
 //     // 初始化 COM 以供多线程单元 （MTA） 的调用线程使用。
 //     initialize_mta().ok().unwrap();
 //     //WAVEFORMAT 结构描述波形音频数据的格式。 此结构中仅包含所有波形音频数据格式通用的格式信息。
-//     let desired_format = WaveFormat::new(32, 32, &SampleType::Float, 48000, 2, None);
+//     let desired_format = WaveFormat::new(16, 16, &SampleType::Int, 32000, 2, None);
 //     // BlockAlign： 2字节小端序。大小等于NumChannels * BitsPerSample / 8， 表示每帧的多通道总字节数。
 //     let blockalign = desired_format.get_blockalign();
-//     let autoconvert = true;
 //     // PROCESS_LOOPBACK_MODE 如果为 true，则环回捕获客户端将从目标进程及其所有子进程捕获音频。 如果为 false，则仅捕获来自目标进程的音频。
 //     let include_tree = true;
 
 //     // 特定进程创建环回捕获 AudioClient。
 //     let mut audio_client = AudioClient::new_application_loopback_client(process_id, include_tree)?;
-
+//     // let (_def_time, min_time) = audio_client.get_periods()?;
 //     // 为给定的方向、共享模式和格式初始化 [IAudioClient]。 设置为 true 将启用自动采样率和格式转换，这意味着几乎接受任何格式
 //     audio_client.initialize_client(
 //         &desired_format, // 波形音频数据的格式
 //         0,
 //         &Direction::Capture, // Direction::Capture 录制 Direction::Render 播放
 //         &ShareMode::Shared,  // ShareMode::Shared 分享  ShareMode::Exclusive 独占
-//         autoconvert,         // 转换
+//         true,                // 转换
 //     )?;
 
 //     //  [IAudioClient] 创建并返回事件句柄
@@ -87,46 +86,47 @@ type Res<T> = Result<T, Box<dyn error::Error>>;
 //     Ok(())
 // }
 
+// #[tauri::command]
 // pub fn process_audio_capture(window: Window, appname: String) {
-//     checkapp(appname.clone());
-//     // tauri::async_runtime::spawn(async move {
-//     let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
-//     let system = System::new_with_specifics(refreshes);
-//     // QQMusic.exe cloudmusic.exe
-//     let binding = appname.clone();
-//     let process_ids = system.processes_by_name(OsStr::new(&binding));
-//     let mut process_id = 0;
-//     for process in process_ids {
-//         process_id = process.parent().unwrap_or(process.pid()).as_u32();
-//     }
+//     // checkapp(appname.clone());
+//     tauri::async_runtime::spawn(async move {
+//         let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
+//         let system = System::new_with_specifics(refreshes);
+//         // QQMusic.exe cloudmusic.exe
+//         let binding = appname.clone();
+//         let process_ids = system.processes_by_name(OsStr::new(&binding));
+//         let mut process_id = 0;
+//         for process in process_ids {
+//             process_id = process.parent().unwrap_or(process.pid()).as_u32();
+//         }
 
-//     let (tx_capt, rx_capt): (
-//         std::sync::mpsc::SyncSender<Vec<u8>>,
-//         std::sync::mpsc::Receiver<Vec<u8>>,
-//     ) = mpsc::sync_channel(2);
-//     let chunksize = 256;
+//         let (tx_capt, rx_capt): (
+//             std::sync::mpsc::SyncSender<Vec<u8>>,
+//             std::sync::mpsc::Receiver<Vec<u8>>,
+//         ) = mpsc::sync_channel(2);
+//         let chunksize = 256;
 
-//     // Capture
-//     let _handle = thread::Builder::new()
-//         .name("Capture".to_string())
-//         .spawn(move || {
-//             let result = capture_loop(tx_capt, chunksize, process_id);
-//             if let Err(err) = result {
-//                 println!("{:?}1", err);
-//             }
-//         });
-//     loop {
-//         match rx_capt.recv() {
-//             Ok(chunk) => {
-//                 let _ = window.emit("audio_chunk", chunk);
-//             }
-//             Err(err) => {
-//                 println!("{:?}2", err);
-//                 break;
+//         // Capture
+//         let _handle = thread::Builder::new()
+//             .name("Capture".to_string())
+//             .spawn(move || {
+//                 let result = capture_loop(tx_capt, chunksize, process_id);
+//                 if let Err(err) = result {
+//                     println!("{:?}1", err);
+//                 }
+//             });
+//         loop {
+//             match rx_capt.recv() {
+//                 Ok(chunk) => {
+//                     let _ = window.emit("audio_chunk", chunk);
+//                 }
+//                 Err(err) => {
+//                     println!("{:?}2", err);
+//                     break;
+//                 }
 //             }
 //         }
-//     }
-//     // });
+//     });
 // }
 
 // pub fn checkapp(appname: String) {
@@ -153,42 +153,43 @@ type Res<T> = Result<T, Box<dyn error::Error>>;
 // }
 
 pub fn default_audio_capture(window: Window) {
-    initialize_mta().ok().unwrap();
+    tauri::async_runtime::spawn(async move {
+        initialize_mta().ok().unwrap();
 
-    let (tx_capt, rx_capt): (
-        std::sync::mpsc::SyncSender<Vec<u8>>,
-        std::sync::mpsc::Receiver<Vec<u8>>,
-    ) = mpsc::sync_channel(2);
-    let chunksize = 4096;
+        let (tx_capt, rx_capt): (
+            std::sync::mpsc::SyncSender<Vec<u8>>,
+            std::sync::mpsc::Receiver<Vec<u8>>,
+        ) = mpsc::sync_channel(2);
+        let chunksize = 1024;
 
-    let _handle = thread::Builder::new()
-        .name("Capture".to_string())
-        .spawn(move || {
-            let result = capture_loop2(tx_capt, chunksize);
-            if let Err(err) = result {
-                println!("{:?}2", err);
-            }
-        });
+        let _handle = thread::Builder::new()
+            .name("Capture".to_string())
+            .spawn(move || {
+                let result = capture_loop2(tx_capt, chunksize);
+                if let Err(err) = result {
+                    println!("{:?}", err);
+                }
+            });
 
-    loop {
-        match rx_capt.recv() {
-            Ok(chunk) => {
-                let _ = window.emit("audio_chunk", chunk);
-            }
-            Err(err) => {
-                println!("{:?}2", err);
-                break;
+        loop {
+            match rx_capt.recv() {
+                Ok(chunk) => {
+                    let _ = window.emit("audio_chunk", chunk);
+                }
+                Err(err) => {
+                    println!("{:?}", err);
+                    break;
+                }
             }
         }
-    }
+    });
 }
 
 fn capture_loop2(tx_capt: std::sync::mpsc::SyncSender<Vec<u8>>, chunksize: usize) -> Res<()> {
-    // Use `Direction::Capture` for normal capture,
-    // or `Direction::Render` for loopback mode (for capturing from a playback device).
     let device = get_default_device(&Direction::Render)?;
     let mut audio_client = device.get_iaudioclient()?;
-    let desired_format = WaveFormat::new(32, 32, &SampleType::Float, 48000, 2, None);
+    println!("{:?}", device.get_friendlyname());
+    let desired_format = WaveFormat::new(16, 16, &SampleType::Int, 32000, 2, None);
     let blockalign = desired_format.get_blockalign();
     let (_def_time, min_time) = audio_client.get_periods()?;
     audio_client.initialize_client(
