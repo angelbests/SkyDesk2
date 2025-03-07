@@ -494,7 +494,7 @@ const wallpapersetting = function(){
                             <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in  monitors"
                                 @click="setmonitorwallpaper(item, monitor)">{{
                                     "屏幕" + (i + 1) }}</v-btn>
-                            <v-btn size="small" border="opacity-50 sm" @click="lockscreen(item)">锁屏</v-btn>
+                            <v-btn v-if="item.type=='image'" size="small" border="opacity-50 sm" @click="lockscreen(item)">锁屏</v-btn>
                             <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)">删除</v-btn>
                             
                         </v-card-actions>
