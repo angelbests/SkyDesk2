@@ -34,6 +34,7 @@ const selectcapture = function () {
         decorations: false,
         transparent: true,
         alwaysOnTop: true,
+        resizable: false,
         url: "/#/pages/desktop/capture",
       })
     );
