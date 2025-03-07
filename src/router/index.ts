@@ -33,14 +33,6 @@ const routes: RouteRecordRaw[] = [
         path: "ollama",
         component: () => import("./../pages/setting/ollama.vue"),
       },
-      {
-        path: "test",
-        component: () => import("./../pages/setting/test.vue"),
-      },
-      {
-        path: "three",
-        component: () => import("./../pages/setting/three.vue"),
-      },
     ],
   },
   {
@@ -92,10 +84,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("./../pages/desktop/wallpapersetting.vue"),
       },
     ],
-  },
-  {
-    path: "/pages/server",
-    component: () => import("./../pages/server.vue"),
   },
   {
     path: "/pages/taskbar",

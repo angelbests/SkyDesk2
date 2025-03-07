@@ -1,7 +1,4 @@
 use std::{thread, time::Duration};
-
-// use std::thread;
-// use std::time::Duration;
 use tauri::{AppHandle, Manager};
 use windows::{
     core::s,
@@ -18,18 +15,32 @@ use windows::{
 #[tauri::command]
 pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32, z: i32) {
     tauri::async_runtime::spawn(async move {
-        let webview = app.get_webview_window(&label).unwrap();
-        let hwnd = webview.hwnd().unwrap();
-        attach(hwnd, x, y, w, h, z);
+        let webview = app.get_webview_window(&label);
+        match webview {
+            Some(webview) => match webview.hwnd() {
+                Ok(hwnd) => attach(hwnd, x, y, w, h, z),
+                Err(e) => println!("Failed to get hwnd: {:?}", e),
+            },
+            None => {
+                println!("webview not found");
+            }
+        }
     });
 }
 
 #[tauri::command]
 pub fn cancelwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i32) {
     tauri::async_runtime::spawn(async move {
-        let webview = app.get_webview_window(&label).unwrap();
-        let hwnd = webview.hwnd().unwrap();
-        detach(hwnd, x, y, w, h);
+        let webview = app.get_webview_window(&label);
+        match webview {
+            Some(webview) => match webview.hwnd() {
+                Ok(hwnd) => detach(hwnd, x, y, w, h),
+                Err(e) => println!("Failed to get hwnd: {:?}", e),
+            },
+            None => {
+                println!("webview not found");
+            }
+        }
     });
 }
 

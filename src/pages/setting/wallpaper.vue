@@ -128,6 +128,10 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
     wallpapers.wallpaperConfig[i].label = label
 }
 
+// 设置锁屏
+const lockscreen = function (item:any) {
+    invoke('setlockscreen', { path: item.path });
+}
 
 const addWallPaperData = ref<{
     "type": "image" | "video" | "html"
@@ -268,6 +272,8 @@ const closewallpaper = async function () {
         }
     })
 }
+
+
 
 // 设置图片为壁纸
 const setwallpaper = async function (src: string) {
@@ -488,7 +494,9 @@ const wallpapersetting = function(){
                             <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in  monitors"
                                 @click="setmonitorwallpaper(item, monitor)">{{
                                     "屏幕" + (i + 1) }}</v-btn>
+                            <v-btn size="small" border="opacity-50 sm" @click="lockscreen(item)">锁屏</v-btn>
                             <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)">删除</v-btn>
+                            
                         </v-card-actions>
                     </v-card>
                 </template>

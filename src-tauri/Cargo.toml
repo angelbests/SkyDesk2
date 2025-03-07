@@ -1,6 +1,6 @@
 [package]
 name = "skydesk2"
-version = "1.2.0"
+version = "1.2.1"
 description = "SkyDesk2"
 authors = ["angelbests1314@live.com"]
 edition = "2021"
@@ -33,12 +33,12 @@ chrono = "0.4.38"
 tiny_http = "0.12.0"
 
 # 录屏库
-windows-capture = "1.3.6"
+windows-capture = "1.4.2"
 
 image = "0.25.2"
 
 # 系统信息
-sysinfo = "0.33.0"
+sysinfo = "0.33.1"
 
 # 按键库
 rdev = {version = "0.5.3", features = ["unstable_grab"] }
@@ -60,8 +60,10 @@ features = [
     "Win32_System_Performance",
     "Win32_System_Threading",
     "Win32_System_ProcessStatus",
+    "System_UserProfile",
     "Media_Control",
     "Storage_Streams",
+    "Storage",
     "Foundation_Collections"
 ]
 

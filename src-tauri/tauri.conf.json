@@ -1,10 +1,10 @@
 {
   "productName": "skydesk2",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "identifier": "com.skydesk2.app",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:2422",
+    "devUrl": "http://localhost:24222",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
@@ -25,18 +25,6 @@
         "dragDropEnabled": false,
         "alwaysOnTop": false,
         "visible": false
-      },
-      {
-        "title": "server",
-        "width": 0,
-        "height": 0,
-        "shadow": false,
-        "decorations": false,
-        "label": "server",
-        "fullscreen": false,
-        "transparent": true,
-        "visible": false,
-        "url": "/#/pages/server"
       },
       {
         "x": 0,

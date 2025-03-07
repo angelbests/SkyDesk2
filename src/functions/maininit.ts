@@ -1,7 +1,6 @@
 import { BaseDirectory, mkdir } from "@tauri-apps/plugin-fs";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { register, isRegistered } from "@tauri-apps/plugin-global-shortcut";
-import { invoke } from "@tauri-apps/api/core";
 import { createtray, traystart } from "./tray";
 import { initWindow } from "./window";
 import { exit } from "@tauri-apps/plugin-process";
@@ -60,17 +59,9 @@ export const maininit = async function () {
     });
   }
   info("快捷键注册完成");
-  // 初始化轮盘事件
-  invoke("wheelclick");
-  info("初始化轮盘事件");
-  // 开启网速事件
-  await invoke("netspeed");
   info("网速事务完成");
-  // 创建托盘
   await createtray();
-  // 检查托盘启动
   await traystart();
-  // 初始化窗口
   await initWindow();
   info("初始化窗口完成");
   // 任务栏关闭窗口
@@ -87,16 +78,6 @@ export const maininit = async function () {
     };
     localStorage.setItem("size", JSON.stringify(size));
   });
-
-  // 初始化壁纸数据
-  invoke("system");
-  // 初始化任务栏监听
-  invoke("listentaskbar");
-  // 通过读取进程的方式获取音乐名称
-  // invoke("get_cliudmusic_name");
-  // windows smtc支持
-  invoke("smtc_listen");
-  // invoke("process_audio_capture", { appname: "cloudmusic.exe" });
 };
 
 export const allinit = async function () {
@@ -152,7 +133,4 @@ export const allinit = async function () {
   };
   // 禁止文本选择
   if (getCurrentWebviewWindow().label.indexOf("note-") >= 0) return;
-  // document.addEventListener("selectstart",(e)=>{
-  //     e.preventDefault();
-  // })
 };

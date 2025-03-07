@@ -1,4 +1,4 @@
-use tauri::{Emitter, Window};
+use tauri::Emitter;
 use windows::{
     Foundation::TypedEventHandler,
     Media::Control::{
@@ -13,7 +13,7 @@ use windows::{
     Storage::Streams::{DataReader, IRandomAccessStreamWithContentType},
 };
 
-use crate::audio;
+// use crate::audio;
 // static mut COUNTER: u32 = 0;
 #[derive(Clone, serde::Serialize)]
 struct Mediapayload {
@@ -34,8 +34,7 @@ struct Timeline {
 static mut CLOUDMUSIC: bool = false;
 static mut QQMUSIC: bool = false;
 #[tauri::command]
-pub fn smtc_listen(window: Window) {
-    audio::default_audio_capture(window.clone());
+pub fn smtc_listen(window: tauri::AppHandle) {
     tauri::async_runtime::spawn(async move {
         let agsmtc = GlobalSystemMediaTransportControlsSessionManager::RequestAsync().unwrap();
         let gsmtc = agsmtc.get().unwrap();
@@ -72,7 +71,10 @@ pub fn smtc_listen(window: Window) {
     });
 }
 
-fn get_sessions(gsmtc: &GlobalSystemMediaTransportControlsSessionManager, window: Window) {
+fn get_sessions(
+    gsmtc: &GlobalSystemMediaTransportControlsSessionManager,
+    window: tauri::AppHandle,
+) {
     let sessions = gsmtc.GetSessions().unwrap();
     let checksessions = gsmtc.GetSessions().unwrap();
     let mut cloudmusicstatus = false;
@@ -113,7 +115,7 @@ fn get_sessions(gsmtc: &GlobalSystemMediaTransportControlsSessionManager, window
     }
 }
 
-fn session_control(session: GlobalSystemMediaTransportControlsSession, window: Window) {
+fn session_control(session: GlobalSystemMediaTransportControlsSession, window: tauri::AppHandle) {
     let timeline = session.GetTimelineProperties();
     match timeline {
         Ok(timeline) => {

@@ -167,7 +167,11 @@ listen(
     };
   }) => {
     let musicthumb =
-      (await appDataDir()) + "\\wallpapers\\temp\\" + "musicthumb.jpg";
+      (await appDataDir()) +
+      "\\wallpapers\\temp\\" +
+      "musicthumb" +
+      index.value +
+      ".jpg";
     if (e.payload.thumb.length > 0) {
       const uint8 = new Uint8Array(e.payload.thumb as number[]);
       await writeFile(musicthumb, uint8);
@@ -212,18 +216,14 @@ onMounted(async () => {
     show.value = true;
   }, 500);
 
-  setInterval(async () => {
-    let res = await getWeather(citycode.value);
-    console.log(res);
-    if (res.code == 200) {
-      w.value = res.now;
-    }
-  }, 60 * 60 * 60);
+  //////////////////////////网速////////////////////////////////
   listen("netspeed", (e) => {
     let res = JSON.parse(e.payload as string);
     net.value.speed_r = res.speed_r;
     net.value.speed_s = res.speed_s;
   });
+
+  //////////////////////////日期/////////////////////////////////////
   setInterval(() => {
     let date = new Date();
     let week = "";
@@ -273,15 +273,26 @@ onMounted(async () => {
   draw();
 });
 
+////////////////////cpu/////////////////////
 listen("cpu", (e) => {
   let str = e.payload;
   cpu.value = Math.trunc(Math.round(Number(str)));
 });
 
+///////////////////////////memeory///////////////////////
 listen("memory", (e) => {
   let str = e.payload;
   memory.value = Math.trunc(Number(str) * 100);
 });
+
+///////////////////weather/////////////////////////
+setInterval(async () => {
+  let res = await getWeather(citycode.value);
+  console.log(res);
+  if (res.code == 200) {
+    w.value = res.now;
+  }
+}, 60 * 60 * 60);
 const w = ref<{
   temp: string; // 温度
   feelsLike: string; // 体感温度
@@ -526,7 +537,7 @@ function draw() {
 
     <div
       class="music"
-      v-show="wallpaperstore.wallpaperConfig[index].config.music"
+      v-show="wallpaperstore.wallpaperConfig[index].config.music || media.thumb"
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,

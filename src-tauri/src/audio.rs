@@ -5,7 +5,7 @@ use std::sync::mpsc;
 use std::thread;
 // use std::time::Duration;
 // use sysinfo::{ProcessRefreshKind, RefreshKind, System};
-use tauri::{Emitter, Window};
+use tauri::Emitter;
 use wasapi::*;
 // static mut APP_STATUS: bool = false;
 type Res<T> = Result<T, Box<dyn error::Error>>;
@@ -87,8 +87,8 @@ type Res<T> = Result<T, Box<dyn error::Error>>;
 // }
 
 // #[tauri::command]
-// pub fn process_audio_capture(window: Window, appname: String) {
-//     // checkapp(appname.clone());
+// pub fn process_audio_capture(window: tauri::AppHandle, appname: String) {
+//     checkapp(appname.clone());
 //     tauri::async_runtime::spawn(async move {
 //         let refreshes = RefreshKind::nothing().with_processes(ProcessRefreshKind::everything());
 //         let system = System::new_with_specifics(refreshes);
@@ -152,7 +152,7 @@ type Res<T> = Result<T, Box<dyn error::Error>>;
 //     });
 // }
 
-pub fn default_audio_capture(window: Window) {
+pub fn default_audio_capture(window: tauri::AppHandle) {
     tauri::async_runtime::spawn(async move {
         initialize_mta().ok().unwrap();
 

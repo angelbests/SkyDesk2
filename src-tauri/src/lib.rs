@@ -1,4 +1,4 @@
-use tauri::Manager;
+use tauri::{path::BaseDirectory, Manager};
 use tauri_plugin_autostart::MacosLauncher;
 mod capture;
 mod icotopng;
@@ -9,14 +9,28 @@ mod wallpaper;
 mod wheel;
 use chrono::prelude::*;
 mod audio;
-mod music;
+mod lockscreen;
 mod smtc;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let local: DateTime<Local> = Local::now();
     let t = local.format("%Y-%m-%d");
     tauri::Builder::default()
-        .setup(|_app| Ok(()))
+        .setup(move |app| {
+            let apphandle = app.handle();
+            wheel::wheelclick(apphandle.clone());
+            sysinfo::netspeed(apphandle.clone());
+            sysinfo::system(apphandle.clone());
+            taskbar::listentaskbar(apphandle.clone());
+            smtc::smtc_listen(apphandle.clone());
+            audio::default_audio_capture(apphandle.clone());
+            let path = app
+                .path()
+                .resolve("wallpapers\\html", BaseDirectory::AppData)
+                .unwrap();
+            server::open_server(path.to_str().unwrap().to_string(), 12345);
+            Ok(())
+        })
         .plugin(
             tauri_plugin_log::Builder::new()
                 .target(tauri_plugin_log::Target::new(
@@ -45,16 +59,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             wallpaper::setwallpaper,
             wallpaper::cancelwallpaper,
-            server::open_server,
             icotopng::ico_to_png,
             icotopng::zipimage,
-            wheel::wheelclick,
             capture::start_capture,
-            sysinfo::netspeed,
-            sysinfo::system,
-            taskbar::listentaskbar,
-            music::get_cliudmusic_name,
-            smtc::smtc_listen,
+            lockscreen::setlockscreen,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

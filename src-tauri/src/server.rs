@@ -1,10 +1,9 @@
 use std::{fs::File, path::Path};
 use tiny_http::{Response, Server};
 
-#[tauri::command]
-pub fn open_server(str: String) {
+pub fn open_server(str: String, port: i32) {
     tauri::async_runtime::spawn(async move {
-        let server = Server::http("127.0.0.1:12345").unwrap();
+        let server = Server::http("127.0.0.1:".to_string() + &port.to_string()).unwrap();
         for request in server.incoming_requests() {
             println!(
                 "received request! method: {:?}, url: {:?}",
