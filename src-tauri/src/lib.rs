@@ -63,6 +63,7 @@ pub fn run() {
             icotopng::zipimage,
             capture::start_capture,
             lockscreen::setlockscreen,
+            wheel::wheel_status,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

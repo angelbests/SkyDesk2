@@ -34,6 +34,7 @@ const systemStore = defineStore("system", {
     return {
       autostart: false as boolean,
       traystart: false as boolean,
+      wheel: true as boolean,
       netspeed: {
         show: false as boolean,
         x: 0,

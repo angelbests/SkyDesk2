@@ -134,7 +134,8 @@ pub fn start_capture(
             ColorFormat::Rgba8,
             flagset,
         );
-        Capture::start_free_threaded(settings).unwrap();
+        // Capture::start_free_threaded(settings).unwrap();
+        Capture::start(settings).expect("Screen Capture Failed");
         app.listen("capture", |event| {
             let mut stauts = CAPTURE_STATUS.lock().unwrap();
             *stauts = event.payload().to_string();

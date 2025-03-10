@@ -6,6 +6,7 @@ import {
 } from "@tauri-apps/api/webviewWindow";
 import { systemStore } from "./../stores/window";
 import { info } from "@tauri-apps/plugin-log";
+import { invoke } from "@tauri-apps/api/core";
 export const createtray = async function () {
   let icodir = await resourceDir();
   await TrayIcon.new({
@@ -44,4 +45,9 @@ export const traystart = async function () {
   if (!systemstore.traystart && appWindow.label == "main") {
     await appWindow.show();
   }
+};
+
+export const wheelstart = async function () {
+  const systemstore = systemStore();
+  invoke("wheel_status", { bool: systemstore.wheel });
 };

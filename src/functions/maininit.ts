@@ -1,7 +1,7 @@
 import { BaseDirectory, mkdir } from "@tauri-apps/plugin-fs";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { register, isRegistered } from "@tauri-apps/plugin-global-shortcut";
-import { createtray, traystart } from "./tray";
+import { createtray, traystart, wheelstart } from "./tray";
 import { initWindow } from "./window";
 import { exit } from "@tauri-apps/plugin-process";
 import { info } from "@tauri-apps/plugin-log";
@@ -62,6 +62,7 @@ export const maininit = async function () {
   info("网速事务完成");
   await createtray();
   await traystart();
+  await wheelstart();
   await initWindow();
   info("初始化窗口完成");
   // 任务栏关闭窗口

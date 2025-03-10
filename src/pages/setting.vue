@@ -14,7 +14,7 @@ import {
 } from "../stores/window";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/maininit";
-import { convertFileSrc } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 const systemstore = systemStore();
 const drawer = ref(true);
@@ -89,6 +89,7 @@ const refresh = function () {
   const system = systemStore();
   system.autostart = false;
   system.traystart = false;
+  system.wheel = true;
   system.fontcolor = "black";
   system.programbcakground = "white";
   system.leftbackground = "white";
@@ -219,6 +220,11 @@ const selectcolor = function () {
       }
     }
   }, 50);
+};
+
+const wheel_status = function (e: any) {
+  console.log(e);
+  invoke("wheel_status", { bool: e });
 };
 </script>
 
@@ -637,12 +643,11 @@ const selectcolor = function () {
                 <template v-slot:append>
                   <v-switch
                     color="info"
-                    v-model="systemstore.autostart"
-                    @update:model-value="autostartsetting"
+                    v-model="systemstore.traystart"
                     hide-details
                   ></v-switch>
                 </template>
-                <v-list-item-title>开机自启</v-list-item-title>
+                <v-list-item-title>启动到托盘</v-list-item-title>
               </v-list-item>
             </v-list>
             <v-list lines="one" select-strategy="classic">
@@ -650,11 +655,12 @@ const selectcolor = function () {
                 <template v-slot:append>
                   <v-switch
                     color="info"
-                    v-model="systemstore.traystart"
+                    v-model="systemstore.wheel"
+                    @update:model-value="autostartsetting"
                     hide-details
                   ></v-switch>
                 </template>
-                <v-list-item-title>启动到托盘</v-list-item-title>
+                <v-list-item-title>开机自启</v-list-item-title>
               </v-list-item>
             </v-list>
             <v-list lines="one" select-strategy="classic">
@@ -679,6 +685,19 @@ const selectcolor = function () {
                   ></v-switch>
                 </template>
                 <v-list-item-title>任务栏</v-list-item-title>
+              </v-list-item>
+            </v-list>
+            <v-list lines="one" select-strategy="classic">
+              <v-list-item>
+                <template v-slot:append>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.autostart"
+                    @update:model-value="wheel_status"
+                    hide-details
+                  ></v-switch>
+                </template>
+                <v-list-item-title>轮盘开关</v-list-item-title>
               </v-list-item>
             </v-list>
             <v-list lines="one" select-strategy="classic">
