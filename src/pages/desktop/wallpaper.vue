@@ -147,12 +147,10 @@ listen(
           status = "未知";
       }
       playstatus.value = e.payload.status;
-      info(musicappname.value + "播放状态：" + e.payload.app);
     }
   }
 );
 
-const musicappname = ref("");
 listen(
   "appstatus",
   (e: {
@@ -183,10 +181,6 @@ listen(
     ) {
       media.value.thumb = "";
     }
-
-    playstatus.value = 5;
-    // musicappname.value = e.payload;
-    // info("播放app：" + e.payload);
   }
 );
 
