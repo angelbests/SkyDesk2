@@ -693,7 +693,6 @@ function draw() {
   left: 50vw;
   top: 10vh;
   width: 300px;
-  background-color: gray;
 }
 .music_title {
   font-size: 16px;
@@ -745,7 +744,7 @@ function draw() {
   align-items: center;
 }
 .music-progress {
-  width: 280px;
-  height: 280px;
+  width: 281px;
+  height: 281px;
 }
 </style>
