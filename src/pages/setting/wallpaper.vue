@@ -421,10 +421,10 @@ const wallpapersetting = function(){
                         <v-radio style="width: 100px;" label="网页" value="html"></v-radio>
                     </v-radio-group>
                 </v-list-item>
-                <v-list-item>
+                <!-- <v-list-item>
                     <v-text-field v-model="addWallPaperData.title" density="compact" hide-details="auto"
                         label="标题"></v-text-field>
-                </v-list-item>
+                </v-list-item> -->
                 <v-list-item>
                     <v-text-field v-model="addWallPaperData.path" @click="getpath" density="compact" hide-details="auto"
                         :readonly="true"
@@ -432,11 +432,11 @@ const wallpapersetting = function(){
                 </v-list-item>
                 <v-list-item>
                     <v-text-field v-model="addWallPaperData.preview" @click="getpreview" density="compact"
-                        hide-details="auto" :readonly="true" label="预览图"></v-text-field>
+                        hide-details="auto" :readonly="true" label="预览图-必选"></v-text-field>
                 </v-list-item>
                 <v-list-item>
                     <v-text-field v-model="addWallPaperData.filename" density="compact" hide-details="auto"
-                        label="文件名称"></v-text-field>
+                        label="文件名称-必选"></v-text-field>
                 </v-list-item>
             </v-list>
             <div
