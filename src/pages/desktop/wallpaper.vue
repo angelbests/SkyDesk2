@@ -124,28 +124,28 @@ listen(
       wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
       e.payload.app
     ) {
-      switch (e.payload.status) {
-        case 0:
-          status = "已关闭";
-          break;
-        case 1:
-          status = "已打开";
-          break;
-        case 2:
-          status = "正在更改";
-          break;
-        case 3:
-          status = "已停止";
-          break;
-        case 4:
-          status = "正在播放";
-          break;
-        case 5:
-          status = "已暂停";
-          break;
-        default:
-          status = "未知";
-      }
+      // switch (e.payload.status) {
+      //   case 0:
+      //     status = "已关闭";
+      //     break;
+      //   case 1:
+      //     status = "已打开";
+      //     break;
+      //   case 2:
+      //     status = "正在更改";
+      //     break;
+      //   case 3:
+      //     status = "已停止";
+      //     break;
+      //   case 4:
+      //     status = "正在播放";
+      //     break;
+      //   case 5:
+      //     status = "已暂停";
+      //     break;
+      //   default:
+      //     status = "未知";
+      // }
       playstatus.value = e.payload.status;
     }
   }
@@ -235,7 +235,7 @@ listen(
         media.value.album_title = e.payload.album_title;
         media.value.media_type = e.payload.media_type;
       }
-      playstatus.value = 4;
+      // playstatus.value = 4;
     }
   }
 );
