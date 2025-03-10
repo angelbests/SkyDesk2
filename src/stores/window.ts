@@ -111,6 +111,7 @@ const wallpaperStore = defineStore("wallpaper", {
           musicx: number;
           musicy: number;
           musicfontsize: number;
+          musicapp: string;
         };
       }[],
       wallpaperList: [] as {

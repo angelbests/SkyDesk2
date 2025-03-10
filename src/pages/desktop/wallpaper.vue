@@ -86,14 +86,21 @@ listen(
   "timeline",
   (e: {
     payload: {
+      app: string;
       start: number;
       position: number;
       end: number;
     };
   }) => {
-    timeline.value = e.payload;
+    if (
+      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+      e.payload.app
+    ) {
+      timeline.value = e.payload;
+    }
     info(
-      "时间线：" +
+      e.payload.app +
+        "时间线：" +
         e.payload.start +
         "-" +
         e.payload.position +
@@ -104,43 +111,84 @@ listen(
 );
 
 const playstatus = ref(5);
-listen("playstatus", (e: { payload: number }) => {
-  // 0 已关闭 1 已打开 2 正在更改 3 已停止 4 正在播放 5 已暂停
-  let status = "";
-  switch (e.payload) {
-    case 0:
-      status = "已关闭";
-      break;
-    case 1:
-      status = "已打开";
-      break;
-    case 2:
-      status = "正在更改";
-      break;
-    case 3:
-      status = "已停止";
-      break;
-    case 4:
-      status = "正在播放";
-      break;
-    case 5:
-      status = "已暂停";
-      break;
-    default:
-      status = "未知";
+listen(
+  "playstatus",
+  (e: {
+    payload: {
+      app: string;
+      status: number;
+    };
+  }) => {
+    // 0 已关闭 1 已打开 2 正在更改 3 已停止 4 正在播放 5 已暂停
+    if (
+      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+      e.payload.app
+    ) {
+      switch (e.payload.status) {
+        case 0:
+          status = "已关闭";
+          break;
+        case 1:
+          status = "已打开";
+          break;
+        case 2:
+          status = "正在更改";
+          break;
+        case 3:
+          status = "已停止";
+          break;
+        case 4:
+          status = "正在播放";
+          break;
+        case 5:
+          status = "已暂停";
+          break;
+        default:
+          status = "未知";
+      }
+      playstatus.value = e.payload.status;
+      info(musicappname.value + "播放状态：" + e.payload.app);
+    }
   }
-  playstatus.value = e.payload;
-  console.log(status);
-  info(musicappname.value + "播放状态：" + e.payload);
-});
+);
 
 const musicappname = ref("");
-listen("musicappname", (e: { payload: string }) => {
-  console.log(e.payload);
-  playstatus.value = 5;
-  musicappname.value = e.payload;
-  info("播放app：" + e.payload);
-});
+listen(
+  "appstatus",
+  (e: {
+    payload: {
+      cloudmusic: boolean;
+      qqmusic: boolean;
+      spotify: boolean;
+    };
+  }) => {
+    // "cloudmusic.exe" "QQMusic.exe" "Spotify.exe"
+    console.log(e.payload);
+    if (
+      !e.payload.cloudmusic &&
+      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+        "cloudmusic.exe"
+    ) {
+      media.value.thumb = "";
+    } else if (
+      !e.payload.qqmusic &&
+      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+        "QQMusic.exe"
+    ) {
+      media.value.thumb = "";
+    } else if (
+      !e.payload.spotify &&
+      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+        "Spotify.exe"
+    ) {
+      media.value.thumb = "";
+    }
+
+    playstatus.value = 5;
+    // musicappname.value = e.payload;
+    // info("播放app：" + e.payload);
+  }
+);
 
 const media = ref<{
   title: string;
@@ -159,6 +207,7 @@ listen(
   "media",
   async (e: {
     payload: {
+      app: string;
       title: string;
       artist: string;
       album_title: string;
@@ -166,29 +215,34 @@ listen(
       thumb: number[];
     };
   }) => {
-    let musicthumb =
-      (await appDataDir()) +
-      "\\wallpapers\\temp\\" +
-      "musicthumb" +
-      index.value +
-      ".jpg";
-    if (e.payload.thumb.length > 0) {
-      const uint8 = new Uint8Array(e.payload.thumb as number[]);
-      await writeFile(musicthumb, uint8);
-      media.value = {
-        title: e.payload.title,
-        artist: e.payload.artist,
-        album_title: e.payload.album_title,
-        media_type: e.payload.media_type,
-        thumb: convertFileSrc(musicthumb) + "?id=" + uuid(),
-      };
-    } else {
-      media.value.title = e.payload.title;
-      media.value.artist = e.payload.artist;
-      media.value.album_title = e.payload.album_title;
-      media.value.media_type = e.payload.media_type;
+    if (
+      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+      e.payload.app
+    ) {
+      let musicthumb =
+        (await appDataDir()) +
+        "\\wallpapers\\temp\\" +
+        "musicthumb" +
+        index.value +
+        ".jpg";
+      if (e.payload.thumb.length > 0) {
+        const uint8 = new Uint8Array(e.payload.thumb as number[]);
+        await writeFile(musicthumb, uint8);
+        media.value = {
+          title: e.payload.title,
+          artist: e.payload.artist,
+          album_title: e.payload.album_title,
+          media_type: e.payload.media_type,
+          thumb: convertFileSrc(musicthumb) + "?id=" + uuid(),
+        };
+      } else {
+        media.value.title = e.payload.title;
+        media.value.artist = e.payload.artist;
+        media.value.album_title = e.payload.album_title;
+        media.value.media_type = e.payload.media_type;
+      }
+      playstatus.value = 4;
     }
-    playstatus.value = 4;
   }
 );
 
@@ -537,7 +591,7 @@ function draw() {
 
     <div
       class="music"
-      v-show="wallpaperstore.wallpaperConfig[index].config.music || media.thumb"
+      v-show="wallpaperstore.wallpaperConfig[index].config.music && media.thumb"
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,

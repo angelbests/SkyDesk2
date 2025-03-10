@@ -442,7 +442,7 @@ onMounted(() => {
             </v-list-item>
             <v-divider></v-divider>
             <v-list-subheader style="background: #d1c4e9"
-              >网易云音乐</v-list-subheader
+              >音乐</v-list-subheader
             >
             <v-list-item>
               <v-list-item-title>显示</v-list-item-title>
@@ -482,6 +482,33 @@ onMounted(() => {
                     hide-details
                   ></v-slider>
                 </div>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title> APP </v-list-item-title>
+              <template v-slot:append>
+                <v-radio-group
+                  v-model="item.config.musicapp"
+                  inline
+                  density="compact"
+                  hide-details="auto"
+                >
+                  <v-radio
+                    style="width: 100px"
+                    label="网易云"
+                    value="cloudmusic.exe"
+                  ></v-radio>
+                  <v-radio
+                    style="width: 100px"
+                    label="QQ"
+                    value="QQMusic.exe"
+                  ></v-radio>
+                  <v-radio
+                    style="width: 100px"
+                    label="Spotify"
+                    value="Spotify.exe"
+                  ></v-radio>
+                </v-radio-group>
               </template>
             </v-list-item>
             <!-- <v-list-item>
