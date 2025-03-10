@@ -235,7 +235,6 @@ listen(
         media.value.album_title = e.payload.album_title;
         media.value.media_type = e.payload.media_type;
       }
-      // playstatus.value = 4;
     }
   }
 );
