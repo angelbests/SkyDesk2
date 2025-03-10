@@ -603,9 +603,10 @@ function draw() {
       <div id="timeline">
         <v-progress-circular
           class="music-progress"
-          color="rgba(223,223,223,0.5)"
+          color="rgba(223,123,103,0.5)"
+          bg-color="rgba(123,123,123,0.3)"
           :model-value="(timeline.position / timeline.end) * 100"
-          :width="25"
+          :width="20"
         ></v-progress-circular>
       </div>
       <canvas
@@ -706,6 +707,7 @@ function draw() {
   overflow: hidden;
 }
 .music_pic {
+  z-index: 215;
   position: relative;
   transform-origin: 50% 50%;
   animation: 15s normal 0s infinite linear music;
@@ -719,12 +721,12 @@ function draw() {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  border: 35px solid rgba(123, 123, 123, 0.2);
+  border: 35px solid white;
   transition: all 1s linear;
 }
 .music_canvas {
   position: absolute;
-  z-index: 220;
+  z-index: 213;
   left: -50px;
   top: 55px;
   display: flex;
@@ -733,7 +735,7 @@ function draw() {
 }
 #timeline {
   position: absolute;
-  z-index: 221;
+  z-index: 216;
   left: -25px;
   top: 80px;
   width: 350px;
@@ -744,7 +746,7 @@ function draw() {
   align-items: center;
 }
 .music-progress {
-  width: 281px;
-  height: 281px;
+  width: 285px;
+  height: 285px;
 }
 </style>
