@@ -655,7 +655,7 @@ const wheel_status = function (e: any) {
                 <template v-slot:append>
                   <v-switch
                     color="info"
-                    v-model="systemstore.wheel"
+                    v-model="systemstore.autostart"
                     @update:model-value="autostartsetting"
                     hide-details
                   ></v-switch>
