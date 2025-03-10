@@ -600,6 +600,14 @@ function draw() {
       >
         <img v-if="media.thumb" :src="media.thumb" class="music_pic_img" />
       </div>
+      <div id="timeline">
+        <v-progress-circular
+          class="music-progress"
+          color="rgba(223,223,223,0.5)"
+          :model-value="(timeline.position / timeline.end) * 100"
+          :width="25"
+        ></v-progress-circular>
+      </div>
       <canvas
         id="music_canvas"
         class="music_canvas"
@@ -685,7 +693,7 @@ function draw() {
   left: 50vw;
   top: 10vh;
   width: 300px;
-  /* background-color: gray; */
+  background-color: gray;
 }
 .music_title {
   font-size: 16px;
@@ -723,5 +731,21 @@ function draw() {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+#timeline {
+  position: absolute;
+  z-index: 221;
+  left: -25px;
+  top: 80px;
+  width: 350px;
+  height: 350px;
+  /* background-color: blue; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.music-progress {
+  width: 280px;
+  height: 280px;
 }
 </style>
