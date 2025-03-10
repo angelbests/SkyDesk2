@@ -638,7 +638,7 @@ const wheel_status = function (e: any) {
             </div>
           </v-card-title>
           <v-card-item>
-            <v-list lines="one" select-strategy="classic">
+            <v-list>
               <v-list-item>
                 <template v-slot:append>
                   <v-switch
@@ -649,8 +649,6 @@ const wheel_status = function (e: any) {
                 </template>
                 <v-list-item-title>启动到托盘</v-list-item-title>
               </v-list-item>
-            </v-list>
-            <v-list lines="one" select-strategy="classic">
               <v-list-item>
                 <template v-slot:append>
                   <v-switch
@@ -662,8 +660,6 @@ const wheel_status = function (e: any) {
                 </template>
                 <v-list-item-title>开机自启</v-list-item-title>
               </v-list-item>
-            </v-list>
-            <v-list lines="one" select-strategy="classic">
               <v-list-item>
                 <template v-slot:append>
                   <v-switch
@@ -674,8 +670,6 @@ const wheel_status = function (e: any) {
                 </template>
                 <v-list-item-title>网速控件</v-list-item-title>
               </v-list-item>
-            </v-list>
-            <v-list lines="one" select-strategy="classic">
               <v-list-item>
                 <template v-slot:append>
                   <v-switch
@@ -686,8 +680,6 @@ const wheel_status = function (e: any) {
                 </template>
                 <v-list-item-title>任务栏</v-list-item-title>
               </v-list-item>
-            </v-list>
-            <v-list lines="one" select-strategy="classic">
               <v-list-item>
                 <template v-slot:append>
                   <v-switch
@@ -699,8 +691,6 @@ const wheel_status = function (e: any) {
                 </template>
                 <v-list-item-title>轮盘开关</v-list-item-title>
               </v-list-item>
-            </v-list>
-            <v-list lines="one" select-strategy="classic">
               <v-list-item>
                 <template v-slot:append>
                   <v-btn @click="refresh">
@@ -714,7 +704,6 @@ const wheel_status = function (e: any) {
               </v-list-item>
             </v-list>
           </v-card-item>
-          <v-card-actions> </v-card-actions>
         </v-card>
       </div>
     </v-dialog>
