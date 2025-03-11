@@ -406,15 +406,12 @@ function draw() {
   // 时域数据
   // player.analyserNode.getByteTimeDomainData(dataArray);
   player.analyserNode.getByteFrequencyData(dataArray);
-  console.log(dataArray);
   const canvas = document.getElementById("music_canvas") as HTMLCanvasElement;
   if (canvas == null) {
-    console.log("canvas error");
     return;
   }
   const canvasCtx = canvas.getContext("2d");
   if (canvasCtx == null) {
-    console.log("canvasctx error");
     return;
   }
 
@@ -431,10 +428,7 @@ function draw() {
     canvasCtx.beginPath();
 
     const h = (dataArray[i] / 256) * 60;
-    // canvasCtx.fillStyle = `rgba(${dataArray[i] * Math.random()},${
-    //   dataArray[i] * Math.random()
-    // },${dataArray[i] * Math.random()},0.8)`;
-    canvasCtx.roundRect(0, 140, 4, h < 4 ? 4 : h, 4);
+    canvasCtx.roundRect(0, 145, 4, h < 4 ? 4 : h, 4);
     canvasCtx.fill();
     canvasCtx.restore();
   }
