@@ -40,7 +40,7 @@ const selectcapture = function () {
     );
   });
 };
-import { open } from "@tauri-apps/plugin-shell";
+import { Command } from "@tauri-apps/plugin-shell";
 import { videoDir } from "@tauri-apps/api/path";
 import { remove } from "@tauri-apps/plugin-fs";
 // const openvideo = function(path:string){
@@ -49,7 +49,7 @@ import { remove } from "@tauri-apps/plugin-fs";
 
 const opendir = async function () {
   let path = (await videoDir()) + "\\skydesk2";
-  open(path);
+  Command.create("start", ["/c", "start", `${path}`]).execute();
 };
 
 const delvideo = function (path: string) {

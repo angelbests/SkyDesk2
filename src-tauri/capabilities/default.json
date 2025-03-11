@@ -144,6 +144,17 @@
           ]
         },
         {
+          "name": "start",
+          "cmd": "cmd",
+          "args": [
+            "/c",
+            "start",
+            {
+              "validator": "\\S+"
+            }
+          ]
+        },
+        {
           "name": "bin/ResourcesExtract",
           "args": true,
           "sidecar": true

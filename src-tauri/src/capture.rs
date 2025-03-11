@@ -33,17 +33,17 @@ lazy_static! {
 impl GraphicsCaptureApiHandler for Capture {
     type Flags = Flagset;
     type Error = Box<dyn std::error::Error + Send + Sync>;
-    fn new(flagset: windows_capture::capture::Context<Flagset>) -> Result<Self, Self::Error> {
+    fn new(flagset: Self::Flags) -> Result<Self, Self::Error> {
         let encoder = VideoEncoder::new(
-            VideoSettingsBuilder::new(flagset.flags.width, flagset.flags.height),
+            VideoSettingsBuilder::new(flagset.width, flagset.height),
             AudioSettingsBuilder::default().disabled(true),
             ContainerSettingsBuilder::default(),
-            flagset.flags.path.clone(),
+            flagset.path.clone(),
         )?;
         Ok(Self {
             encoder: Some(encoder),
             start: Instant::now(),
-            flag: flagset.flags,
+            flag: flagset,
         })
     }
     fn on_frame_arrived(
@@ -67,7 +67,7 @@ impl GraphicsCaptureApiHandler for Capture {
             .unwrap();
         let w = framecrop.width() as usize;
         let h = framecrop.height() as usize;
-        let nopad = framecrop.as_nopadding_buffer().unwrap();
+        let nopad = framecrop.as_raw_nopadding_buffer().unwrap();
         let b = convert_rgba_to_bgra_and_flip(&nopad, w, h);
         self.encoder.as_mut().unwrap().send_frame_buffer(&b, time)?; //纯视频
         let mut status = CAPTURE_STATUS.lock().unwrap();
@@ -135,10 +135,10 @@ pub fn start_capture(
             flagset,
         );
         Capture::start_free_threaded(settings).unwrap();
-        // Capture::start(settings).expect("Screen Capture Failed");
         app.listen("capture", |event| {
             let mut stauts = CAPTURE_STATUS.lock().unwrap();
             *stauts = event.payload().to_string();
         });
+        // Capture::start(settings).expect("Screen Capture Failed");
     });
 }
