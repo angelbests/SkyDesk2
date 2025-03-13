@@ -124,33 +124,13 @@ listen(
       wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
       e.payload.app
     ) {
-      // switch (e.payload.status) {
-      //   case 0:
-      //     status = "已关闭";
-      //     break;
-      //   case 1:
-      //     status = "已打开";
-      //     break;
-      //   case 2:
-      //     status = "正在更改";
-      //     break;
-      //   case 3:
-      //     status = "已停止";
-      //     break;
-      //   case 4:
-      //     status = "正在播放";
-      //     break;
-      //   case 5:
-      //     status = "已暂停";
-      //     break;
-      //   default:
-      //     status = "未知";
-      // }
       playstatus.value = e.payload.status;
     }
   }
 );
 
+
+////////////监听特定音乐软件是否关闭/////////////////////////////
 listen(
   "appstatus",
   (e: {
@@ -236,6 +216,7 @@ listen(
         media.value.media_type = e.payload.media_type;
       }
     }
+    playstatus.value = 4;
   }
 );
 
@@ -399,12 +380,14 @@ listen("audio_chunk", (e: { payload: number[] }) => {
 });
 
 const bufferLength = player.analyserNode.frequencyBinCount / 2;
+let getdataArray = new Uint8Array(bufferLength * 2);
 let dataArray = new Uint8Array(bufferLength);
 function draw() {
   requestAnimationFrame(draw);
   // 时域数据
   // player.analyserNode.getByteTimeDomainData(dataArray);
-  player.analyserNode.getByteFrequencyData(dataArray);
+  // 频率数据
+  player.analyserNode.getByteFrequencyData(getdataArray);
   const canvas = document.getElementById("music_canvas") as HTMLCanvasElement;
   if (canvas == null) {
     return;
@@ -416,6 +399,8 @@ function draw() {
 
   if (playstatus.value == 5) {
     dataArray = new Uint8Array(bufferLength)
+  } else {
+    dataArray = getdataArray.slice(60, bufferLength + 60)
   }
 
   const WIDTH = canvas.width,
@@ -438,7 +423,7 @@ function draw() {
   canvasCtx.restore();
 }
 
-//////////////////////////
+//////////////////////////手势检测/////////////////////////////
 let mouseleftdown: {
   x: number, y: number, in: boolean
 } | null = null
@@ -460,7 +445,6 @@ listen("desktop", async (e: Event<MouseEvent>) => {
       y: e.payload.y,
       in: true,
     }
-    info(`down ${mouseleftdown.x}`)
   }
   if (e.payload.mouse == MouseAction.LeftUp && mouseleftdown && mouseleftdown.in) {
     info(`up ${mouseleftdown.x}-${e.payload.x}-${e.payload.x - mouseleftdown.x}`)
@@ -474,7 +458,6 @@ listen("desktop", async (e: Event<MouseEvent>) => {
   }
   if (e.payload.mouse == MouseAction.LeftUp) {
     mouseleftdown = null
-    info("null")
   }
 
 })
@@ -483,8 +466,20 @@ listen("desktop", async (e: Event<MouseEvent>) => {
 
 <template>
   <div class="window">
+    <div v-if="false"
+      style="width: 300px;height: 300px;position: absolute;z-index: 300;left: 300px;top: 100px;background: white;display: flex;justify-content: center;">
+      <div class="rain" style="width: 15px;height: 30px;background: gray;
+        border-top-left-radius: 30px 80px;
+        border-top-right-radius: 30px 80px;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+        background: rgba(123,123,123,0.3);
+        position: relative;
+        z-index: 301;
+        ">
+      </div>
+    </div>
     <img v-if="type == 'image'" :src="convertFileSrc(path)" class="image" />
-    <!-- <div v-if="type == 'image'" style="width: 100vw;height: 100vh;background: black;"></div> -->
     <video id="wallpapervideo" v-else class="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
     <!-- 天气 -->
     <div class="weather" v-show="wallpaperstore.wallpaperConfig[index].config.weather" :style="{
@@ -741,5 +736,19 @@ listen("desktop", async (e: Event<MouseEvent>) => {
 .music-progress {
   width: 285px;
   height: 285px;
+}
+
+@keyframes rain {
+  0% {
+    top: 0px;
+  }
+
+  100% {
+    top: 400px;
+  }
+}
+
+.rain {
+  animation: rain 0.6s infinite linear;
 }
 </style>
