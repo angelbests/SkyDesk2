@@ -124,79 +124,6 @@ fn get_sessions(
 }
 
 fn session_control(session: GlobalSystemMediaTransportControlsSession, window: tauri::AppHandle) {
-    // // 获取时间轴信息
-    // let timeline = session.GetTimelineProperties();
-    // match timeline {
-    //     Ok(timeline) => {
-    //         let start = timeline.StartTime().unwrap().Duration;
-    //         let end = timeline.EndTime().unwrap().Duration;
-    //         let position = timeline.Position().unwrap().Duration;
-    //         let payload = Timeline {
-    //             start,
-    //             position,
-    //             end,
-    //         };
-    //         let _ = window.emit("timeline", payload);
-    //     }
-    //     Err(e) => {
-    //         println!("{:?}", e);
-    //     }
-    // }
-
-    // // 获取媒体信息
-    // let isession = session.TryGetMediaPropertiesAsync();
-    // match isession {
-    //     Ok(isession) => {
-    //         let media = isession.get().unwrap();
-    //         let album_title = media.AlbumTitle().unwrap();
-    //         let artist = media.Artist().unwrap();
-    //         let title = media.Title().unwrap();
-    //         let match_media_type = media.PlaybackType();
-    //         let media_type = match match_media_type {
-    //             Ok(media_type) => media_type.Value().unwrap(),
-    //             Err(e) => {
-    //                 println!("media_type{:?}", e);
-    //                 MediaPlaybackType::Music
-    //             }
-    //         };
-
-    //         let mut data = vec![];
-    //         let thumb = media.Thumbnail();
-    //         match thumb {
-    //             Ok(thumb) => {
-    //                 let read = thumb.OpenReadAsync().unwrap();
-    //                 let stream = read.get().unwrap();
-    //                 data = get_thumb_data(stream);
-    //             }
-    //             Err(e) => {
-    //                 println!("thumb_error:{:?}", e);
-    //             }
-    //         }
-    //         let payload = Mediapayload {
-    //             title: title.to_string(),
-    //             artist: artist.to_string(),
-    //             album_title: album_title.to_string(),
-    //             media_type: media_type.0,
-    //             thumb: data,
-    //         };
-    //         let _ = window.emit("media", payload);
-    //     }
-    //     Err(e) => {
-    //         println!("{:?}", e);
-    //     }
-    // }
-
-    // // 0 已关闭 1 已打开 2 正在更改 3 已停止 4 正在播放 5 已暂停
-    // let playinfo = session.GetPlaybackInfo();
-    // match playinfo {
-    //     Ok(playinfo) => {
-    //         let e = playinfo.PlaybackStatus().unwrap();
-    //         let _ = window.emit("playstatus", e.0);
-    //     }
-    //     Err(e) => {
-    //         println!("{:?}", e);
-    //     }
-    // }
     let window2 = window.clone();
     let window3 = window.clone();
     let appname = session
@@ -359,4 +286,31 @@ fn checkappstatus(window: tauri::AppHandle) {
         }
     }
     let _ = window.emit("appstatus", musicapp.clone());
+}
+
+// 控制音乐的播放 暂停 下一曲 上一曲 -1 上一曲 0 播放暂停toogle切换 1 下一曲
+#[tauri::command]
+pub fn play_control(appname: String, control: i32) {
+    tauri::async_runtime::spawn(async move {
+        let agsmtc = GlobalSystemMediaTransportControlsSessionManager::RequestAsync().unwrap();
+        let gsmtc = agsmtc.get().unwrap();
+        let smtcs = gsmtc.GetSessions().unwrap();
+        println!("{:?}+{:?}", appname, control);
+        for smtc in smtcs {
+            let name = smtc
+                .SourceAppUserModelId()
+                .unwrap()
+                .to_string_lossy()
+                .to_string();
+            if name == appname {
+                if control == -1 {
+                    let _ = smtc.TrySkipPreviousAsync();
+                } else if control == 0 {
+                    let _ = smtc.TryTogglePlayPauseAsync();
+                } else if control == 1 {
+                    let _ = smtc.TrySkipNextAsync();
+                }
+            }
+        }
+    });
 }

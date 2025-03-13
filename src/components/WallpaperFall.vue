@@ -183,21 +183,11 @@ const download = function (src: string) {
 
 <template>
   <div class="container" data-tauri-drag-region>
-    <waterfall
-      :col="4"
-      :gap="5"
-      :images="wallpaperswaterfall"
-      @scrollload="getwallpapers(false)"
-    >
+    <waterfall :col="4" :gap="5" :images="wallpaperswaterfall" @scrollload="getwallpapers(false)">
       <template v-slot="{ image }">
-        <div
-          style="position: relative; width: 100%; height: 100%"
-          @mouseover="mousename = image.src"
-        >
+        <div style="position: relative; width: 100%; height: 100%" @mouseover="mousename = image.src">
           <img :src="image.thumbs" style="width: 100%; height: 100%" />
-          <div
-            v-if="image.src == mousename"
-            style="
+          <div v-if="image.src == mousename" style="
               position: absolute;
               left: 0px;
               top: 0px;
@@ -207,8 +197,7 @@ const download = function (src: string) {
               align-items: center;
               width: 100%;
               height: 100%;
-            "
-          >
+            ">
             <v-btn icon size="small" @click="setwallpaper(image.src)">
               <v-icon>mdi-image</v-icon>
             </v-btn>
@@ -221,38 +210,19 @@ const download = function (src: string) {
     </waterfall>
     <RightBar>
       <div class="select">
-        <buttonbox
-          :boxs="categories"
-          v-model="selectvalue.categories"
-        ></buttonbox>
+        <buttonbox :boxs="categories" v-model="selectvalue.categories"></buttonbox>
         <buttonbox :boxs="sorting" v-model="selectvalue.sorting"></buttonbox>
         <buttonbox :boxs="order" v-model="selectvalue.order"></buttonbox>
         <buttonbox :boxs="ratio" v-model="selectvalue.ratio"></buttonbox>
-        <buttonbox
-          :boxs="resolutions"
-          v-model="selectvalue.resolutions"
-        ></buttonbox>
-        <div
-          style="width: 100%; height: 40px; display: flex; flex-direction: row"
-        >
+        <buttonbox :boxs="resolutions" v-model="selectvalue.resolutions"></buttonbox>
+        <div style="width: 100%; height: 40px; display: flex; flex-direction: row">
           <div style="width: 300px; margin-right: 20px">
-            <v-text-field
-              v-model="selectvalue.keyword"
-              density="compact"
-              hide-details="auto"
-              placeholder="关键字"
-            ></v-text-field>
+            <v-text-field v-model="selectvalue.keyword" density="compact" hide-details="auto"
+              placeholder="关键字"></v-text-field>
           </div>
           <div style="width: 200px">
-            <v-number-input
-              v-model="selectvalue.page"
-              :min="1"
-              :max="999999"
-              control-variant="split"
-              density="compact"
-              hide-details="auto"
-              placeholder="页"
-            ></v-number-input>
+            <v-number-input v-model="selectvalue.page" :min="1" :max="999999" control-variant="split" density="compact"
+              hide-details="auto" placeholder="页"></v-number-input>
           </div>
         </div>
         <v-btn @click="getwallpapers(true)">查询</v-btn>
@@ -267,6 +237,7 @@ const download = function (src: string) {
   height: 100%;
   position: relative;
 }
+
 .select {
   box-sizing: border-box;
   padding: 20px;

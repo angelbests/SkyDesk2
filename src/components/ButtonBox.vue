@@ -18,13 +18,8 @@ const checkbox = function (e: { text: string; value: string }) {
 
 <template>
   <div class="div">
-    <v-btn
-      v-for="item in boxs"
-      class="button"
-      size="small"
-      :style="{ background: value == item.value ? '#5865f2' : 'white' }"
-      @click="checkbox(item)"
-    >
+    <v-btn v-for="item in boxs" class="button" size="small"
+      :style="{ background: value == item.value ? '#5865f2' : 'white' }" @click="checkbox(item)">
       {{ item.text }}
     </v-btn>
   </div>

@@ -8,11 +8,7 @@ const minus = function () {
 
 <template>
   <div @click="minus" class="minus">
-    <img
-      src="./../assets/FluentSubtract48Regular.png"
-      draggable="false"
-      style="width: 100%"
-    />
+    <img src="./../assets/FluentSubtract48Regular.png" draggable="false" style="width: 100%" />
   </div>
 </template>
 

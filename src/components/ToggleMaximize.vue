@@ -15,18 +15,8 @@ const toggleMaximize = function () {
 
 <template>
   <div @click="toggleMaximize" class="toggleMaximize">
-    <img
-      v-show="!toggle"
-      src="./../assets/FluentSquare48Regular.png"
-      draggable="false"
-      style="width: 100%"
-    />
-    <img
-      v-show="toggle"
-      src="./../assets/FluentSquareMultiple48Regular.png"
-      draggable="false"
-      style="width: 100%"
-    />
+    <img v-show="!toggle" src="./../assets/FluentSquare48Regular.png" draggable="false" style="width: 100%" />
+    <img v-show="toggle" src="./../assets/FluentSquareMultiple48Regular.png" draggable="false" style="width: 100%" />
   </div>
 </template>
 

@@ -84,39 +84,19 @@ const exec = async function (item: any, i: number) {
 </script>
 
 <template>
-  <svg
-    style=""
-    width="240"
-    height="240"
-    viewBox="-120 -120 240 240"
-    xmlns="http://www.w3.org/2000/svg"
-    transform="rotate(22.5)"
-  >
-    <g
-      @mouseenter="exec(item, i)"
-      v-for="(item, i) in wheel"
-      :transform="'rotate(' + 45 * (1 + i) + ')'"
-    >
-      <path
-        d="M 0 0 L 120 0 A 120 120 0 0 1 85 85 Z"
-        :fill="index == i ? 'rgba(123,123,123,0)' : 'rgba(123,123,123,0.1)'"
-      />
+  <svg style="" width="240" height="240" viewBox="-120 -120 240 240" xmlns="http://www.w3.org/2000/svg"
+    transform="rotate(22.5)">
+    <g @mouseenter="exec(item, i)" v-for="(item, i) in wheel" :transform="'rotate(' + 45 * (1 + i) + ')'">
+      <path d="M 0 0 L 120 0 A 120 120 0 0 1 85 85 Z"
+        :fill="index == i ? 'rgba(123,123,123,0)' : 'rgba(123,123,123,0.1)'" />
     </g>
     <circle cx="0px" cy="0px" r="30px" fill="white" fill-opacity="1"></circle>
   </svg>
   <div class="container">
-    <div
-      v-for="(item, i) in wheel"
-      @mouseenter="exec(item, i)"
-      class="img-container"
-      :style="{ transform: `rotate(${45 * i + 135}deg) translate(80px)` }"
-    >
-      <img
-        v-if="item.icoPath ? true : false"
-        class="img"
-        :style="{ transform: `rotate(${-(90 + 45 * i)}deg)` }"
-        :src="convertFileSrc(item.icoPath)"
-      />
+    <div v-for="(item, i) in wheel" @mouseenter="exec(item, i)" class="img-container"
+      :style="{ transform: `rotate(${45 * i + 135}deg) translate(80px)` }">
+      <img v-if="item.icoPath ? true : false" class="img" :style="{ transform: `rotate(${-(90 + 45 * i)}deg)` }"
+        :src="convertFileSrc(item.icoPath)" />
     </div>
   </div>
 </template>

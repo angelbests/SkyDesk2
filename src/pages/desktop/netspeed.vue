@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
-import { listen } from "@tauri-apps/api/event";
+import { listen, Event } from "@tauri-apps/api/event";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { onMounted, ref, watch } from "vue";
 import { systemStore } from "../../stores/window";
+import { NetSpeed } from "../../types/netspeedType";
 getCurrentWebviewWindow().setSize(new LogicalSize(80, 45));
-const net = ref({
+const net = ref<NetSpeed>({
   speed_r: 0,
   speed_s: 0,
 });
@@ -24,10 +25,9 @@ onMounted(() => {
       systemstore.$hydrate();
     }
   });
-  listen("netspeed", (e) => {
-    let res = JSON.parse(e.payload as string);
-    net.value.speed_r = res.speed_r;
-    net.value.speed_s = res.speed_s;
+  listen("netspeed", (e: Event<NetSpeed>) => {
+    net.value.speed_r = e.payload.speed_r;
+    net.value.speed_s = e.payload.speed_s;
   });
   document.addEventListener("selectstart", (e) => {
     e.preventDefault();
@@ -51,26 +51,15 @@ watch(systemstore, () => {
 
 <template>
   <div class="window" data-tauri-drag-region>
-    <div
-      data-tauri-drag-region
-      style="width: 100px; display: flex; align-items: center"
-    >
-      <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon
-      >{{
-        Math.trunc(net.speed_r / 1024) < 1024
-          ? Math.trunc(net.speed_r / 1024) + "KB/s"
-          : Math.trunc((net.speed_r / 1024 / 1024) * 10) / 10 + "MB/s"
-      }}
-    </div>
-    <div style="width: 100px; display: flex; align-items: center">
-      <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon
-      >{{
-        Math.trunc(net.speed_s / 1024) < 1024
-          ? Math.trunc(net.speed_s / 1024) + "KB/s"
-          : Math.trunc((net.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
-      }}
-    </div>
-  </div>
+    <div data-tauri-drag-region style="width: 100px; display: flex; align-items: center">
+      <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{
+        Math.trunc(net.speed_r / 1024) < 1024 ? Math.trunc(net.speed_r / 1024) + "KB/s" : Math.trunc((net.speed_r / 1024 /
+          1024) * 10) / 10 + "MB/s" }} </div>
+        <div style="width: 100px; display: flex; align-items: center">
+          <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{
+            Math.trunc(net.speed_s / 1024) < 1024 ? Math.trunc(net.speed_s / 1024) + "KB/s" : Math.trunc((net.speed_s /
+              1024 / 1024) * 10) / 10 + "MB/s" }} </div>
+        </div>
 </template>
 
 <style>

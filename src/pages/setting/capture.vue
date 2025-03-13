@@ -63,13 +63,10 @@ const delvideo = function (path: string) {
 
 <template>
   <div class="window">
-    <v-card
-      :style="{
-        background: systemstore.btnbarbackground,
-        backgroundSize: 'cover',
-      }"
-      class="btnbar"
-    >
+    <v-card :style="{
+      background: systemstore.btnbarbackground,
+      backgroundSize: 'cover',
+    }" class="btnbar">
       <v-btn style="margin-right: 20px" @click="selectcapture">
         <template v-slot:prepend>
           <v-icon>mdi-record-circle-outline</v-icon>
@@ -78,47 +75,24 @@ const delvideo = function (path: string) {
       </v-btn>
     </v-card>
     <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-    <div
-      style="
+    <div style="
         width: 100%;
         height: calc(100% - 64px);
         display: flex;
         overflow: hidden;
         padding: 10px;
-      "
-    >
+      ">
       <div class="video">
-        <GridContainer
-          style="width: 100%; height: 100%; min-height: 100%"
-          v-model="capturestore.video"
-          :gridheight="240"
-          :gridwidth="320"
-          :padding="10"
-        >
+        <GridContainer style="width: 100%; height: 100%; min-height: 100%" v-model="capturestore.video"
+          :gridheight="240" :gridwidth="320" :padding="10">
           <template v-slot="{ item }">
-            <v-card
-              width="320"
-              height="240"
-              variant="elevated"
-              elevation="10"
-              style="width: 100%; height: 100%"
-            >
+            <v-card width="320" height="240" variant="elevated" elevation="10" style="width: 100%; height: 100%">
               <v-card-text style="width: 100%; height: 80%; padding: 0px">
-                <video
-                  style="width: 100%; height: 100%; object-fit: cover"
-                  :src="convertFileSrc(item.path)"
-                ></video>
+                <video style="width: 100%; height: 100%; object-fit: cover" :src="convertFileSrc(item.path)"></video>
               </v-card-text>
               <v-card-actions style="height: 20%; padding: 0px 0px 0px 10px">
-                <v-btn size="small" border="opacity-50 sm" @click="opendir"
-                  >文件夹</v-btn
-                >
-                <v-btn
-                  size="small"
-                  border="opacity-50 sm"
-                  @click="delvideo(item.path)"
-                  >删除</v-btn
-                >
+                <v-btn size="small" border="opacity-50 sm" @click="opendir">文件夹</v-btn>
+                <v-btn size="small" border="opacity-50 sm" @click="delvideo(item.path)">删除</v-btn>
               </v-card-actions>
             </v-card>
           </template>
@@ -133,6 +107,7 @@ const delvideo = function (path: string) {
   width: 100%;
   height: 100%;
 }
+
 .btnbar {
   width: 100%;
   height: 60px;
@@ -142,6 +117,7 @@ const delvideo = function (path: string) {
   padding: 0 20px;
   filter: drop-shadow(0px 2px 5px gray);
 }
+
 .video {
   width: 100%;
   display: flex;

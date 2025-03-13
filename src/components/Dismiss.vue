@@ -7,11 +7,7 @@ const dismiss = function () {
 
 <template>
   <div @click="dismiss" class="dismiss">
-    <img
-      src="./../assets/FluentDismiss48Regular.png"
-      draggable="false"
-      style="width: 100%"
-    />
+    <img src="./../assets/FluentDismiss48Regular.png" draggable="false" style="width: 100%" />
   </div>
 </template>
 

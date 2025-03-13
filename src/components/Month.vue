@@ -1,79 +1,61 @@
 <template>
-  <div
-    style="
+  <div style="
       display: flex;
       flex-direction: column;
       width: 100%;
       height: 100%;
       box-sizing: border-box;
       padding: 10px;
-    "
-  >
-    <div
-      style="
+    ">
+    <div style="
         display: grid;
         width: 100%;
         grid-template-columns: repeat(7, 1fr);
         grid-template-rows: repeat(1, 1fr);
-      "
-    >
-      <div
-        style="border: 1px solid gray; border-bottom: none; text-align: center"
-      >
+      ">
+      <div style="border: 1px solid gray; border-bottom: none; text-align: center">
         星期一
       </div>
-      <div
-        style="
+      <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
-        "
-      >
+        ">
         星期二
       </div>
-      <div
-        style="
+      <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
-        "
-      >
+        ">
         星期三
       </div>
-      <div
-        style="
+      <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
-        "
-      >
+        ">
         星期四
       </div>
-      <div
-        style="
+      <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
-        "
-      >
+        ">
         星期五
       </div>
-      <div
-        style="
+      <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
-        "
-      >
+        ">
         星期六
       </div>
-      <div
-        style="
+      <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
-        "
-      >
+        ">
         星期日
       </div>
     </div>
@@ -159,6 +141,7 @@ const getWeekday = function (year, month, day) {
   grid-template-columns: repeat(7, 1fr);
   position: relative;
 }
+
 .monthz {
   position: absolute;
   left: 0;
@@ -170,17 +153,21 @@ const getWeekday = function (year, month, day) {
   grid-template-rows: repeat(6, 1fr);
   grid-template-columns: 1r;
 }
+
 .day:nth-child(7n + 1) {
   border-left: 1px solid gray;
 }
+
 .day:nth-child(-n + 7) {
   border-top: 1px solid gray;
 }
+
 .day {
   font-size: 13px;
   border-right: 1px solid gray;
   border-bottom: 1px solid gray;
 }
+
 .dayz {
   width: 100%;
   height: 100%;

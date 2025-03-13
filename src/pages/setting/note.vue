@@ -4,10 +4,7 @@ import { uuid } from "../../functions";
 import { createWindow } from "../../functions/window";
 import { listen } from "@tauri-apps/api/event";
 import { noteStore, systemStore, windowStore } from "../../stores/window";
-import {
-  getAllWebviewWindows,
-  getCurrentWebviewWindow,
-} from "@tauri-apps/api/webviewWindow";
+import { getAllWebviewWindows, getCurrentWebviewWindow, } from "@tauri-apps/api/webviewWindow";
 import GridContainer from "../../components/GridContainer.vue";
 const notestore = noteStore();
 const systemstore = systemStore();
@@ -165,13 +162,10 @@ const notewallpaper = async function (note: any) {
 
 <template>
   <div class="window">
-    <v-card
-      :style="{
-        background: systemstore.btnbarbackground,
-        backgroundSize: 'cover',
-      }"
-      class="btnbar"
-    >
+    <v-card :style="{
+      background: systemstore.btnbarbackground,
+      backgroundSize: 'cover',
+    }" class="btnbar">
       <v-btn style="margin-right: 20px" @click="createnote">
         <template v-slot:prepend>
           <v-icon>mdi-note-plus-outline</v-icon>
@@ -180,56 +174,35 @@ const notewallpaper = async function (note: any) {
       </v-btn>
     </v-card>
     <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-    <div
-      style="
+    <div style="
         width: 100%;
         height: calc(100% - 64px);
         display: flex;
         overflow: hidden;
         box-sizing: border-box;
         padding: 10px;
-      "
-    >
-      <GridContainer
-        style="width: 100%; height: 100%; min-height: 100%"
-        v-model="notestore.note"
-        :gridheight="240"
-        :gridwidth="320"
-        :padding="10"
-      >
+      ">
+      <GridContainer style="width: 100%; height: 100%; min-height: 100%" v-model="notestore.note" :gridheight="240"
+        :gridwidth="320" :padding="10">
         <template v-slot="{ item }">
-          <v-card
-            style="width: 100%; height: 100%"
-            variant="elevated"
-            elevation="5"
-          >
-            <v-card-text
-              :style="{
-                width: '100%',
-                height: '80%',
-                background:
-                  'rgba(' + item.color + ',' + item.opacity / 100 + ')',
-                boxSizing: 'border-box',
-                padding: '10px',
-                overflow: 'hidden',
-                overflowY: 'scroll',
-              }"
-            >
+          <v-card style="width: 100%; height: 100%" variant="elevated" elevation="5">
+            <v-card-text :style="{
+              width: '100%',
+              height: '80%',
+              background:
+                'rgba(' + item.color + ',' + item.opacity / 100 + ')',
+              boxSizing: 'border-box',
+              padding: '10px',
+              overflow: 'hidden',
+              overflowY: 'scroll',
+            }">
               <div style="width: 100%; height: auto" v-html="item.value"></div>
             </v-card-text>
             <v-card-actions style="height: 20%; padding: 0px 0px 0px 10px">
-              <v-btn
-                size="small"
-                border="opacity-50 sm"
-                @click="notewallpaper(item)"
-              >
+              <v-btn size="small" border="opacity-50 sm" @click="notewallpaper(item)">
                 {{ item.wallpaper ? "映出" : "映入" }}
               </v-btn>
-              <v-btn
-                size="small"
-                border="opacity-50 sm"
-                @click="opennote(item)"
-              >
+              <v-btn size="small" border="opacity-50 sm" @click="opennote(item)">
                 编辑
               </v-btn>
               <v-btn size="small" border="opacity-50 sm" @click="delnote(item)">
@@ -248,9 +221,11 @@ const notewallpaper = async function (note: any) {
   width: 100%;
   height: 100%;
 }
+
 ol {
   list-style-position: inside !important;
 }
+
 .btnbar {
   width: 100%;
   height: 60px;
@@ -260,6 +235,7 @@ ol {
   padding: 0 20px;
   filter: drop-shadow(0px 2px 5px gray);
 }
+
 .note {
   width: 100%;
   background: white;

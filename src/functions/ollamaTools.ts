@@ -1,11 +1,11 @@
-import ollama from "ollama";
+import ollama from "ollama"
 
 // Simulates an API call to get flight times
 // In a real application, this would fetch data from a live database or API
 function getFlightTimes(args: { [key: string]: any }) {
   // this is where you would validate the arguments you received
-  const departure = args.departure;
-  const arrival = args.arrival;
+  const departure = args.departure
+  const arrival = args.arrival
 
   const flights: any = {
     "NYC-LAX": {
@@ -38,10 +38,10 @@ function getFlightTimes(args: { [key: string]: any }) {
       arrival: "07:30 AM",
       duration: "7h 30m",
     },
-  };
+  }
 
-  const key = `${departure}-${arrival}`.toUpperCase();
-  return JSON.stringify(flights[key] || { error: "Flight not found" });
+  const key = `${departure}-${arrival}`.toUpperCase()
+  return JSON.stringify(flights[key] || { error: "Flight not found" })
 }
 
 // 通过AI拿到对话中中的参数
@@ -53,10 +53,9 @@ export const run = async function (model: string) {
   let messages = [
     {
       role: "user",
-      content:
-        "What is the flight time from New York (NYC) to Los Angeles (LAX)?",
+      content: "What is the flight time from New York (NYC) to Los Angeles (LAX)?",
     },
-  ];
+  ]
 
   // First API call: Send the query and function description to the model
   const response = await ollama.chat({
@@ -85,33 +84,30 @@ export const run = async function (model: string) {
         },
       },
     ],
-  });
+  })
   // Add the model's response to the conversation history
-  messages.push(response.message);
-  console.log(response);
+  messages.push(response.message)
+  console.log(response)
   // Check if the model decided to use the provided function
-  if (
-    !response.message.tool_calls ||
-    response.message.tool_calls.length === 0
-  ) {
-    console.log("The model didn't use the function. Its response was:");
-    console.log(response.message.content);
-    return;
+  if (!response.message.tool_calls || response.message.tool_calls.length === 0) {
+    console.log("The model didn't use the function. Its response was:")
+    console.log(response.message.content)
+    return
   }
 
   // Process function calls made by the model
   if (response.message.tool_calls) {
     const availableFunctions: any = {
       get_flight_times: getFlightTimes,
-    };
+    }
     for (const tool of response.message.tool_calls) {
-      const functionToCall = availableFunctions[tool.function.name];
-      const functionResponse = functionToCall(tool.function.arguments);
+      const functionToCall = availableFunctions[tool.function.name]
+      const functionResponse = functionToCall(tool.function.arguments)
       // Add function response to the conversation
       messages.push({
         role: "tool",
         content: functionResponse,
-      });
+      })
     }
   }
 
@@ -119,6 +115,6 @@ export const run = async function (model: string) {
   const finalResponse = await ollama.chat({
     model: model,
     messages: messages,
-  });
-  console.log(finalResponse.message.content);
-};
+  })
+  console.log(finalResponse.message.content)
+}

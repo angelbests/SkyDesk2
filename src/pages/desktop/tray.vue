@@ -7,16 +7,9 @@ getCurrentWebviewWindow().setSize(new LogicalSize(100, 100));
 
 <template>
   <div class="window">
-    <v-btn
-      style="width: 100px; height: 30px; margin-bottom: 5px"
-      size="small"
-      @click="relaunch()"
-      >重启</v-btn
-    >
+    <v-btn style="width: 100px; height: 30px; margin-bottom: 5px" size="small" @click="relaunch()">重启</v-btn>
 
-    <v-btn style="width: 100px; height: 30px" size="small" @click="exit()"
-      >退出</v-btn
-    >
+    <v-btn style="width: 100px; height: 30px" size="small" @click="exit()">退出</v-btn>
   </div>
 </template>
 

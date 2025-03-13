@@ -94,22 +94,13 @@ watch(images.value, () => {
 
 <template>
   <div class="container" id="waterfall">
-    <div
-      class="col"
-      v-for="(_n, i) in props.col"
-      :id="'c' + i"
-      :style="{
-        width: `calc( 100% / ${col})`,
-        marginRight: `${gap}px`,
-        marginLeft: i == 0 ? `${gap}px` : `0px`,
-      }"
-    >
-      <div
-        v-for="item in list[i]"
-        :src="item.thumbs"
-        loading="lazy"
-        :style="{ width: '100%', marginBottom: gap + 'px' }"
-      >
+    <div class="col" v-for="(_n, i) in props.col" :id="'c' + i" :style="{
+      width: `calc( 100% / ${col})`,
+      marginRight: `${gap}px`,
+      marginLeft: i == 0 ? `${gap}px` : `0px`,
+    }">
+      <div v-for="item in list[i]" :src="item.thumbs" loading="lazy"
+        :style="{ width: '100%', marginBottom: gap + 'px' }">
         <slot :image="item" style="width: 100%"></slot>
       </div>
     </div>
@@ -127,6 +118,7 @@ watch(images.value, () => {
   overflow: hidden;
   overflow-y: scroll;
 }
+
 .col {
   margin-top: 10px;
   display: flex;

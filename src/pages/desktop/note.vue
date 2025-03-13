@@ -66,17 +66,14 @@ onMounted(() => {
 
 const setconfig = async function () {
   let doc = document.getElementsByTagName("body")[0];
-  doc.style.background = `rgba(${editorData.color},${
-    editorData.opacity / 100
-  })`;
+  doc.style.background = `rgba(${editorData.color},${editorData.opacity / 100
+    })`;
   let tool: any = document.getElementsByClassName("w-e-toolbar")[0];
-  tool.style.background = `rgba(${editorData.color},${
-    editorData.opacity / 100
-  })`;
+  tool.style.background = `rgba(${editorData.color},${editorData.opacity / 100
+    })`;
   let text: any = document.getElementById("w-e-textarea-1");
-  text.style.background = `rgba(${editorData.color},${
-    editorData.opacity / 100
-  })`;
+  text.style.background = `rgba(${editorData.color},${editorData.opacity / 100
+    })`;
   let con: any = document.getElementsByClassName("w-e-text-container")[0];
   con.style.background = "transparent";
   if (editorData.always == "top") {
@@ -435,65 +432,30 @@ const rightClick = function () {
 
 <template>
   <right-bar :border-radius="'0px'" @right-click="rightClick">
-    <div
-      style="
+    <div style="
         display: flex;
         justify-content: space-evenly;
         align-items: center;
         width: 100%;
         height: 100%;
-      "
-      data-tauri-drag-region
-    >
-      <v-btn
-        icon="mdi-opacity"
-        size="small"
-        @click="transparentbool = !transparentbool"
-      ></v-btn>
+      " data-tauri-drag-region>
+      <v-btn icon="mdi-opacity" size="small" @click="transparentbool = !transparentbool"></v-btn>
       <v-btn icon="mdi-palette" size="small" @click="colorChange"></v-btn>
       <v-btn :icon="alwaysicon" size="small" @click="setalways"></v-btn>
       <v-btn icon="mdi-close" size="small" @click="close()"></v-btn>
     </div>
   </right-bar>
   <!-- 背景色选择 -->
-  <input
-    type="color"
-    v-show="true"
-    id="colorBoard"
-    class="color-board"
-    @input="colorInput"
-  />
+  <input type="color" v-show="true" id="colorBoard" class="color-board" @input="colorInput" />
   <!-- 透明度 -->
-  <input
-    type="range"
-    v-show="transparentbool"
-    @input="rangeChange"
-    id="transparent"
-    class="transparent"
-    step="1"
-    max="100"
-    min="0"
-  />
+  <input type="range" v-show="transparentbool" @input="rangeChange" id="transparent" class="transparent" step="1"
+    max="100" min="0" />
   <div class="editor-container">
-    <Toolbar
-      v-show="show"
-      class="toolbar"
-      :editor="editorRef"
-      :defaultConfig="toolbarConfig"
-      :mode="mode"
-    />
-    <Editor
-      :style="{
-        height: show ? 'calc( 100vh - 40px ) !important' : '100vh !important',
-      }"
-      class="editor"
-      v-model="editorData.value"
-      :defaultConfig="editorConfig"
-      :mode="mode"
-      @onCreated="handleCreated"
-      @customPaste="customPaste"
-      @onChange="onChange"
-    />
+    <Toolbar v-show="show" class="toolbar" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
+    <Editor :style="{
+      height: show ? 'calc( 100vh - 40px ) !important' : '100vh !important',
+    }" class="editor" v-model="editorData.value" :defaultConfig="editorConfig" :mode="mode" @onCreated="handleCreated"
+      @customPaste="customPaste" @onChange="onChange" />
   </div>
 </template>
 <style>
@@ -505,6 +467,7 @@ const rightClick = function () {
   width: 80vw;
   margin-left: 10vw;
 }
+
 /* 色板 */
 .color-board {
   position: absolute;
@@ -524,6 +487,7 @@ const rightClick = function () {
   height: 40px;
   /* overflow: hidden; */
 }
+
 /* editor */
 .editor {
   width: 100vw;

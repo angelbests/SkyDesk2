@@ -13,8 +13,8 @@ const props = defineProps<{
   clone?: ((element: any) => any) | undefined;
   onAdd?: ((event: SortableEvent) => void) | undefined;
   setData?:
-    | ((dataTransfer: DataTransfer, draggedElement: HTMLElement) => void)
-    | undefined;
+  | ((dataTransfer: DataTransfer, draggedElement: HTMLElement) => void)
+  | undefined;
 }>();
 const { gridwidth, gridheight, padding } = toRefs(props);
 onMounted(() => {
@@ -34,7 +34,7 @@ const gridcontainerheight = computed(() => {
   return (
     Math.ceil(
       array.value.length /
-        Math.trunc(gridcontainerwidth.value / gridwidth.value)
+      Math.trunc(gridcontainerwidth.value / gridwidth.value)
     ) *
     (gridheight.value + 10)
   );
@@ -43,32 +43,16 @@ const gridcontainerheight = computed(() => {
 
 <template>
   <div class="container" ref="containerref">
-    <VueDraggable
-      v-model="array"
-      class="gridcontainer"
-      :animation="150"
-      :group="group"
-      :setData="setData"
-      :onAdd="onAdd"
-      :clone="clone"
-      :style="{
+    <VueDraggable v-model="array" class="gridcontainer" :animation="150" :group="group" :setData="setData"
+      :onAdd="onAdd" :clone="clone" :style="{
         gridTemplateColumns: `repeat(auto-fill,${gridwidth}px)`,
         gridTemplateRows: `repeat(auto-fit,${gridheight}px)`,
         height: `${gridcontainerheight}px`,
         gap: `${padding}px`,
-      }"
-    >
-      <div
-        :data-lnk="JSON.stringify(item)"
-        v-for="(item, index) in array"
-        :key="item"
-        :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }"
-      >
-        <slot
-          :item="item"
-          :index="index"
-          :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }"
-        ></slot>
+      }">
+      <div :data-lnk="JSON.stringify(item)" v-for="(item, index) in array" :key="item"
+        :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }">
+        <slot :item="item" :index="index" :style="{ width: `${gridwidth}px`, height: `${gridheight}px` }"></slot>
       </div>
     </VueDraggable>
   </div>

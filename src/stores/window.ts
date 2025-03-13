@@ -1,33 +1,19 @@
-import { defineStore } from "pinia";
-import { WindowOptions } from "@tauri-apps/api/window";
-import { WebviewOptions } from "@tauri-apps/api/webview";
-import { availableMonitors, Monitor } from "@tauri-apps/api/window";
-const monitors = await availableMonitors();
+import { defineStore } from "pinia"
+import { Note, ShortCut, WallpaperConfig, WallpaperList, Windows, Monitor } from "../types/storeType"
+import { availableMonitors } from "@tauri-apps/api/window"
+const monitors = await availableMonitors()
+
 const windowStore = defineStore("window", {
   state: function () {
     return {
-      windows: [] as {
-        label: string;
-        monitor?: boolean;
-        option: Omit<WebviewOptions, "x" | "y" | "width" | "height"> &
-          WindowOptions;
-        wallpaper: {
-          x: number;
-          y: number;
-          w: number;
-          h: number;
-          z: number;
-          status: boolean;
-          monitor: Monitor | undefined;
-        };
-      }[],
+      windows: [] as Windows[],
       monitors: monitors as Monitor[],
-    };
+    }
   },
   persist: {
     paths: ["windows"],
   },
-});
+})
 
 const systemStore = defineStore("system", {
   state: function () {
@@ -52,91 +38,34 @@ const systemStore = defineStore("system", {
       btnbackground: "white" as string,
       shortcutbackground: "rgba(123,123,123,0.2)" as string,
       btnbarbackground: "white" as string,
-    };
+    }
   },
   persist: true,
-});
+})
 
 const noteStore = defineStore("note", {
   state: function () {
     return {
-      note: [] as {
-        value: string;
-        date: string;
-        color: string;
-        opacity: number;
-        label: string;
-        wallpaper: boolean;
-        option?: Omit<WebviewOptions, "x" | "y" | "width" | "height"> &
-          WindowOptions;
-      }[],
-    };
+      note: [] as Note[],
+    }
   },
   persist: true,
-});
+})
 
 const wallpaperStore = defineStore("wallpaper", {
   state: function () {
     return {
-      wallpaperConfig: [] as {
-        monitor: string;
-        label: string;
-        config: {
-          audio: number;
-          date: boolean;
-          datex: number;
-          datey: number;
-          datefontsize: number;
-          time: boolean;
-          timex: number;
-          timey: number;
-          timefontsize: number;
-          weather: boolean;
-          weatherx: number;
-          weathery: number;
-          weatherfontsize: number;
-          netspeed: boolean;
-          netspeedx: number;
-          netspeedy: number;
-          netspeedfontsize: number;
-          cpu: boolean;
-          cpux: number;
-          cpuy: number;
-          cpufontsize: number;
-          memory: boolean;
-          memoryx: number;
-          memoryy: number;
-          memoryfontsize: number;
-          music: boolean;
-          musicx: number;
-          musicy: number;
-          musicfontsize: number;
-          musicapp: string;
-        };
-      }[],
-      wallpaperList: [] as {
-        type: "image" | "video" | "html";
-        title: string;
-        preview: string; // 预览图
-        filename: string; // 文件名称
-        path: string;
-      }[],
-    };
+      wallpaperConfig: [] as WallpaperConfig[],
+      wallpaperList: [] as WallpaperList[],
+    }
   },
   persist: true,
-});
+})
 
 const shortcutStore = defineStore("shortcut", {
   state: function () {
     return {
-      shortcutsTemp: [] as {
-        targetPath: string;
-        iconLocationPeFile: string;
-        iconLocation: string;
-        lnkPath: string;
-        icoPath: string;
-        name: string;
-      }[],
+      shortcutsTemp: [] as ShortCut[],
       shortcuts: [
         {
           title: "开始",
@@ -144,29 +73,15 @@ const shortcutStore = defineStore("shortcut", {
           shortcut: [],
         },
       ] as {
-        title: string;
-        index: number;
-        shortcut: {
-          targetPath: string;
-          iconLocationPeFile: string;
-          iconLocation: string;
-          lnkPath: string;
-          icoPath: string;
-          name: string;
-        }[];
+        title: string
+        index: number
+        shortcut: ShortCut[]
       }[],
-      wheels: [] as {
-        targetPath: string;
-        iconLocationPeFile: string;
-        iconLocation: string;
-        lnkPath: string;
-        icoPath: string;
-        name: string;
-      }[],
-    };
+      wheels: [] as ShortCut[],
+    }
   },
   persist: true,
-});
+})
 
 const weatherStore = defineStore("weather", {
   state() {
@@ -176,29 +91,21 @@ const weatherStore = defineStore("weather", {
       citycode: "" as string,
       query: "" as string,
       pois: [] as any[],
-    };
+    }
   },
   persist: true,
-});
+})
 
 const captureStore = defineStore("capture", {
   state() {
     return {
       video: [] as {
-        name: string;
-        path: string;
+        name: string
+        path: string
       }[],
-    };
+    }
   },
   persist: true,
-});
+})
 
-export {
-  windowStore,
-  noteStore,
-  wallpaperStore,
-  shortcutStore,
-  systemStore,
-  weatherStore,
-  captureStore,
-};
+export { windowStore, noteStore, wallpaperStore, shortcutStore, systemStore, weatherStore, captureStore }

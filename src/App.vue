@@ -35,6 +35,7 @@ body {
   background: rgba(123, 123, 123, 0.5);
   border-radius: 5px;
 }
+
 ::-webkit-scrollbar-button {
   display: none;
 }

@@ -19,17 +19,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    id="titlebar"
-    :style="{
-      height: height,
-      background: background,
-      borderTopLeftRadius: borderTopLeftRadius,
-      borderTopRightRadius: borderTopRightRadius,
-    }"
-    class="titlebar"
-    data-tauri-drag-region
-  >
+  <div id="titlebar" :style="{
+    height: height,
+    background: background,
+    borderTopLeftRadius: borderTopLeftRadius,
+    borderTopRightRadius: borderTopRightRadius,
+  }" class="titlebar" data-tauri-drag-region>
     <slot />
   </div>
 </template>

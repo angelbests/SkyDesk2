@@ -2,36 +2,25 @@
 import { onMounted, ref } from "vue";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { listen } from "@tauri-apps/api/event";
-import {
-  systemStore,
-  windowStore,
-  noteStore,
-  wallpaperStore,
-  shortcutStore,
-  weatherStore,
-  captureStore,
-} from "../stores/window";
+import { listen, Event } from "@tauri-apps/api/event";
+import { systemStore, windowStore, noteStore, wallpaperStore, shortcutStore, weatherStore, captureStore, } from "../stores/window";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { NetSpeed } from "../types/netspeedType";
 const systemstore = systemStore();
 const drawer = ref(true);
 const colorshow = ref(false);
 const settingshow = ref(false);
-const net = ref({
-  speed_r: 0,
-  speed_s: 0,
+const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
+listen("netspeed", (e: Event<NetSpeed>) => {
+  net.value.speed_r = e.payload.speed_r;
+  net.value.speed_s = e.payload.speed_s;
 });
 const toggleMaximizeBool = ref(false);
 onMounted(async () => {
   await maininit();
-  listen("netspeed", (e) => {
-    let res = JSON.parse(e.payload as string);
-    net.value.speed_r = res.speed_r;
-    net.value.speed_s = res.speed_s;
-  });
   // 设置窗口拖拽
   document
     .getElementById("toolbar")
@@ -86,37 +75,13 @@ const autostartsetting = function (e: any) {
 
 const refresh = function () {
   localStorage.clear();
-  const system = systemStore();
-  system.autostart = false;
-  system.traystart = false;
-  system.wheel = true;
-  system.fontcolor = "black";
-  system.programbcakground = "white";
-  system.leftbackground = "white";
-  system.topbackground = "white";
-  system.btnbackground = "white";
-  system.shortcutbackground = "rgba(123,123,123,0.2)";
-  system.btnbarbackground = "white";
-  const window = windowStore();
-  window.windows = [];
-  window.monitors = [];
-  const note = noteStore();
-  note.note = [];
-  const wallpaper = wallpaperStore();
-  wallpaper.wallpaperConfig = [];
-  wallpaper.wallpaperList = [];
-  const shortcut = shortcutStore();
-  shortcut.shortcutsTemp = [];
-  shortcut.shortcuts = [];
-  shortcut.wheels = [];
-  const weather = weatherStore();
-  weather.apikey = "9cda7ed49a914d5eb6987706d642da65";
-  weather.city = "";
-  weather.citycode = "";
-  weather.query = "";
-  weather.pois = [];
-  const capture = captureStore();
-  capture.video = [];
+  systemStore().$reset();
+  windowStore().$reset();
+  noteStore().$reset();
+  wallpaperStore().$reset();
+  shortcutStore().$reset();
+  weatherStore().$reset();
+  captureStore().$reset();
   relaunch();
 };
 
@@ -229,151 +194,91 @@ const wheel_status = function (e: any) {
 </script>
 
 <template>
-  <v-layout
-    :style="{
-      background: systemstore.programbcakground
-        ? systemstore.programbcakground
+  <v-layout :style="{
+    background: systemstore.programbcakground
+      ? systemstore.programbcakground
+      : 'transparent',
+    backgroundSize: 'cover',
+    color: systemstore.fontcolor,
+  }">
+    <v-app-bar :style="{
+      background: systemstore.topbackground
+        ? systemstore.topbackground
         : 'transparent',
       backgroundSize: 'cover',
-      color: systemstore.fontcolor,
-    }"
-  >
-    <v-app-bar
-      :style="{
-        background: systemstore.topbackground
-          ? systemstore.topbackground
-          : 'transparent',
-        backgroundSize: 'cover',
-      }"
-      :absolute="true"
-      :height="48"
-      id="toolbar"
-      class="toolbar"
-      data-tauri-drag-region
-    >
+    }" :absolute="true" :height="48" id="toolbar" class="toolbar" data-tauri-drag-region>
       <template v-slot:title>
         <div :style="{ color: systemstore.fontcolor }" data-tauri-drag-region>
           SkyDesk2
         </div>
       </template>
       <template v-slot:prepend>
-        <v-app-bar-nav-icon
-          style="background: transparent"
-          @click="drawer = !drawer"
-        ></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon style="background: transparent" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
-      <div
-        :style="{
-          width: '100px',
-          display: 'flex',
-          alignItems: 'center',
-          color: systemstore.fontcolor,
-        }"
-        data-tauri-drag-region
-      >
-        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon
-        >{{
-          Math.trunc(net.speed_r / 1024) < 1024
-            ? Math.trunc(net.speed_r / 1024) + "KB/s"
-            : Math.trunc((net.speed_r / 1024 / 1024) * 10) / 10 + "MB/s"
-        }}
-      </div>
-      <div
-        :style="{
-          width: '100px',
-          display: 'flex',
-          alignItems: 'center',
-          color: systemstore.fontcolor,
-        }"
-        data-tauri-drag-region
-      >
-        <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon
-        >{{
-          Math.trunc(net.speed_s / 1024) < 1024
-            ? Math.trunc(net.speed_s / 1024) + "KB/s"
-            : Math.trunc((net.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
-        }}
-      </div>
-      <v-btn style="background: transparent" icon>
-        <v-icon>mdi-help-circle-outline</v-icon>
-      </v-btn>
-      <v-btn style="background: transparent" @click="colorshow = true" icon>
-        <v-icon>mdi-palette</v-icon>
-      </v-btn>
-      <v-btn style="background: transparent" icon @click="settingshow = true">
-        <v-icon>mdi-cog-outline</v-icon>
-      </v-btn>
-      <v-btn style="background: transparent" icon @click="minus">
-        <v-icon>mdi-window-minimize</v-icon>
-      </v-btn>
-      <v-btn style="background: transparent" icon @click="toggleMaximize">
-        <v-icon v-show="toggleMaximizeBool">mdi-window-restore</v-icon>
-        <v-icon v-show="!toggleMaximizeBool">mdi-window-maximize</v-icon>
-      </v-btn>
-      <v-btn style="background: transparent" icon @click="closeApp">
-        <v-icon>mdi-window-close</v-icon>
-      </v-btn>
+      <div :style="{
+        width: '100px',
+        display: 'flex',
+        alignItems: 'center',
+        color: systemstore.fontcolor,
+      }" data-tauri-drag-region>
+        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{
+          Math.trunc(net.speed_r / 1024) < 1024 ? Math.trunc(net.speed_r / 1024) + "KB/s" : Math.trunc((net.speed_r / 1024
+            / 1024) * 10) / 10 + "MB/s" }} </div>
+          <div :style="{
+            width: '100px',
+            display: 'flex',
+            alignItems: 'center',
+            color: systemstore.fontcolor,
+          }" data-tauri-drag-region>
+            <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{
+              Math.trunc(net.speed_s / 1024) < 1024 ? Math.trunc(net.speed_s / 1024) + "KB/s" : Math.trunc((net.speed_s /
+                1024 / 1024) * 10) / 10 + "MB/s" }} </div>
+              <v-btn style="background: transparent" icon>
+                <v-icon>mdi-help-circle-outline</v-icon>
+              </v-btn>
+              <v-btn style="background: transparent" @click="colorshow = true" icon>
+                <v-icon>mdi-palette</v-icon>
+              </v-btn>
+              <v-btn style="background: transparent" icon @click="settingshow = true">
+                <v-icon>mdi-cog-outline</v-icon>
+              </v-btn>
+              <v-btn style="background: transparent" icon @click="minus">
+                <v-icon>mdi-window-minimize</v-icon>
+              </v-btn>
+              <v-btn style="background: transparent" icon @click="toggleMaximize">
+                <v-icon v-show="toggleMaximizeBool">mdi-window-restore</v-icon>
+                <v-icon v-show="!toggleMaximizeBool">mdi-window-maximize</v-icon>
+              </v-btn>
+              <v-btn style="background: transparent" icon @click="closeApp">
+                <v-icon>mdi-window-close</v-icon>
+              </v-btn>
     </v-app-bar>
 
     <v-main style="height: calc(100vh); overflow-y: auto; width: 100%">
-      <v-navigation-drawer
-        :style="{
-          boxShadow: drawer ? '5px 0px 5px rgba(123,123,123,0.5)' : 'none',
-          background: systemstore.leftbackground
-            ? systemstore.leftbackground
-            : 'transparent',
-          backgroundSize: 'cover',
-        }"
-        width="150"
-        temporary
-        v-model="drawer"
-        :permanent="true"
-        expand-on-hover
-      >
+      <v-navigation-drawer :style="{
+        boxShadow: drawer ? '5px 0px 5px rgba(123,123,123,0.5)' : 'none',
+        background: systemstore.leftbackground
+          ? systemstore.leftbackground
+          : 'transparent',
+        backgroundSize: 'cover',
+      }" width="150" temporary v-model="drawer" :permanent="true" expand-on-hover>
         <v-list style="height: 100%">
-          <v-list-item
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-apps"
-            title="快捷"
-            :href="'/#/pages/setting/shortcut'"
-          ></v-list-item>
-          <v-list-item
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-wallpaper"
-            title="壁纸"
-            :href="'/#/pages/setting/wallpaper'"
-          ></v-list-item>
-          <v-list-item
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-note-outline"
-            title="便签"
-            :href="'/#/pages/setting/note'"
-          ></v-list-item>
-          <v-list-item
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-robot-outline"
-            title="AI"
-            :href="'/#/pages/setting/ollama'"
-          ></v-list-item>
-          <v-list-item
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-wallpaper"
-            title="录屏"
-            :href="'/#/pages/setting/capture'"
-          ></v-list-item>
-          <v-list-item
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-calendar-range"
-            title="日历"
-            :href="'/#/pages/setting/datenote'"
-          ></v-list-item>
+          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-apps" title="快捷"
+            :href="'/#/pages/setting/shortcut'"></v-list-item>
+          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper" title="壁纸"
+            :href="'/#/pages/setting/wallpaper'"></v-list-item>
+          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-note-outline" title="便签"
+            :href="'/#/pages/setting/note'"></v-list-item>
+          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline" title="AI"
+            :href="'/#/pages/setting/ollama'"></v-list-item>
+          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper" title="录屏"
+            :href="'/#/pages/setting/capture'"></v-list-item>
+          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range" title="日历"
+            :href="'/#/pages/setting/datenote'"></v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <router-view
-        v-slot="{ Component }"
-        :key="$route.fullPath"
-        style="width: auto; height: 100%; box-sizing: border-box; padding: 10px"
-      >
+      <router-view v-slot="{ Component }" :key="$route.fullPath"
+        style="width: auto; height: 100%; box-sizing: border-box; padding: 10px">
         <transition name="fade" mode="out-in" appear>
           <!-- <keep-alive> -->
           <component :is="Component" />
@@ -382,51 +287,30 @@ const wheel_status = function (e: any) {
       </router-view>
     </v-main>
     <v-dialog v-model="colorshow">
-      <div
-        style="
+      <div style="
           width: 100%;
           height: 100%;
           display: flex;
           justify-content: center;
           position: relative;
-        "
-        @click.self="colorshow = false"
-      >
-        <input
-          id="palette"
-          @input="selectcolor"
-          v-model="colorv"
-          style="position: absolute; left: 10; top: 10"
-          type="color"
-        />
+        " @click.self="colorshow = false">
+        <input id="palette" @input="selectcolor" v-model="colorv" style="position: absolute; left: 10; top: 10"
+          type="color" />
         <v-card style="width: 400px">
           <v-card-title>
             <div style="display: flex; flex-direction: row">
               <div style="width: 50%; text-align: left">背景设置</div>
               <div style="width: 50%; text-align: right">
-                <v-icon
-                  icon="mdi-window-close"
-                  @click="colorshow = false"
-                ></v-icon>
+                <v-icon icon="mdi-window-close" @click="colorshow = false"></v-icon>
               </div>
             </div>
           </v-card-title>
           <v-list style="width: 400px">
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.programbcakground"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.programbcakground" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
-                    <v-btn
-                      variant="tonal"
-                      size="mini"
-                      @click="getImage(1)"
-                      style="margin-right: 5px"
-                    >
+                    <v-btn variant="tonal" size="mini" @click="getImage(1)" style="margin-right: 5px">
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
@@ -444,19 +328,9 @@ const wheel_status = function (e: any) {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.leftbackground"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.leftbackground" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
-                    <v-btn
-                      variant="tonal"
-                      size="mini"
-                      @click="getImage(2)"
-                      style="margin-right: 5px"
-                    >
+                    <v-btn variant="tonal" size="mini" @click="getImage(2)" style="margin-right: 5px">
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
@@ -474,19 +348,9 @@ const wheel_status = function (e: any) {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.topbackground"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.topbackground" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
-                    <v-btn
-                      variant="tonal"
-                      size="mini"
-                      @click="getImage(3)"
-                      style="margin-right: 5px"
-                    >
+                    <v-btn variant="tonal" size="mini" @click="getImage(3)" style="margin-right: 5px">
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
@@ -504,19 +368,10 @@ const wheel_status = function (e: any) {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.shortcutbackground"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.shortcutbackground" width="280" hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
-                    <v-btn
-                      variant="tonal"
-                      size="mini"
-                      @click="getImage(4)"
-                      style="margin-right: 5px"
-                    >
+                    <v-btn variant="tonal" size="mini" @click="getImage(4)" style="margin-right: 5px">
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
@@ -534,20 +389,10 @@ const wheel_status = function (e: any) {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.btnbackground"
-                  @update:model-value="changebtn(1)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.btnbackground" @update:model-value="changebtn(1)" width="280"
+                  hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
-                    <v-btn
-                      variant="tonal"
-                      size="mini"
-                      @click="getImage(5)"
-                      style="margin-right: 5px"
-                    >
+                    <v-btn variant="tonal" size="mini" @click="getImage(5)" style="margin-right: 5px">
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
@@ -565,20 +410,10 @@ const wheel_status = function (e: any) {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.btnbarbackground"
-                  @update:model-value="changebtn(2)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.btnbarbackground" @update:model-value="changebtn(2)" width="280"
+                  hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
-                    <v-btn
-                      variant="tonal"
-                      size="mini"
-                      @click="getImage(7)"
-                      style="margin-right: 5px"
-                    >
+                    <v-btn variant="tonal" size="mini" @click="getImage(7)" style="margin-right: 5px">
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
@@ -596,13 +431,8 @@ const wheel_status = function (e: any) {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.fontcolor"
-                  @update:model-value="changebtn(2)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact"
-                >
+                <v-text-field v-model="systemstore.fontcolor" @update:model-value="changebtn(2)" width="280"
+                  hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="palette(6)">
                       <template v-slot:append>
@@ -621,19 +451,13 @@ const wheel_status = function (e: any) {
     </v-dialog>
     <!-- 设置 -->
     <v-dialog v-model="settingshow">
-      <div
-        style="display: flex; justify-content: center"
-        @click.self="settingshow = false"
-      >
+      <div style="display: flex; justify-content: center" @click.self="settingshow = false">
         <v-card style="width: 400px">
           <v-card-title>
             <div style="display: flex; flex-direction: row">
               <div style="width: 50%; text-align: left">设置</div>
               <div style="width: 50%; text-align: right">
-                <v-icon
-                  icon="mdi-window-close"
-                  @click="settingshow = false"
-                ></v-icon>
+                <v-icon icon="mdi-window-close" @click="settingshow = false"></v-icon>
               </div>
             </div>
           </v-card-title>
@@ -641,53 +465,33 @@ const wheel_status = function (e: any) {
             <v-list>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch
-                    color="info"
-                    v-model="systemstore.traystart"
-                    hide-details
-                  ></v-switch>
+                  <v-switch color="info" v-model="systemstore.traystart" hide-details></v-switch>
                 </template>
                 <v-list-item-title>启动到托盘</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch
-                    color="info"
-                    v-model="systemstore.autostart"
-                    @update:model-value="autostartsetting"
-                    hide-details
-                  ></v-switch>
+                  <v-switch color="info" v-model="systemstore.autostart" @update:model-value="autostartsetting"
+                    hide-details></v-switch>
                 </template>
                 <v-list-item-title>开机自启</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch
-                    color="info"
-                    v-model="systemstore.netspeed.show"
-                    hide-details
-                  ></v-switch>
+                  <v-switch color="info" v-model="systemstore.netspeed.show" hide-details></v-switch>
                 </template>
                 <v-list-item-title>网速控件</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch
-                    color="info"
-                    v-model="systemstore.taskbar"
-                    hide-details
-                  ></v-switch>
+                  <v-switch color="info" v-model="systemstore.taskbar" hide-details></v-switch>
                 </template>
                 <v-list-item-title>任务栏</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch
-                    color="info"
-                    v-model="systemstore.wheel"
-                    @update:model-value="wheel_status"
-                    hide-details
-                  ></v-switch>
+                  <v-switch color="info" v-model="systemstore.wheel" @update:model-value="wheel_status"
+                    hide-details></v-switch>
                 </template>
                 <v-list-item-title>轮盘开关</v-list-item-title>
               </v-list-item>
@@ -710,50 +514,56 @@ const wheel_status = function (e: any) {
   </v-layout>
 </template>
 
-<style>
-.v-btn {
-  color: var(--font-color) !important;
-  background: var(--btn-background);
-  background-size: cover;
-}
-.v-text-field {
-  color: var(--font-color) !important;
-}
-.v-list-item-title {
-  color: var(--font-color) !important;
-}
-.v-card {
-  color: var(--font-color) !important;
-}
+        <style>
+        .v-btn {
+          color: var(--font-color) !important;
+          background: var(--btn-background);
+          background-size: cover;
+        }
 
-.home {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-.toolbar {
-  cursor: default;
-}
-.v-list-group__items {
-  --parent-padding: calc(0px);
-}
+        .v-text-field {
+          color: var(--font-color) !important;
+        }
 
-.fade-leave-active,
-.fade-enter-active {
-  transition: all 0.3s;
-}
+        .v-list-item-title {
+          color: var(--font-color) !important;
+        }
 
-.fade-enter-from {
-  opacity: 0;
-  transform: translateX(-10px);
-}
-.fade-enter-to {
-  opacity: 1;
-  transform: translateX(0px);
-}
+        .v-card {
+          color: var(--font-color) !important;
+        }
 
-.fade-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>
+        .home {
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+        }
+
+        .toolbar {
+          cursor: default;
+        }
+
+        .v-list-group__items {
+          --parent-padding: calc(0px);
+        }
+
+        .fade-leave-active,
+        .fade-enter-active {
+          transition: all 0.3s;
+        }
+
+        .fade-enter-from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+
+        .fade-enter-to {
+          opacity: 1;
+          transform: translateX(0px);
+        }
+
+        .fade-leave-to {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+      </style>

@@ -151,8 +151,8 @@ const start_capture = async function () {
     captureWindow.value.setPosition(
       new LogicalPosition(
         window_size.x +
-          monitor.value.position.x / monitor.value.scaleFactor -
-          5,
+        monitor.value.position.x / monitor.value.scaleFactor -
+        5,
         window_size.y + monitor.value.position.y / monitor.value.scaleFactor - 5
       )
     );
@@ -160,12 +160,12 @@ const start_capture = async function () {
     captureBtn.value?.setPosition(
       new LogicalPosition(
         window_size.x +
-          monitor.value.position.x / monitor.value.scaleFactor +
-          window_size.width / 2 -
-          40,
+        monitor.value.position.x / monitor.value.scaleFactor +
+        window_size.width / 2 -
+        40,
         window_size.y +
-          monitor.value.position.y / monitor.value.scaleFactor -
-          30
+        monitor.value.position.y / monitor.value.scaleFactor -
+        30
       )
     );
     let title = moment().format("YYMMDDhhmmss") + ".mp4";
@@ -192,10 +192,7 @@ const start_capture = async function () {
 
 <template>
   <div class="window">
-    <div
-      v-show="show"
-      id="control"
-      style="
+    <div v-show="show" id="control" style="
         position: absolute;
         z-index: 100;
         display: flex;
@@ -203,20 +200,9 @@ const start_capture = async function () {
         align-items: center;
         box-sizing: border-box;
         padding: 3px;
-      "
-    >
-      <v-btn
-        style="margin-right: 10px; font-size: 12px"
-        size="small"
-        @click="start_capture"
-        >开始录制</v-btn
-      >
-      <v-btn
-        style="margin-right: 10px; font-size: 12px"
-        size="small"
-        @click="close"
-        >退出录制</v-btn
-      >
+      ">
+      <v-btn style="margin-right: 10px; font-size: 12px" size="small" @click="start_capture">开始录制</v-btn>
+      <v-btn style="margin-right: 10px; font-size: 12px" size="small" @click="close">退出录制</v-btn>
     </div>
     <canvas id="c"></canvas>
   </div>

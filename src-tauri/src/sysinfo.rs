@@ -1,22 +1,23 @@
-use std::{
-    // ffi::OsString,
-    // os::windows::ffi::{OsStrExt, OsStringExt},
-    thread,
-    time,
-};
+use std::{thread, time};
 use sysinfo::{Networks, System};
 use tauri::{AppHandle, Emitter};
+
+#[derive(Clone, serde::Serialize)]
+struct Netspeed {
+    speed_r: u64,
+    speed_s: u64,
+}
 #[tauri::command]
 pub fn netspeed(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
-        let mut _r: u64 = 0;
-        let mut _t: u64 = 0;
         let mut networks = Networks::new_with_refreshed_list();
         loop {
             thread::sleep(time::Duration::from_secs(1));
             networks.refresh(true);
-            _r = 0;
-            _t = 0;
+            let mut netspeed = Netspeed {
+                speed_r: 0,
+                speed_s: 0,
+            };
             for (name, network) in &networks {
                 // 排除 vEthernet Bridge Virtual Filter Qos 网络
                 if (name.contains("vEthernet")
@@ -26,12 +27,11 @@ pub fn netspeed(app: AppHandle) {
                     || name.contains("Qos"))
                     == false
                 {
-                    _r = _r + network.received();
-                    _t = _t + network.transmitted();
+                    netspeed.speed_r = netspeed.speed_r + network.received();
+                    netspeed.speed_s = netspeed.speed_s + network.transmitted();
                 }
             }
-            let str = format!("{{\"speed_r\":{},\"speed_s\":{}}}", _r, _t);
-            let _ = app.emit("netspeed", str);
+            let _ = app.emit("netspeed", netspeed);
         }
     });
 }

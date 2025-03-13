@@ -244,39 +244,29 @@ const upfile = function () {
     <v-dialog v-model="loadsetup" width="auto" data-tauri-drag-region>
       <v-card prepend-icon="mdi-update" title="安装ollama">
         <template v-slot:text>
-          <div
-            class="markdown-body"
-            v-html="
-              md.render(
-                '#### 下载b并安装ollama \n  https://ollama.com/download/ \n #### 查找想要安装的模型 \n  https://ollama.com/library \n #### 进入想要下载的模型页面;选择适合电脑的模型;打开CMD并输入： \n \`\`\`javascript \n ollama run 模型名称 \n ollama run qwen2.5:7b #通问千义 \n ollama run llama3.1:8b # Meta llama3.1 \n ``` \n #### 安装完成后页面自动关闭并可以使用AI对话！ '
-              )
-            "
-          ></div>
+          <div class="markdown-body" v-html="md.render(
+            '#### 下载b并安装ollama \n  https://ollama.com/download/ \n #### 查找想要安装的模型 \n  https://ollama.com/library \n #### 进入想要下载的模型页面;选择适合电脑的模型;打开CMD并输入： \n \`\`\`javascript \n ollama run 模型名称 \n ollama run qwen2.5:7b #通问千义 \n ollama run llama3.1:8b # Meta llama3.1 \n ``` \n #### 安装完成后页面自动关闭并可以使用AI对话！ '
+          )
+            "></div>
         </template>
         <template v-slot:actions>
           <v-btn style="margin-right: 20px" @click="checkollama()">
             安装完成
           </v-btn>
-          <v-btn
-            style="margin-right: 20px"
-            @click="
-              () => {
-                router.push({ path: '/pages/setting/shortcut' });
-              }
-            "
-          >
+          <v-btn style="margin-right: 20px" @click="
+            () => {
+              router.push({ path: '/pages/setting/shortcut' });
+            }
+          ">
             暂不使用
           </v-btn>
         </template>
       </v-card>
     </v-dialog>
-    <v-card
-      :style="{
-        background: systemstore.btnbarbackground,
-        backgroundSize: 'cover',
-      }"
-      class="btnbar"
-    >
+    <v-card :style="{
+      background: systemstore.btnbarbackground,
+      backgroundSize: 'cover',
+    }" class="btnbar">
       <v-btn style="margin-right: 20px" @click="delmsg">
         <template v-slot:prepend>
           <v-icon>mdi-delete-outline</v-icon>
@@ -287,29 +277,13 @@ const upfile = function () {
     <v-snackbar multi-line v-model="snackbar.bool">
       {{ snackbar.text }}
     </v-snackbar>
-    <v-progress-linear
-      color="black"
-      :indeterminate="loading"
-    ></v-progress-linear>
+    <v-progress-linear color="black" :indeterminate="loading"></v-progress-linear>
     <div style="width: 100%; height: calc(100% - 64px); overflow: hidden">
       <v-tabs-window v-model="model" style="width: 100%; height: 100%">
-        <v-tabs
-          density="compact"
-          show-arrows
-          v-model="model"
-          hide-slider
-          style="background: rgba(223, 223, 223, 0.4)"
-        >
-          <v-tab
-            v-for="item in modellist"
-            :key="item.name"
-            :text="item.name"
-            :value="item"
-          ></v-tab>
+        <v-tabs density="compact" show-arrows v-model="model" hide-slider style="background: rgba(223, 223, 223, 0.4)">
+          <v-tab v-for="item in modellist" :key="item.name" :text="item.name" :value="item"></v-tab>
         </v-tabs>
-        <div
-          id="chatdiv"
-          style="
+        <div id="chatdiv" style="
             width: 100%;
             height: calc(100% - 60px);
             display: flex;
@@ -320,77 +294,51 @@ const upfile = function () {
             padding: 10px;
             transition: all 0.3s linear;
             user-select: text !important;
-          "
-        >
+          ">
           <template v-for="item in messages">
-            <div
-              v-if="item.role == 'assistant'"
-              style="
+            <div v-if="item.role == 'assistant'" style="
                 width: 100%;
                 display: flex;
                 justify-content: flex-start;
                 margin-bottom: 20px;
                 transition: all 0.3s linear;
-              "
-            >
-              <div
-                style="
+              ">
+              <div style="
                   width: calc(100% - 50px);
                   display: flex;
                   justify-content: flex-start;
-                "
-              >
-                <v-avatar
-                  icon="mdi-robot-outline"
-                  style="margin-right: 10px"
-                  :style="{ color: systemstore.fontcolor }"
-                ></v-avatar>
-                <div
-                  class="markdown-body"
-                  :style="{
-                    background: 'rgba(220,220,220,0.4)',
-                    color: systemstore.fontcolor,
-                  }"
-                  v-html="md.render(item.md)"
-                ></div>
+                ">
+                <v-avatar icon="mdi-robot-outline" style="margin-right: 10px"
+                  :style="{ color: systemstore.fontcolor }"></v-avatar>
+                <div class="markdown-body" :style="{
+                  background: 'rgba(220,220,220,0.4)',
+                  color: systemstore.fontcolor,
+                }" v-html="md.render(item.md)"></div>
               </div>
             </div>
-            <div
-              v-else
-              style="
+            <div v-else style="
                 width: 100%;
                 display: flex;
                 justify-content: flex-end;
                 margin-bottom: 20px;
                 transition: all 0.3s linear;
-              "
-            >
-              <div
-                style="
+              ">
+              <div style="
                   width: calc(100% - 50px);
                   display: flex;
                   justify-content: flex-end;
-                "
-              >
-                <div
-                  class="markdown-body"
-                  v-html="md.render(item.md)"
-                  :style="{
-                    background: 'rgba(220,220,220,0.4)',
-                    color: systemstore.fontcolor,
-                    marginRight: '10px',
-                  }"
-                ></div>
-                <v-avatar
-                  icon="mdi-account-circle-outline"
-                  :style="{ color: systemstore.fontcolor }"
-                ></v-avatar>
+                ">
+                <div class="markdown-body" v-html="md.render(item.md)" :style="{
+                  background: 'rgba(220,220,220,0.4)',
+                  color: systemstore.fontcolor,
+                  marginRight: '10px',
+                }"></div>
+                <v-avatar icon="mdi-account-circle-outline" :style="{ color: systemstore.fontcolor }"></v-avatar>
               </div>
             </div>
           </template>
         </div>
-        <div
-          style="
+        <div style="
             width: 100%;
             height: 60px;
             display: flex;
@@ -398,29 +346,12 @@ const upfile = function () {
             align-items: flex-end;
             box-sizing: border-box;
             padding: 10px 10px;
-          "
-        >
-          <v-text-field
-            width="50px"
-            v-model="message"
-            hide-details="auto"
-            density="compact"
-            variant="solo"
-            clearable
-            v-on:keyup.enter="sendmessage"
-          >
+          ">
+          <v-text-field width="50px" v-model="message" hide-details="auto" density="compact" variant="solo" clearable
+            v-on:keyup.enter="sendmessage">
             <template v-slot:append>
-              <input
-                type="file"
-                id="upfile"
-                accept="image/png, image/jpeg"
-                style="width: 0px"
-              />
-              <v-icon
-                @click="upfile"
-                style="margin-right: 15px; font-size: 40px"
-                >mdi-image</v-icon
-              >
+              <input type="file" id="upfile" accept="image/png, image/jpeg" style="width: 0px" />
+              <v-icon @click="upfile" style="margin-right: 15px; font-size: 40px">mdi-image</v-icon>
               <v-btn style="height: 40px" @click="sendmessage">
                 <template v-slot:prepend>
                   <v-icon>mdi-send-variant-outline</v-icon>
@@ -440,6 +371,7 @@ const upfile = function () {
   width: 100%;
   height: 100%;
 }
+
 .btnbar {
   width: 100%;
   height: 60px;
@@ -449,6 +381,7 @@ const upfile = function () {
   padding: 0 20px;
   filter: drop-shadow(0px 2px 5px gray);
 }
+
 .markdown-body {
   box-sizing: border-box;
   min-width: 200px;

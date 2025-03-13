@@ -39,7 +39,7 @@ image = "0.25.2"
 
 # 系统信息
 sysinfo = "0.33.1"
-
+log = "0.4.26"
 # 按键库
 rdev = {version = "0.5.3", features = ["unstable_grab"] }
 wasapi = "0.16.0"

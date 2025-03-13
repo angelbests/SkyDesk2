@@ -47,30 +47,18 @@ const getImage = async function () {
 </script>
 
 <template>
-  <v-card
-    class="mx-auto"
-    max-width="400"
-    style="background-color: white; width: 100vw; height: 100vh"
-  >
+  <v-card class="mx-auto" max-width="400" style="background-color: white; width: 100vw; height: 100vh">
     <v-toolbar id="toolbar" color="purple" density="compact">
       <v-toolbar-title data-tauri-drag-region>设置快捷容器</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn
-        icon="mdi-close"
-        @click="getCurrentWebviewWindow().close()"
-      ></v-btn>
+      <v-btn icon="mdi-close" @click="getCurrentWebviewWindow().close()"></v-btn>
     </v-toolbar>
     <v-divider></v-divider>
     <v-list lines="one" select-strategy="classic">
       <v-list-item>
         <template v-slot:append>
-          <v-text-field
-            v-model="shortcutWindows.setting.background"
-            @update:model-value="emitToShortcut('background')"
-            width="200"
-            hide-details="auto"
-            density="compact"
-          >
+          <v-text-field v-model="shortcutWindows.setting.background" @update:model-value="emitToShortcut('background')"
+            width="200" hide-details="auto" density="compact">
             <template v-slot:prepend-inner>
               <v-btn variant="tonal" size="mini" @click="getImage">
                 <template v-slot:append>
@@ -85,41 +73,20 @@ const getImage = async function () {
       <v-divider></v-divider>
       <v-list-item>
         <template v-slot:append>
-          <v-number-input
-            v-model="shortcutWindows.setting.blur"
-            @update:model-value="emitToShortcut('blur')"
-            style="width: 200px"
-            hide-details="auto"
-            density="compact"
-            :min="0"
-            :max="20"
-          ></v-number-input>
+          <v-number-input v-model="shortcutWindows.setting.blur" @update:model-value="emitToShortcut('blur')"
+            style="width: 200px" hide-details="auto" density="compact" :min="0" :max="20"></v-number-input>
         </template>
         <v-list-item-title>容器虚化</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
       <v-list-item>
         <template v-slot:append>
-          <v-number-input
-            v-model="shortcutWindows.setting.r"
-            @update:model-value="emitToShortcut('r')"
-            control-variant="stacked"
-            :min="1"
-            :max="100"
-            width="100"
-            hide-details="auto"
-            density="compact"
-          ></v-number-input>
-          <v-number-input
-            v-model="shortcutWindows.setting.c"
-            @update:model-value="emitToShortcut('c')"
-            control-variant="stacked"
-            :min="1"
-            :max="100"
-            width="100"
-            hide-details="auto"
-            density="compact"
-          ></v-number-input>
+          <v-number-input v-model="shortcutWindows.setting.r" @update:model-value="emitToShortcut('r')"
+            control-variant="stacked" :min="1" :max="100" width="100" hide-details="auto"
+            density="compact"></v-number-input>
+          <v-number-input v-model="shortcutWindows.setting.c" @update:model-value="emitToShortcut('c')"
+            control-variant="stacked" :min="1" :max="100" width="100" hide-details="auto"
+            density="compact"></v-number-input>
         </template>
         <v-list-item-title>容器网格</v-list-item-title>
       </v-list-item>
@@ -127,49 +94,27 @@ const getImage = async function () {
       <v-list-item>
         <v-list-item-title>容器宽高</v-list-item-title>
         <template v-slot:append>
-          <v-number-input
-            v-model="shortcutWindows.setting.w"
-            @update:model-value="emitToShortcut('w')"
-            control-variant="stacked"
-            :min="60"
-            :max="4000"
-            width="100"
-            hide-details="auto"
-            density="compact"
-          ></v-number-input>
-          <v-number-input
-            v-model="shortcutWindows.setting.h"
-            @update:model-value="emitToShortcut('h')"
-            control-variant="stacked"
-            :min="60"
-            :max="4000"
-            width="100"
-            hide-details="auto"
-            density="compact"
-          ></v-number-input>
+          <v-number-input v-model="shortcutWindows.setting.w" @update:model-value="emitToShortcut('w')"
+            control-variant="stacked" :min="60" :max="4000" width="100" hide-details="auto"
+            density="compact"></v-number-input>
+          <v-number-input v-model="shortcutWindows.setting.h" @update:model-value="emitToShortcut('h')"
+            control-variant="stacked" :min="60" :max="4000" width="100" hide-details="auto"
+            density="compact"></v-number-input>
         </template>
       </v-list-item>
       <v-divider></v-divider>
       <v-list-item>
         <template v-slot:append>
-          <v-switch
-            v-model="shortcutWindows.setting.font"
-            @update:model-value="emitToShortcut('font')"
-            hide-details="auto"
-            density="compact"
-          ></v-switch>
+          <v-switch v-model="shortcutWindows.setting.font" @update:model-value="emitToShortcut('font')"
+            hide-details="auto" density="compact"></v-switch>
         </template>
         <v-list-item-title>字体显示</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
       <v-list-item>
         <template v-slot:append>
-          <v-switch
-            v-model="shortcutWindows.setting.alwaysOnTop"
-            @update:model-value="emitToShortcut('alwaysOnTop')"
-            hide-details="auto"
-            density="compact"
-          ></v-switch>
+          <v-switch v-model="shortcutWindows.setting.alwaysOnTop" @update:model-value="emitToShortcut('alwaysOnTop')"
+            hide-details="auto" density="compact"></v-switch>
         </template>
         <v-list-item-title>容器置顶</v-list-item-title>
       </v-list-item>

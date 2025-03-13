@@ -22,11 +22,11 @@ const video = ref()
 const image = ref()
 const html = ref()
 onMounted(async () => {
-    window.addEventListener("storage",(e)=>{
-        if(e.key == 'system'){
+    window.addEventListener("storage", (e) => {
+        if (e.key == 'system') {
             systemstore.$hydrate()
         }
-        if(e.key == "wallpaper"){
+        if (e.key == "wallpaper") {
             wallpapers.$hydrate()
         }
     })
@@ -34,42 +34,42 @@ onMounted(async () => {
     image.value = convertFileSrc(await resourceDir() + '\\resources\\image.png')
     html.value = convertFileSrc(await resourceDir() + '\\resources\\html.png')
     monitors.value = await availableMonitors()
-    if(wallpapers.wallpaperConfig.length == 0){
-        for(let i =0;i<monitors.value.length;i++){
+    if (wallpapers.wallpaperConfig.length == 0) {
+        for (let i = 0; i < monitors.value.length; i++) {
             wallpapers.wallpaperConfig.push({
-                label:"",
-                monitor:monitors.value[i].name as string,
-                config:{
-                    audio:0,
-                    date:true,
-                    datex:0,
-                    datey:0,
-                    datefontsize:0,
-                    time:true,
-                    timex:0,
-                    timey:0,
-                    timefontsize:0,
-                    weather:false,
-                    weatherx:0,
-                    weathery:0,
-                    weatherfontsize:0,
-                    netspeed:true,
-                    netspeedx:0,
-                    netspeedy:0,
-                    netspeedfontsize:0,
-                    cpu:true,
-                    cpux:0,
-                    cpuy:0,
-                    cpufontsize:0,
-                    memory:true,
-                    memoryx:0,
-                    memoryy:0,
+                label: "",
+                monitor: monitors.value[i].name as string,
+                config: {
+                    audio: 0,
+                    date: true,
+                    datex: 0,
+                    datey: 0,
+                    datefontsize: 0,
+                    time: true,
+                    timex: 0,
+                    timey: 0,
+                    timefontsize: 0,
+                    weather: false,
+                    weatherx: 0,
+                    weathery: 0,
+                    weatherfontsize: 0,
+                    netspeed: true,
+                    netspeedx: 0,
+                    netspeedy: 0,
+                    netspeedfontsize: 0,
+                    cpu: true,
+                    cpux: 0,
+                    cpuy: 0,
+                    cpufontsize: 0,
+                    memory: true,
+                    memoryx: 0,
+                    memoryy: 0,
                     memoryfontsize: 0,
                     music: false,
                     musicx: 0,
                     musicy: 0,
                     musicfontsize: 0,
-                    musicapp:"QQMusic.exe",
+                    musicapp: "QQMusic.exe",
                 }
             })
         }
@@ -92,9 +92,9 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
         y: 9999999,
         width: 1000,
         height: 1000,
-        decorations: false,
+        decorations: true,
         transparent: true,
-        fullscreen: false,
+        fullscreen: true,
         dragDropEnabled: true,
         shadow: false,
         alwaysOnBottom: true,
@@ -102,26 +102,27 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
         url: url,
     }, {
         x: monitor.position.x,
-        y: monitor.position.y - 5,
+        y: monitor.position.y,
         w: monitor.size.width,
-        h: monitor.size.height + 10,
+        h: monitor.size.height,
         z: 0,
         status: true,
-        monitor:monitor
+        monitor: monitor
     })
+
     w?.setSize(new LogicalSize(100, 100));
     await setWindowToMonitor(
         label,
         monitor.position.x as number,
-        monitor.position.y as number - 5,
+        monitor.position.y as number,
         monitor.size.width as number,
-        monitor.size.height as number + 10
+        monitor.size.height as number
     )
     let i = wallpapers.wallpaperConfig.findIndex(item => item.monitor == monitor.name)
-    if(wallpapers.wallpaperConfig[i].label){
+    if (wallpapers.wallpaperConfig[i].label) {
         let all = await getAllWebviewWindows()
-        all.filter(item=>{
-            if(item.label == wallpapers.wallpaperConfig[i].label){
+        all.filter(item => {
+            if (item.label == wallpapers.wallpaperConfig[i].label) {
                 item.close()
             }
         })
@@ -130,7 +131,7 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
 }
 
 // 设置锁屏
-const lockscreen = function (item:any) {
+const lockscreen = function (item: any) {
     invoke('setlockscreen', { path: item.path });
 }
 
@@ -195,7 +196,7 @@ const getpath = async function () {
     if (addWallPaperData.value.type == "image" && res) {
         addWallPaperData.value.preview = res
     }
-} 
+}
 
 // 类型改变时，清空内容
 const typechange = function (value: any) {
@@ -218,7 +219,7 @@ const addWallpaper = async function () {
     let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
     await invoke('zipimage', {
         imgpath: addWallPaperData.value.preview,
-        savepath:p_path
+        savepath: p_path
     });
     addWallPaperData.value.preview = p_path
     if (addWallPaperData.value.type == "image") {
@@ -342,15 +343,15 @@ const delwallpaper = async function (index: number) {
     console.log(wallpapers.wallpaperList[index])
     let name = await basename(wallpapers.wallpaperList[index].preview)
     let path = wallpapers.wallpaperList[index].preview.replace(name, "")
-    console.log(name,path)
+    console.log(name, path)
     if (await exists(path)) {
         await remove(path, { recursive: true })
     }
     wallpapers.wallpaperList.splice(index, 1)
 }
 
-const wallpapersetting = function(){
-    new WebviewWindow('wallpapersetting',{
+const wallpapersetting = function () {
+    new WebviewWindow('wallpapersetting', {
         width: 400,
         height: 600,
         decorations: false,
@@ -361,8 +362,8 @@ const wallpapersetting = function(){
         maximizable: false,
         resizable: false,
         skipTaskbar: true,
-        center:true,
-        url:'/#/pages/desktop/wallpapersetting'
+        center: true,
+        url: '/#/pages/desktop/wallpapersetting'
     })
 }
 </script>
@@ -402,16 +403,8 @@ const wallpapersetting = function(){
             </div>
         </v-dialog>
         <v-dialog max-width="500" v-model="addWallpaperShow">
-            <v-overlay
-            :model-value="overlay"
-            :persistent="true"
-            class="align-center justify-center"
-            >
-            <v-progress-circular
-                color="primary"
-                size="64"
-                indeterminate
-            ></v-progress-circular>
+            <v-overlay :model-value="overlay" :persistent="true" class="align-center justify-center">
+                <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>
             </v-overlay>
             <v-list>
                 <v-list-item>
@@ -446,8 +439,7 @@ const wallpapersetting = function(){
                 <v-btn style="margin-right: 10px;" @click="addWallpaper">确认</v-btn>
             </div>
         </v-dialog>
-        <v-card
-            :style="{background:systemstore.btnbarbackground,backgroundSize:'cover'}" class="btnbar">
+        <v-card :style="{ background: systemstore.btnbarbackground, backgroundSize: 'cover' }" class="btnbar">
             <v-btn style="margin-right: 20px;" @click="addWallpaperShow = true">
                 <template v-slot:prepend>
                     <v-icon>mdi-image-plus-outline</v-icon>
@@ -491,13 +483,15 @@ const wallpapersetting = function(){
                                 style="width: 100%;height: 100%;object-fit: cover;">
                         </v-card-text>
                         <v-card-actions style="height: 20%;padding: 0px 0px 0px 10px;">
-                            <img style="width: 25px;height: 25px;border-radius: 50%;" :src="item.type == 'image' ? image : item.type == 'video' ? video : html">
-                            <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in  monitors"
+                            <img style="width: 25px;height: 25px;border-radius: 50%;"
+                                :src="item.type == 'image' ? image : item.type == 'video' ? video : html">
+                            <v-btn size="small" border="opacity-50 sm" v-for="(monitor, i) in monitors"
                                 @click="setmonitorwallpaper(item, monitor)">{{
                                     "屏幕" + (i + 1) }}</v-btn>
-                            <v-btn v-if="item.type=='image'" size="small" border="opacity-50 sm" @click="lockscreen(item)">锁屏</v-btn>
+                            <v-btn v-if="item.type == 'image'" size="small" border="opacity-50 sm"
+                                @click="lockscreen(item)">锁屏</v-btn>
                             <v-btn size="small" border="opacity-50 sm" @click="delwallpaper(index)">删除</v-btn>
-                            
+
                         </v-card-actions>
                     </v-card>
                 </template>
@@ -513,8 +507,14 @@ const wallpapersetting = function(){
     width: 100%;
     height: 100%;
 }
-.btnbar{
-    width: 100%;height: 60px;display: flex;align-items: center;box-sizing: border-box;padding: 0 20px;filter:drop-shadow(0px 2px 5px gray)
-}
 
+.btnbar {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 20px;
+    filter: drop-shadow(0px 2px 5px gray)
+}
 </style>

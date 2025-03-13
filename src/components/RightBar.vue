@@ -9,7 +9,7 @@ const show = defineModel("show", {
 });
 
 const emit = defineEmits({
-  rightClick: () => {},
+  rightClick: () => { },
 });
 
 onMounted(async () => {
@@ -22,12 +22,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    :style="{ background: background, borderRadius: borderRadius }"
-    v-show="show"
-    class="rightbar"
-    data-tauri-drag-region
-  >
+  <div :style="{ background: background, borderRadius: borderRadius }" v-show="show" class="rightbar"
+    data-tauri-drag-region>
     <slot></slot>
   </div>
 </template>

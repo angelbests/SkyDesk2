@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { onMounted, ref, toRefs, watch } from "vue";
 import { useRoute } from "vue-router";
-import { convertFileSrc } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { wallpaperStore, weatherStore } from "../../stores/window";
 import { getWeather } from "../../api/weather";
-import { listen } from "@tauri-apps/api/event";
+import { listen, Event } from "@tauri-apps/api/event";
 import "qweather-icons/font/qweather-icons.css";
-import { currentMonitor } from "@tauri-apps/api/window";
+import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
 import { appDataDir } from "@tauri-apps/api/path";
 import { writeFile } from "@tauri-apps/plugin-fs";
 import { uuid } from "../../functions";
-import { info } from "@tauri-apps/plugin-log";
 import PCMPlayer from "pcm-player";
+import { NetSpeed } from "../../types/netspeedType";
+import { info } from "@tauri-apps/plugin-log";
+import { MouseAction, MouseEvent } from "../../types/desktopType";
 const weatherstore = weatherStore();
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
@@ -24,6 +26,7 @@ const net = ref({
   speed_r: 0,
   speed_s: 0,
 });
+//  document.elementFromPoint(300, 10).click()
 const cpu = ref(0);
 const memory = ref(0);
 const date = new Date();
@@ -92,21 +95,18 @@ listen(
       end: number;
     };
   }) => {
+
     if (
       wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
       e.payload.app
     ) {
+      // if (e.payload.position != timeline.value.position) {
+      //   playstatus.value = 4;
+      // } else {
+      //   playstatus.value = 5;
+      // }
       timeline.value = e.payload;
     }
-    info(
-      e.payload.app +
-        "时间线：" +
-        e.payload.start +
-        "-" +
-        e.payload.position +
-        "-" +
-        e.payload.end
-    );
   }
 );
 
@@ -165,19 +165,19 @@ listen(
     if (
       !e.payload.cloudmusic &&
       wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-        "cloudmusic.exe"
+      "cloudmusic.exe"
     ) {
       media.value.thumb = "";
     } else if (
       !e.payload.qqmusic &&
       wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-        "QQMusic.exe"
+      "QQMusic.exe"
     ) {
       media.value.thumb = "";
     } else if (
       !e.payload.spotify &&
       wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-        "Spotify.exe"
+      "Spotify.exe"
     ) {
       media.value.thumb = "";
     }
@@ -264,12 +264,11 @@ onMounted(async () => {
   }, 500);
 
   //////////////////////////网速////////////////////////////////
-  listen("netspeed", (e) => {
-    let res = JSON.parse(e.payload as string);
-    net.value.speed_r = res.speed_r;
-    net.value.speed_s = res.speed_s;
-  });
 
+  listen("netspeed", (e: Event<NetSpeed>) => {
+    net.value.speed_r = e.payload.speed_r;
+    net.value.speed_s = e.payload.speed_s;
+  });
   //////////////////////////日期/////////////////////////////////////
   setInterval(() => {
     let date = new Date();
@@ -400,7 +399,7 @@ listen("audio_chunk", (e: { payload: number[] }) => {
 });
 
 const bufferLength = player.analyserNode.frequencyBinCount / 2;
-const dataArray = new Uint8Array(bufferLength);
+let dataArray = new Uint8Array(bufferLength);
 function draw() {
   requestAnimationFrame(draw);
   // 时域数据
@@ -413,6 +412,10 @@ function draw() {
   const canvasCtx = canvas.getContext("2d");
   if (canvasCtx == null) {
     return;
+  }
+
+  if (playstatus.value == 5) {
+    dataArray = new Uint8Array(bufferLength)
   }
 
   const WIDTH = canvas.width,
@@ -434,54 +437,79 @@ function draw() {
   }
   canvasCtx.restore();
 }
+
+//////////////////////////
+let mouseleftdown: {
+  x: number, y: number, in: boolean
+} | null = null
+listen("desktop", async (e: Event<MouseEvent>) => {
+  let dom = document.getElementById("music_img");
+  if (!dom) return;
+  let monitor = await monitorFromPoint(e.payload.x, e.payload.y) as Monitor
+  let current = await currentMonitor()
+  if (monitor?.name != current?.name) {
+    mouseleftdown = null;
+    return
+  };
+  let x = (e.payload.x - monitor.position.x) / monitor.scaleFactor
+  let y = (e.payload.y - monitor.position.y) / monitor.scaleFactor
+  let { left, top, right, bottom } = dom.getBoundingClientRect()
+  if ((left < x) && (right > x) && (top < y) && (bottom > y) && e.payload.mouse == MouseAction.LeftDown) {
+    mouseleftdown = {
+      x: e.payload.x,
+      y: e.payload.y,
+      in: true,
+    }
+    info(`down ${mouseleftdown.x}`)
+  }
+  if (e.payload.mouse == MouseAction.LeftUp && mouseleftdown && mouseleftdown.in) {
+    info(`up ${mouseleftdown.x}-${e.payload.x}-${e.payload.x - mouseleftdown.x}`)
+    if ((e.payload.x - mouseleftdown.x) > 40) {
+      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 1 })
+    } else if ((e.payload.x - mouseleftdown.x) < 40 && (e.payload.x - mouseleftdown.x) > -40) {
+      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 0 })
+    } else if ((e.payload.x - mouseleftdown.x) < -40) {
+      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: -1 })
+    }
+  }
+  if (e.payload.mouse == MouseAction.LeftUp) {
+    mouseleftdown = null
+    info("null")
+  }
+
+})
+
 </script>
 
 <template>
   <div class="window">
     <img v-if="type == 'image'" :src="convertFileSrc(path)" class="image" />
-    <video
-      id="wallpapervideo"
-      v-else
-      class="video"
-      :src="convertFileSrc(path)"
-      autoplay="true"
-      loop="true"
-    ></video>
+    <!-- <div v-if="type == 'image'" style="width: 100vw;height: 100vh;background: black;"></div> -->
+    <video id="wallpapervideo" v-else class="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
     <!-- 天气 -->
-    <div
-      class="weather"
-      v-show="wallpaperstore.wallpaperConfig[index].config.weather"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
-      }"
-    >
+    <div class="weather" v-show="wallpaperstore.wallpaperConfig[index].config.weather" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
+    }">
       <div style="width: 200px; height: 30px; text-align: center">
         {{ city }}
       </div>
       <div style="width: 200px; display: flex; height: 60px">
-        <div
-          style="
+        <div style="
             width: 100px;
             height: 50px;
             line-height: 50px;
             text-align: center;
-          "
-        >
+          ">
           {{ w.text }} {{ w.temp }}°
         </div>
-        <div
-          style="
+        <div style="
             width: 100px;
             height: 50px;
             text-align: center;
             line-height: 50px;
-          "
-        >
-          <i
-            style="font-size: 30px"
-            :class="['qi-' + (w.icon ? w.icon : 100), 'weather-icon']"
-          ></i>
+          ">
+          <i style="font-size: 30px" :class="['qi-' + (w.icon ? w.icon : 100), 'weather-icon']"></i>
         </div>
       </div>
       <div style="width: 200px; height: 60px; display: flex">
@@ -494,123 +522,78 @@ function draw() {
       </div>
     </div>
     <!-- 网速 -->
-    <div
-      class="netspeed"
-      v-show="wallpaperstore.wallpaperConfig[index].config.netspeed"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.netspeedx}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.netspeedy}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.netspeedfontsize}px`,
-      }"
-    >
+    <div class="netspeed" v-show="wallpaperstore.wallpaperConfig[index].config.netspeed" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.netspeedx}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.netspeedy}%`,
+      fontSize: `${wallpaperstore.wallpaperConfig[index].config.netspeedfontsize}px`,
+    }">
       <div data-tauri-drag-region style="display: flex; align-items: center">
-        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon
-        >{{
-          Math.trunc(net.speed_r / 1024) < 1024
-            ? Math.trunc(net.speed_r / 1024) + "KB/s"
-            : Math.trunc((net.speed_r / 1024 / 1024) * 10) / 10 + "MB/s"
-        }}
-      </div>
-      <div style="display: flex; align-items: center">
-        <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon
-        >{{
-          Math.trunc(net.speed_s / 1024) < 1024
-            ? Math.trunc(net.speed_s / 1024) + "KB/s"
-            : Math.trunc((net.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
-        }}
-      </div>
-    </div>
-    <!-- time -->
-    <div
-      class="time"
-      v-show="wallpaperstore.wallpaperConfig[index].config.time"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.timex}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.timey}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.timefontsize}px`,
-      }"
-    >
-      <div class="hour">
-        {{ time.hour }}:{{ time.minute }}:{{ time.second }}
-      </div>
-    </div>
-    <div
-      class="date"
-      v-show="wallpaperstore.wallpaperConfig[index].config.date"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.datefontsize}px`,
-      }"
-    >
-      <div style="margin-right: 10px">
-        {{ time.year }}
-        {{ time.month }}
-        {{ time.day }}
-      </div>
-      <div>
-        {{ time.week }}
-      </div>
-    </div>
-    <!-- cpu -->
-    <div
-      class="cpu"
-      v-show="wallpaperstore.wallpaperConfig[index].config.cpu"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.cpux}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.cpuy}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.cpufontsize}px`,
-      }"
-    >
-      CPU：{{ cpu }}%
-    </div>
-    <div
-      class="memory"
-      v-show="wallpaperstore.wallpaperConfig[index].config.memory"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.memoryx}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.memoryy}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.memoryfontsize}px`,
-      }"
-    >
-      内存：{{ memory }}%
-    </div>
+        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{
+          Math.trunc(net.speed_r / 1024) < 1024 ? Math.trunc(net.speed_r / 1024) + "KB/s" : Math.trunc((net.speed_r / 1024
+            / 1024) * 10) / 10 + "MB/s" }} </div>
+          <div style="display: flex; align-items: center">
+            <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{
+              Math.trunc(net.speed_s / 1024) < 1024 ? Math.trunc(net.speed_s / 1024) + "KB/s" : Math.trunc((net.speed_s /
+                1024 / 1024) * 10) / 10 + "MB/s" }} </div>
+          </div>
+          <!-- time -->
+          <div class="time" v-show="wallpaperstore.wallpaperConfig[index].config.time" :style="{
+            left: `${wallpaperstore.wallpaperConfig[index].config.timex}%`,
+            top: `${wallpaperstore.wallpaperConfig[index].config.timey}%`,
+            fontSize: `${wallpaperstore.wallpaperConfig[index].config.timefontsize}px`,
+          }">
+            <div class="hour">
+              {{ time.hour }}:{{ time.minute }}:{{ time.second }}
+            </div>
+          </div>
+          <div class="date" v-show="wallpaperstore.wallpaperConfig[index].config.date" :style="{
+            left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
+            top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
+            fontSize: `${wallpaperstore.wallpaperConfig[index].config.datefontsize}px`,
+          }">
+            <div style="margin-right: 10px">
+              {{ time.year }}
+              {{ time.month }}
+              {{ time.day }}
+            </div>
+            <div>
+              {{ time.week }}
+            </div>
+          </div>
+          <!-- cpu -->
+          <div class="cpu" v-show="wallpaperstore.wallpaperConfig[index].config.cpu" :style="{
+            left: `${wallpaperstore.wallpaperConfig[index].config.cpux}%`,
+            top: `${wallpaperstore.wallpaperConfig[index].config.cpuy}%`,
+            fontSize: `${wallpaperstore.wallpaperConfig[index].config.cpufontsize}px`,
+          }">
+            CPU：{{ cpu }}%
+          </div>
+          <div class="memory" v-show="wallpaperstore.wallpaperConfig[index].config.memory" :style="{
+            left: `${wallpaperstore.wallpaperConfig[index].config.memoryx}%`,
+            top: `${wallpaperstore.wallpaperConfig[index].config.memoryy}%`,
+            fontSize: `${wallpaperstore.wallpaperConfig[index].config.memoryfontsize}px`,
+          }">
+            内存：{{ memory }}%
+          </div>
 
-    <div
-      class="music"
-      v-show="wallpaperstore.wallpaperConfig[index].config.music && media.thumb"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
-      }"
-    >
-      <div class="music_title">{{ media.title }} - {{ media.artist }}</div>
-      <div
-        class="music_pic"
-        :style="{
-          animationPlayState: playstatus == 4 ? 'running' : 'paused',
-        }"
-      >
-        <img v-if="media.thumb" :src="media.thumb" class="music_pic_img" />
+          <div class="music" v-show="wallpaperstore.wallpaperConfig[index].config.music && media.thumb" :style="{
+            left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+            top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+            fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
+          }">
+            <div class="music_title">{{ media.title }} - {{ media.artist }}</div>
+            <div class="music_pic" :style="{
+              animationPlayState: playstatus == 4 ? 'running' : 'paused',
+            }">
+              <img id="music_img" :src="media.thumb" class="music_pic_img" />
+            </div>
+            <div id="timeline">
+              <v-progress-circular class="music-progress" color="rgba(223,123,103,0.5)" bg-color="rgba(123,123,123,0.3)"
+                :model-value="(timeline.position / timeline.end) * 100" :width="20"></v-progress-circular>
+            </div>
+            <canvas id="music_canvas" class="music_canvas" width="400" height="400"></canvas>
+          </div>
       </div>
-      <div id="timeline">
-        <v-progress-circular
-          class="music-progress"
-          color="rgba(223,123,103,0.5)"
-          bg-color="rgba(123,123,123,0.3)"
-          :model-value="(timeline.position / timeline.end) * 100"
-          :width="20"
-        ></v-progress-circular>
-      </div>
-      <canvas
-        id="music_canvas"
-        class="music_canvas"
-        width="400"
-        height="400"
-      ></canvas>
-    </div>
-  </div>
 </template>
 
 <style scoped>
@@ -618,22 +601,26 @@ function draw() {
   font-family: HarmonyOS_Sans_TC_Light;
   src: url("fonts/HarmonyOS_Sans_TC_Light.ttf") format("truetype");
 }
+
 .window {
   font-family: HarmonyOS_Sans_TC_Light simsun;
   width: 100vw;
   height: 100vh;
   position: relative;
 }
+
 .image {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
 }
+
 .video {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
 }
+
 .netspeed {
   position: absolute;
   z-index: 200;
@@ -645,16 +632,19 @@ function draw() {
   align-items: flex-start;
   color: rgba(223, 223, 223, 0.5);
 }
+
 .time {
   position: absolute;
   z-index: 201;
   color: rgba(223, 223, 223, 0.5);
 }
+
 .hour {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
+
 .date {
   position: absolute;
   z-index: 202;
@@ -667,11 +657,13 @@ function draw() {
   z-index: 203;
   color: rgba(223, 223, 223, 0.5);
 }
+
 .memory {
   position: absolute;
   z-index: 204;
   color: rgba(223, 223, 223, 0.5);
 }
+
 .weather {
   display: flex;
   flex-direction: column;
@@ -682,6 +674,7 @@ function draw() {
   width: 200px;
   height: 300px;
 }
+
 .music {
   position: absolute;
   z-index: 215;
@@ -689,6 +682,7 @@ function draw() {
   top: 10vh;
   width: 300px;
 }
+
 .music_title {
   font-size: 16px;
   height: 80px;
@@ -700,6 +694,7 @@ function draw() {
   text-overflow: clip;
   overflow: hidden;
 }
+
 .music_pic {
   z-index: 215;
   position: relative;
@@ -711,6 +706,7 @@ function draw() {
   justify-content: center;
   align-items: center;
 }
+
 .music_pic_img {
   width: 300px;
   height: 300px;
@@ -718,6 +714,7 @@ function draw() {
   border: 35px solid white;
   transition: all 1s linear;
 }
+
 .music_canvas {
   position: absolute;
   z-index: 213;
@@ -727,6 +724,7 @@ function draw() {
   justify-content: center;
   align-items: center;
 }
+
 #timeline {
   position: absolute;
   z-index: 216;
@@ -739,6 +737,7 @@ function draw() {
   justify-content: center;
   align-items: center;
 }
+
 .music-progress {
   width: 285px;
   height: 285px;

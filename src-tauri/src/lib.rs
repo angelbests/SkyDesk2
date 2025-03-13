@@ -9,6 +9,7 @@ mod wallpaper;
 mod wheel;
 use chrono::prelude::*;
 mod audio;
+mod desktop;
 mod lockscreen;
 mod smtc;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -29,10 +30,12 @@ pub fn run() {
                 .resolve("wallpapers\\html", BaseDirectory::AppData)
                 .unwrap();
             server::open_server(path.to_str().unwrap().to_string(), 12345);
+            desktop::desktop_mouse_listen(app.handle().clone());
             Ok(())
         })
         .plugin(
             tauri_plugin_log::Builder::new()
+                .level(log::LevelFilter::Info)
                 .target(tauri_plugin_log::Target::new(
                     tauri_plugin_log::TargetKind::LogDir {
                         file_name: Some(t.to_string()),
@@ -64,6 +67,7 @@ pub fn run() {
             capture::start_capture,
             lockscreen::setlockscreen,
             wheel::wheel_status,
+            smtc::play_control,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

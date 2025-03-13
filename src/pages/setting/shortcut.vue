@@ -364,23 +364,16 @@ const drop = function (e: DragEvent) {
     <v-dialog max-width="500" v-model="tabshow">
       <v-list>
         <v-list-item>
-          <v-text-field
-            v-model="tabtitle"
-            density="compact"
-            hide-details="auto"
-            label="合集名称"
-          ></v-text-field>
+          <v-text-field v-model="tabtitle" density="compact" hide-details="auto" label="合集名称"></v-text-field>
         </v-list-item>
       </v-list>
-      <div
-        style="
+      <div style="
           background: white;
           box-sizing: border-box;
           padding: 10px;
           display: flex;
           justify-content: flex-end;
-        "
-      >
+        ">
         <v-btn style="margin-right: 10px" @click="tabshow = false">取消</v-btn>
         <v-btn style="margin-right: 10px" @click="addtab">确认</v-btn>
       </div>
@@ -388,53 +381,28 @@ const drop = function (e: DragEvent) {
     <v-dialog max-width="500" v-model="dialog">
       <v-list>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.lnkPath"
-            density="compact"
-            hide-details="auto"
-            :readonly="true"
-            @click="getlnk"
-            label="快捷路径"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getlnk" label="快捷路径"></v-text-field>
         </v-list-item>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.targetPath"
-            density="compact"
-            hide-details="auto"
-            :readonly="true"
-            @click="getexe"
-            label="程序路径"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.targetPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getexe" label="程序路径"></v-text-field>
         </v-list-item>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.icoPath"
-            density="compact"
-            hide-details="auto"
-            :readonly="true"
-            @click="getico"
-            label="图标路径"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getico" label="图标路径"></v-text-field>
         </v-list-item>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.name"
-            density="compact"
-            hide-details="auto"
-            label="快捷名称"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
         </v-list-item>
       </v-list>
-      <div
-        style="
+      <div style="
           background: white;
           box-sizing: border-box;
           padding: 10px;
           display: flex;
           justify-content: flex-end;
-        "
-      >
+        ">
         <v-btn style="margin-right: 10px" @click="cancelsubmit">取消</v-btn>
         <v-btn style="margin-right: 10px" @click="submitshortcut">确认</v-btn>
       </div>
@@ -442,64 +410,36 @@ const drop = function (e: DragEvent) {
     <v-dialog max-width="500" v-model="dialog2">
       <v-list>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.lnkPath"
-            density="compact"
-            hide-details="auto"
-            :readonly="true"
-            @click="getlnk"
-            label="快捷路径"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getlnk" label="快捷路径"></v-text-field>
         </v-list-item>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.targetPath"
-            density="compact"
-            hide-details="auto"
-            :readonly="true"
-            @click="getexe"
-            label="程序路径"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.targetPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getexe" label="程序路径"></v-text-field>
         </v-list-item>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.icoPath"
-            density="compact"
-            hide-details="auto"
-            :readonly="true"
-            @click="getico"
-            label="图标路径"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getico" label="图标路径"></v-text-field>
         </v-list-item>
         <v-list-item>
-          <v-text-field
-            v-model="shortcut.name"
-            density="compact"
-            hide-details="auto"
-            label="快捷名称"
-          ></v-text-field>
+          <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
         </v-list-item>
       </v-list>
-      <div
-        style="
+      <div style="
           background: white;
           box-sizing: border-box;
           padding: 10px;
           display: flex;
           justify-content: flex-end;
-        "
-      >
+        ">
         <v-btn style="margin-right: 10px" @click="cancelsubmit">取消</v-btn>
         <v-btn style="margin-right: 10px" @click="submitshortcut2">确认</v-btn>
       </div>
     </v-dialog>
-    <v-card
-      :style="{
-        background: systemstore.btnbarbackground,
-        backgroundSize: 'cover',
-      }"
-      class="btnbar"
-    >
+    <v-card :style="{
+      background: systemstore.btnbarbackground,
+      backgroundSize: 'cover',
+    }" class="btnbar">
       <v-btn style="margin-right: 20px" @click="scanProgram">
         <template v-slot:prepend>
           <v-icon>mdi-magnify-scan</v-icon>
@@ -531,56 +471,31 @@ const drop = function (e: DragEvent) {
         桌面合集
       </v-btn>
     </v-card>
-    <v-progress-linear
-      color="black"
-      :indeterminate="scanbar"
-    ></v-progress-linear>
-    <div
-      @dragover="dragover($event)"
-      @drop="drop($event)"
-      style="
+    <v-progress-linear color="black" :indeterminate="scanbar"></v-progress-linear>
+    <div @dragover="dragover($event)" @drop="drop($event)" style="
         width: 100%;
         height: calc(100% - 180px);
         display: flex;
         overflow: hidden;
-      "
-    >
+      ">
       <!-- 左 -->
       <div :style="{ width: scanbtn ? '100%' : '50%' }" v-show="!scanbtn">
-        <GridContainer
-          v-model="shortcutsTemp"
-          :animation="150"
-          :group="{
-            name: 'shortcut',
-            pull: 'clone',
-          }"
-          :clone="clonelefttoright"
-          :gridwidth="90"
-          :gridheight="90"
-          :onAdd="addleft"
-          :setData="setdata"
-        >
+        <GridContainer v-model="shortcutsTemp" :animation="150" :group="{
+          name: 'shortcut',
+          pull: 'clone',
+        }" :clone="clonelefttoright" :gridwidth="90" :gridheight="90" :onAdd="addleft" :setData="setdata">
           <template v-slot="{ item }">
-            <div
-              :style="{
-                background: systemstore.shortcutbackground,
-                backgroundSize: 'cover',
-              }"
-              :key="item.lnkPath"
-              class="shortcut-container"
-            >
+            <div :style="{
+              background: systemstore.shortcutbackground,
+              backgroundSize: 'cover',
+            }" :key="item.lnkPath" class="shortcut-container">
               <div class="icon-div">
-                <img
-                  class="icon"
-                  :src="
-                    item.icoPath == ''
-                      ? '/icons/program.png'
-                      : convertFileSrc(item.icoPath)
-                  "
-                />
+                <img class="icon" :src="item.icoPath == ''
+                  ? '/icons/program.png'
+                  : convertFileSrc(item.icoPath)
+                  " />
               </div>
-              <div
-                style="
+              <div style="
                   font-size: 10px;
                   width: 60px;
                   height: 30px;
@@ -590,8 +505,7 @@ const drop = function (e: DragEvent) {
                   overflow: hidden;
                   line-height: 15px;
                   filter: drop-shadow(0px 5px 5px gray);
-                "
-              >
+                ">
                 {{ item.name }}
               </div>
             </div>
@@ -599,91 +513,51 @@ const drop = function (e: DragEvent) {
         </GridContainer>
       </div>
       <!-- 右 -->
-      <div
-        :style="{
-          width: scanbtn ? '100%' : '50%',
-          height: '100%',
-          transition: 'all 0.1s linear',
-        }"
-      >
-        <v-tabs
-          id="shortcuttab"
-          density="compact"
-          v-model="tab"
-          center-active
-          style="
+      <div :style="{
+        width: scanbtn ? '100%' : '50%',
+        height: '100%',
+        transition: 'all 0.1s linear',
+      }">
+        <v-tabs id="shortcuttab" density="compact" v-model="tab" center-active style="
             height: 36px;
             width: 100%;
             background: rgba(223, 223, 223, 0.4);
-          "
-          hide-slider
-          show-arrows
-        >
+          " hide-slider show-arrows>
           <v-tab v-for="item in shortcuts" :value="item.index">
             <div style="display: flex; justify-content: center">
               <div style="width: calc(100% - 20px); margin-right: 10px">
                 {{ item.title }}
               </div>
-              <v-btn
-                v-show="setting"
-                @click="deltabshow = true"
-                icon
-                size="mini"
-                style="
+              <v-btn v-show="setting" @click="deltabshow = true" icon size="mini" style="
                   width: 20px;
                   height: 20px;
                   box-shadow: none;
                   background: transparent;
-                "
-              >
+                ">
                 <v-icon color="white" size="mini">mdi-close</v-icon>
               </v-btn>
             </div>
           </v-tab>
         </v-tabs>
         <div style="width: 100%; height: calc(100% - 36px)">
-          <v-tabs-window
-            v-model="tab"
-            style="width: 100%; height: 100%; padding: 10px"
-          >
-            <v-tabs-window-item
-              v-for="item1 in shortcuts"
-              style="width: 100%; height: 100%; min-height: 100%"
-            >
-              <GridContainer
-                v-model="item1.shortcut"
-                :animation="150"
-                :gridwidth="90"
-                :gridheight="setting ? 120 : 90"
-                :group="{ name: 'shortcut', pull: 'clone' }"
-                :setData="setdata"
-                :clone="clone"
-                :onAdd="addright"
-              >
+          <v-tabs-window v-model="tab" style="width: 100%; height: 100%; padding: 10px">
+            <v-tabs-window-item v-for="item1 in shortcuts" style="width: 100%; height: 100%; min-height: 100%">
+              <GridContainer v-model="item1.shortcut" :animation="150" :gridwidth="90" :gridheight="setting ? 120 : 90"
+                :group="{ name: 'shortcut', pull: 'clone' }" :setData="setdata" :clone="clone" :onAdd="addright">
                 <template v-slot="{ item, index }">
-                  <div
-                    :style="{
-                      height: setting ? '110px' : '80px',
-                      background: systemstore.shortcutbackground,
-                      backgroundSize: 'cover',
-                    }"
-                    class="shortcut-container"
-                  >
+                  <div :style="{
+                    height: setting ? '110px' : '80px',
+                    background: systemstore.shortcutbackground,
+                    backgroundSize: 'cover',
+                  }" class="shortcut-container">
                     <div class="icon-div" @click="exec(item)">
-                      <img
-                        @mouseenter="mouseenter(index)"
-                        @mouseleave="mouseleave(index)"
-                        :id="'img' + index"
-                        class="icon"
-                        :src="
-                          item.icoPath == ''
-                            ? '/icons/program.png'
-                            : convertFileSrc(item.icoPath)
-                        "
-                      />
+                      <img @mouseenter="mouseenter(index)" @mouseleave="mouseleave(index)" :id="'img' + index"
+                        class="icon" :src="item.icoPath == ''
+                          ? '/icons/program.png'
+                          : convertFileSrc(item.icoPath)
+                          " />
                     </div>
-                    <div
-                      style="
+                    <div style="
                         font-size: 10px;
                         width: 60px;
                         height: 30px;
@@ -692,45 +566,33 @@ const drop = function (e: DragEvent) {
                         text-align: center;
                         text-overflow: clip;
                         overflow: hidden;
-                      "
-                    >
+                      ">
                       {{ item.name }}
                     </div>
-                    <div
-                      v-show="setting"
-                      style="
+                    <div v-show="setting" style="
                         width: 80px;
                         height: 20px;
                         display: flex;
                         justify-content: space-around;
                         align-items: flex-end;
-                      "
-                    >
-                      <v-btn
-                        @click="delSshorcut(item)"
-                        style="
+                      ">
+                      <v-btn @click="delSshorcut(item)" style="
                           font-size: 12px;
                           box-shadow: none;
                           background: none;
                           color: gray;
-                        "
-                        size="mini"
-                      >
+                        " size="mini">
                         <template v-slot:prepend>
                           <v-icon>mdi-delete-outline</v-icon>
                         </template>
                         删
                       </v-btn>
-                      <v-btn
-                        @click="editshortcut(index)"
-                        style="
+                      <v-btn @click="editshortcut(index)" style="
                           font-size: 10px;
                           box-shadow: none;
                           background: none;
                           color: gray;
-                        "
-                        size="mini"
-                      >
+                        " size="mini">
                         <template v-slot:prepend>
                           <v-icon>mdi-pencil-box-outline</v-icon>
                         </template>
@@ -746,36 +608,20 @@ const drop = function (e: DragEvent) {
       </div>
     </div>
     <!-- 下 -->
-    <VueDraggable
-      v-model="shortcutstore.wheels"
-      :group="{ name: 'shortcut' }"
-      :animation="150"
-      class="VueDraggable-wheel"
-      :onAdd="adddown"
-      :setData="setdata"
-    >
-      <div
-        :style="{
-          background: systemstore.shortcutbackground,
-          backgroundSize: 'cover',
-        }"
-        v-for="item in shortcutstore.wheels"
-        :key="item.name"
-        :data-lnk="JSON.stringify(item)"
-        class="shortcut-container"
-      >
+    <VueDraggable v-model="shortcutstore.wheels" :group="{ name: 'shortcut' }" :animation="150"
+      class="VueDraggable-wheel" :onAdd="adddown" :setData="setdata">
+      <div :style="{
+        background: systemstore.shortcutbackground,
+        backgroundSize: 'cover',
+      }" v-for="item in shortcutstore.wheels" :key="item.name" :data-lnk="JSON.stringify(item)"
+        class="shortcut-container">
         <div class="icon-div">
-          <img
-            class="icon"
-            :src="
-              item.icoPath == ''
-                ? '/icons/program.png'
-                : convertFileSrc(item.icoPath)
-            "
-          />
+          <img class="icon" :src="item.icoPath == ''
+            ? '/icons/program.png'
+            : convertFileSrc(item.icoPath)
+            " />
         </div>
-        <div
-          style="
+        <div style="
             font-size: 10px;
             width: 70px;
             height: 30px;
@@ -785,8 +631,7 @@ const drop = function (e: DragEvent) {
             text-overflow: clip;
             overflow: hidden;
             line-height: 15px;
-          "
-        >
+          ">
           {{ item.name }}
         </div>
       </div>
@@ -800,6 +645,7 @@ const drop = function (e: DragEvent) {
   height: 100%;
   position: relative;
 }
+
 .btnbar {
   width: 100%;
   height: 60px;
@@ -810,6 +656,7 @@ const drop = function (e: DragEvent) {
   filter: drop-shadow(0px 2px 5px gray);
   background: transparent;
 }
+
 .scan-container {
   height: calc(100% - 120px);
   display: flex;

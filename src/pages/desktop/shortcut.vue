@@ -50,7 +50,7 @@ listen(
           new LogicalSize(
             shortcutWindows.value.setting.w,
             shortcutWindows.value.setting.h +
-              30 * shortcutWindows.value.setting.r
+            30 * shortcutWindows.value.setting.r
           )
         );
         shortcutWindows.value.setting.h =
@@ -61,7 +61,7 @@ listen(
           new LogicalSize(
             shortcutWindows.value.setting.w,
             shortcutWindows.value.setting.h -
-              30 * shortcutWindows.value.setting.r
+            30 * shortcutWindows.value.setting.r
           )
         );
         shortcutWindows.value.setting.h =
@@ -190,108 +190,70 @@ const setdata = function (d: DataTransfer, h: HTMLElement) {
 
 <template>
   <div v-show="show">
-    <div
-      class="wallpaper"
-      :style="{
-        background: shortcutWindows.setting.background,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-      }"
-    ></div>
-    <div
-      class="window"
-      :style="{ backdropFilter: `blur(${shortcutWindows.setting.blur}px)` }"
-      @dragover="dragover($event)"
-      @drop="drop($event)"
-    >
-      <VueDraggable
-        :style="{
-          width: shortcutWindows.setting.w + 'px',
-          height: shortcutWindows.setting.h + 'px',
-          gridTemplateColumns: `repeat(auto-fill, ${
-            shortcutWindows.setting.w / shortcutWindows.setting.c
+    <div class="wallpaper" :style="{
+      background: shortcutWindows.setting.background,
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+    }"></div>
+    <div class="window" :style="{ backdropFilter: `blur(${shortcutWindows.setting.blur}px)` }"
+      @dragover="dragover($event)" @drop="drop($event)">
+      <VueDraggable :style="{
+        width: shortcutWindows.setting.w + 'px',
+        height: shortcutWindows.setting.h + 'px',
+        gridTemplateColumns: `repeat(auto-fill, ${shortcutWindows.setting.w / shortcutWindows.setting.c
           }px)`,
-          gridTemplateRows: `repeat(auto-fill, ${
-            shortcutWindows.setting.h / shortcutWindows.setting.r
+        gridTemplateRows: `repeat(auto-fill, ${shortcutWindows.setting.h / shortcutWindows.setting.r
           }px)`,
-        }"
-        class="lnklist"
-        v-model="shortcutWindows.shortcuts"
-        :animation="150"
-        :group="{
-          name: 'shortcut',
-        }"
-        :setData="setdata"
-      >
-        <div
-          v-for="(item, i) in shortcutWindows.shortcuts"
-          :key="item.lnkPath"
-          :data-lnk="JSON.stringify(item)"
-        >
-          <div
-            class="imgdiv"
-            @click="exec(item)"
-            :style="{
+      }" class="lnklist" v-model="shortcutWindows.shortcuts" :animation="150" :group="{
+        name: 'shortcut',
+      }" :setData="setdata">
+        <div v-for="(item, i) in shortcutWindows.shortcuts" :key="item.lnkPath" :data-lnk="JSON.stringify(item)">
+          <div class="imgdiv" @click="exec(item)" :style="{
+            width:
+              shortcutWindows.setting.w / shortcutWindows.setting.c + 'px',
+            height:
+              shortcutWindows.setting.h / shortcutWindows.setting.r -
+              (shortcutWindows.setting.font ? 30 : 0) +
+              'px',
+          }">
+            <img class="img" @mouseenter="mouseenter(i)" @mouseleave="mouseleave(i)" :id="'img' + i" :style="{
               width:
-                shortcutWindows.setting.w / shortcutWindows.setting.c + 'px',
+                shortcutWindows.setting.w / shortcutWindows.setting.c -
+                20 +
+                'px',
               height:
                 shortcutWindows.setting.h / shortcutWindows.setting.r -
-                (shortcutWindows.setting.font ? 30 : 0) +
+                (shortcutWindows.setting.font ? 50 : 20) +
                 'px',
-            }"
-          >
-            <img
-              class="img"
-              @mouseenter="mouseenter(i)"
-              @mouseleave="mouseleave(i)"
-              :id="'img' + i"
-              :style="{
-                width:
-                  shortcutWindows.setting.w / shortcutWindows.setting.c -
-                  20 +
-                  'px',
-                height:
-                  shortcutWindows.setting.h / shortcutWindows.setting.r -
-                  (shortcutWindows.setting.font ? 50 : 20) +
-                  'px',
-              }"
-              :src="
-                item.icoPath == ''
-                  ? '/icons/program.png'
-                  : convertFileSrc(item.icoPath)
-              "
-            />
+            }" :src="item.icoPath == ''
+              ? '/icons/program.png'
+              : convertFileSrc(item.icoPath)
+              " />
           </div>
-          <div
-            v-show="shortcutWindows.setting.font"
-            :style="{
-              fontSize: '10px',
-              height: '30px',
-              textWrap: 'balance',
-              textAlign: 'center',
-              width:
-                shortcutWindows.setting.w / shortcutWindows.setting.c + 'px',
-              textOverflow: 'clip',
-              overflow: 'hidden',
-            }"
-          >
+          <div v-show="shortcutWindows.setting.font" :style="{
+            fontSize: '10px',
+            height: '30px',
+            textWrap: 'balance',
+            textAlign: 'center',
+            width:
+              shortcutWindows.setting.w / shortcutWindows.setting.c + 'px',
+            textOverflow: 'clip',
+            overflow: 'hidden',
+          }">
             {{ item.name }}
           </div>
         </div>
       </VueDraggable>
       <right-bar :border-radius="'15px'">
-        <div
-          style="
+        <div style="
             display: flex;
             justify-content: space-evenly;
             align-content: space-evenly;
             width: 100%;
             height: 100%;
             flex-wrap: wrap;
-          "
-          data-tauri-drag-region
-        >
+          " data-tauri-drag-region>
           <v-btn @click="close" style="width: 30px; height: 30px" icon>
             <v-icon size="mini">mdi-close</v-icon>
           </v-btn>
