@@ -24,13 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 首先安装 npm
-      - name: Install npm
-        uses: npm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
       # 然后设置 Node.js
       - name: Setup Node
         uses: actions/setup-node@v4
