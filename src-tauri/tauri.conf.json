@@ -193,7 +193,7 @@
         "installMode": "passive"
       },
       "dialog": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMxRjJBOEM2MzZBRDM2NDgKUldSSU5xMDJ4cWp5d1RUV2JBQW01dGk1MWhpUTc1ckJYZnQ4TVhoRElEeFBoM1V5WFBQZlliWG0K",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDExNjEwMjdGQ0VFOUY5MDUKUldRRitlbk9md0poRVkySklaaGdiaXQ0MURGMXZ5ZjhPblFUWWY0RW54Qm8yQ0NoWHR0alRKV1YK",
       "endpoints": [
         "https://github.com/angelbests/SkyDesk2/releases/latest/download/latest.json"
       ]
