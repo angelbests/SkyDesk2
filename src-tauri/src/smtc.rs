@@ -1,6 +1,7 @@
+use rand::Rng;
 use std::ffi::OsStr;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System};
-use tauri::Emitter;
+use tauri::{path::BaseDirectory, Emitter, Manager};
 use windows::{
     Foundation::TypedEventHandler,
     Media::{
@@ -27,7 +28,7 @@ struct Mediapayload {
     album_title: String,
     artist: String,
     media_type: i32,
-    thumb: Vec<u8>,
+    thumb: String,
 }
 
 #[derive(Clone, serde::Serialize)]
@@ -139,7 +140,6 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
         GlobalSystemMediaTransportControlsSession,
         TimelinePropertiesChangedEventArgs,
     >::new(move |sender, _args| {
-        println!("timeline change");
         if let Some(gsmtc) = sender {
             let timeline = gsmtc.GetTimelineProperties();
             match timeline {
@@ -169,7 +169,6 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
         GlobalSystemMediaTransportControlsSession,
         MediaPropertiesChangedEventArgs,
     >::new(move |sender, _args| {
-        println!("media change");
         if let Some(session) = sender {
             let isession = session.TryGetMediaPropertiesAsync();
             match isession {
@@ -187,25 +186,38 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
                         }
                     };
 
-                    let mut data = vec![];
+                    let mut path: String = String::from("");
                     let thumb = media.Thumbnail();
                     match thumb {
                         Ok(thumb) => {
                             let read = thumb.OpenReadAsync().unwrap();
                             let stream = read.get().unwrap();
-                            data = get_thumb_data(stream);
+                            let data = get_thumb_data(stream);
+                            let pathbuf = window2
+                                .path()
+                                .resolve(
+                                    String::from("wallpapers\\temp\\")
+                                        + &random_string(10)
+                                        + ".png",
+                                    BaseDirectory::AppData,
+                                )
+                                .unwrap();
+
+                            let _ = std::fs::write(&pathbuf, &data);
+                            path = pathbuf.to_string_lossy().to_string();
                         }
                         Err(e) => {
                             println!("thumb_error:{:?}", e);
                         }
                     }
+
                     let payload = Mediapayload {
                         app: appname1.clone(),
                         title: title.to_string(),
                         artist: artist.to_string(),
                         album_title: album_title.to_string(),
                         media_type: media_type.0,
-                        thumb: data,
+                        thumb: path,
                     };
                     let _ = window2.emit("media", payload);
                 }
@@ -230,7 +242,6 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
                 Ok(playinfo) => {
                     let e = playinfo.PlaybackStatus().unwrap();
                     // 0 已关闭 1 已打开 2 正在更改 3 已停止 4 正在播放 5 已暂停]
-                    println!("rust:播放状态{:?}", e.0);
                     let _ = window3.emit(
                         "playstatus",
                         Playstatus {
@@ -313,4 +324,19 @@ pub fn play_control(appname: String, control: i32) {
             }
         }
     });
+}
+
+// 随机字符串
+fn random_string(len: usize) -> String {
+    let charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let mut rng = rand::rng();
+
+    (0..len)
+        .map(|_| {
+            charset
+                .chars()
+                .nth(rng.random_range(0..charset.len()))
+                .unwrap()
+        })
+        .collect()
 }

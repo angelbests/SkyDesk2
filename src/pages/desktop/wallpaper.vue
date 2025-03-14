@@ -1,226 +1,22 @@
 <script setup lang="ts">
-import { onMounted, ref, toRefs, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
-import { wallpaperStore, weatherStore } from "../../stores/window";
-import { getWeather } from "../../api/weather";
+import { wallpaperStore } from "../../stores/window";
 import { listen, Event } from "@tauri-apps/api/event";
 import "qweather-icons/font/qweather-icons.css";
 import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
-import { appDataDir } from "@tauri-apps/api/path";
-import { writeFile } from "@tauri-apps/plugin-fs";
-import { uuid } from "../../functions";
 import PCMPlayer from "pcm-player";
-import { NetSpeed } from "../../types/netspeedType";
 import { info } from "@tauri-apps/plugin-log";
 import { MouseAction, MouseEvent } from "../../types/desktopType";
-const weatherstore = weatherStore();
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
-const { city, apikey, citycode } = toRefs(weatherstore);
 const route = useRoute();
 const show = ref(false);
 const path = ref();
 const type = ref();
-const net = ref({
-  speed_r: 0,
-  speed_s: 0,
-});
-//  document.elementFromPoint(300, 10).click()
-const cpu = ref(0);
-const memory = ref(0);
-const date = new Date();
-let week = "";
-switch (date.getDay()) {
-  case 0:
-    week = "星期天";
-    break;
-  case 1:
-    week = "星期一";
-    break;
-  case 2:
-    week = "星期二";
-    break;
-  case 3:
-    week = "星期三";
-    break;
-  case 4:
-    week = "星期四";
-    break;
-  case 5:
-    week = "星期五";
-    break;
-  case 6:
-    week = "星期六";
-    break;
-}
-const time = ref<{
-  year: string;
-  month: string;
-  day: string;
-  week: string;
-  hour: string;
-  minute: string;
-  second: string;
-}>({
-  year: date.getFullYear() + "",
-  month:
-    date.getMonth() + 1 > 9
-      ? date.getMonth() + 1 + ""
-      : "0" + (date.getMonth() + 1),
-  day: date.getDate() < 10 ? "0" + date.getDate() : date.getDate() + "",
-  week: week,
-  hour: date.getHours() < 10 ? "0" + date.getHours() : date.getHours() + "",
-  minute:
-    date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes() + "",
-  second:
-    date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds() + "",
-});
-const timeline = ref<{
-  start: number;
-  position: number;
-  end: number;
-}>({
-  start: 0,
-  position: 0,
-  end: 0,
-});
-listen(
-  "timeline",
-  (e: {
-    payload: {
-      app: string;
-      start: number;
-      position: number;
-      end: number;
-    };
-  }) => {
-
-    if (
-      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-      e.payload.app
-    ) {
-      // if (e.payload.position != timeline.value.position) {
-      //   playstatus.value = 4;
-      // } else {
-      //   playstatus.value = 5;
-      // }
-      timeline.value = e.payload;
-    }
-  }
-);
-
-const playstatus = ref(5);
-listen(
-  "playstatus",
-  (e: {
-    payload: {
-      app: string;
-      status: number;
-    };
-  }) => {
-    // 0 已关闭 1 已打开 2 正在更改 3 已停止 4 正在播放 5 已暂停
-    if (
-      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-      e.payload.app
-    ) {
-      playstatus.value = e.payload.status;
-    }
-  }
-);
-
-
-////////////监听特定音乐软件是否关闭/////////////////////////////
-listen(
-  "appstatus",
-  (e: {
-    payload: {
-      cloudmusic: boolean;
-      qqmusic: boolean;
-      spotify: boolean;
-    };
-  }) => {
-    // "cloudmusic.exe" "QQMusic.exe" "Spotify.exe"
-    console.log(e.payload);
-    if (
-      !e.payload.cloudmusic &&
-      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-      "cloudmusic.exe"
-    ) {
-      media.value.thumb = "";
-    } else if (
-      !e.payload.qqmusic &&
-      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-      "QQMusic.exe"
-    ) {
-      media.value.thumb = "";
-    } else if (
-      !e.payload.spotify &&
-      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-      "Spotify.exe"
-    ) {
-      media.value.thumb = "";
-    }
-  }
-);
-
-const media = ref<{
-  title: string;
-  artist: string;
-  album_title: string;
-  media_type: number;
-  thumb: string;
-}>({
-  title: "",
-  artist: "",
-  album_title: "",
-  media_type: 0,
-  thumb: "",
-});
-listen(
-  "media",
-  async (e: {
-    payload: {
-      app: string;
-      title: string;
-      artist: string;
-      album_title: string;
-      media_type: number;
-      thumb: number[];
-    };
-  }) => {
-    if (
-      wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-      e.payload.app
-    ) {
-      let musicthumb =
-        (await appDataDir()) +
-        "\\wallpapers\\temp\\" +
-        "musicthumb" +
-        index.value +
-        ".jpg";
-      if (e.payload.thumb.length > 0) {
-        const uint8 = new Uint8Array(e.payload.thumb as number[]);
-        await writeFile(musicthumb, uint8);
-        media.value = {
-          title: e.payload.title,
-          artist: e.payload.artist,
-          album_title: e.payload.album_title,
-          media_type: e.payload.media_type,
-          thumb: convertFileSrc(musicthumb) + "?id=" + uuid(),
-        };
-      } else {
-        media.value.title = e.payload.title;
-        media.value.artist = e.payload.artist;
-        media.value.album_title = e.payload.album_title;
-        media.value.media_type = e.payload.media_type;
-      }
-    }
-    playstatus.value = 4;
-  }
-);
-
 onMounted(async () => {
+  draw();
   const monitor = await currentMonitor();
   index.value = wallpaperstore.wallpaperConfig.findIndex(
     (item) => item.monitor == monitor?.name
@@ -228,9 +24,6 @@ onMounted(async () => {
   let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
   dom.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
   window.addEventListener("storage", (e) => {
-    if (e.key == "weather") {
-      weatherstore.$hydrate();
-    }
     if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
       let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
@@ -243,129 +36,37 @@ onMounted(async () => {
   setTimeout(() => {
     show.value = true;
   }, 500);
-
-  //////////////////////////网速////////////////////////////////
-
-  listen("netspeed", (e: Event<NetSpeed>) => {
-    net.value.speed_r = e.payload.speed_r;
-    net.value.speed_s = e.payload.speed_s;
-  });
-  //////////////////////////日期/////////////////////////////////////
-  setInterval(() => {
-    let date = new Date();
-    let week = "";
-    switch (date.getDay()) {
-      case 0:
-        week = "星期天";
-        break;
-      case 1:
-        week = "星期一";
-        break;
-      case 2:
-        week = "星期二";
-        break;
-      case 3:
-        week = "星期三";
-        break;
-      case 4:
-        week = "星期四";
-        break;
-      case 5:
-        week = "星期五";
-        break;
-      case 6:
-        week = "星期六";
-        break;
-    }
-    time.value = {
-      year: date.getFullYear() + "",
-      month:
-        date.getMonth() + 1 > 9
-          ? date.getMonth() + 1 + ""
-          : "0" + (date.getMonth() + 1),
-      day: date.getDate() < 10 ? "0" + date.getDate() : date.getDate() + "",
-      week: week,
-      hour: date.getHours() < 10 ? "0" + date.getHours() : date.getHours() + "",
-      minute:
-        date.getMinutes() < 10
-          ? "0" + date.getMinutes()
-          : date.getMinutes() + "",
-      second:
-        date.getSeconds() < 10
-          ? "0" + date.getSeconds()
-          : date.getSeconds() + "",
-    };
-  }, 1000);
-
-  draw();
 });
 
+//////////////////////////日期/////////////////////////////////////
+import { get_time, TimeWallpaper } from "../../functions/date";
+const time = ref<TimeWallpaper>({ year: "0000", month: "00", day: "00", "week": "星期一", hour: "00", minute: "00", second: "00" });
+setInterval(() => {
+  time.value = get_time()
+}, 1000);
 ////////////////////cpu/////////////////////
+const cpu = ref(0);
 listen("cpu", (e) => {
   let str = e.payload;
   cpu.value = Math.trunc(Math.round(Number(str)));
 });
 
 ///////////////////////////memeory///////////////////////
+const memory = ref(0);
 listen("memory", (e) => {
   let str = e.payload;
   memory.value = Math.trunc(Number(str) * 100);
 });
 
 ///////////////////weather/////////////////////////
-setInterval(async () => {
-  let res = await getWeather(citycode.value);
-  console.log(res);
-  if (res.code == 200) {
-    w.value = res.now;
-  }
-}, 60 * 60 * 60);
-const w = ref<{
-  temp: string; // 温度
-  feelsLike: string; // 体感温度
-  icon: string; // 天气图标
-  text: string; // 文本描述
-  windDir: string; // 风向
-  windScale: string; // 风等级
-  windSpeed: string; // 风速
-  humidity: string; // 相对湿度
-  precip: string; // 过去1小时降水量，默认单位：毫米
-  pressure: string; // 大气压强
-  vis: string; // 能见度
-  cloud: string; // 云量
-  dew: string; // 露点温度
-}>({
-  temp: "", // 温度
-  feelsLike: "", // 体感温度
-  icon: "", // 天气图标
-  text: "", // 文本描述
-  windDir: "", // 风向
-  windScale: "", // 风等级
-  windSpeed: "", // 风速
-  humidity: "", // 相对湿度
-  precip: "", // 过去1小时降水量，默认单位：毫米
-  pressure: "", // 大气压强
-  vis: "", // 能见度
-  cloud: "", // 云量
-  dew: "", // 露点温度
-});
-watch(
-  city,
-  async () => {
-    if (apikey.value && city) {
-      let res = await getWeather(citycode.value);
-      console.log(res);
-      if (res.code == 200) {
-        w.value = res.now;
-      }
-    }
-  },
-  {
-    immediate: true,
-  }
-);
-
-///////music////////////////
+import { weather_wallpaper, WeatherType } from "../../functions/weather";
+const w = ref<WeatherType>({ temp: "", feelsLike: "", icon: "", text: "", windDir: "", windScale: "", windSpeed: "", humidity: "", precip: "", pressure: "", vis: "", cloud: "", dew: "", city: "", });
+weather_wallpaper((e) => {
+  w.value = e
+}).then((e) => {
+  w.value = e
+})
+//////////////////////音频频谱////////////////
 
 const player = new PCMPlayer({
   inputCodec: "Int16",
@@ -459,9 +160,66 @@ listen("desktop", async (e: Event<MouseEvent>) => {
   if (e.payload.mouse == MouseAction.LeftUp) {
     mouseleftdown = null
   }
-
 })
 
+//////////////////////////////smtc/////////////////////////////////////////
+import { Media, Smtc_Control, TimeLine } from "../../functions/smtc";
+let smtc = new Smtc_Control();
+const media = ref<Media>({ app: "", title: "", artist: "", album_title: "", media_type: 0, thumb: "", })
+const timeline = ref<TimeLine>({ app: "", position: 0, start: 0, end: 0 })
+smtc.listen_appstatus(async (e) => {
+  if (
+    !e.payload.cloudmusic &&
+    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+    "cloudmusic.exe"
+  ) {
+    media.value.thumb = "";
+  } else if (
+    !e.payload.qqmusic &&
+    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+    "QQMusic.exe"
+  ) {
+    media.value.thumb = "";
+  } else if (
+    !e.payload.spotify &&
+    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+    "Spotify.exe"
+  ) {
+    media.value.thumb = "";
+  }
+})
+
+smtc.listen_timeline((e) => {
+  if (wallpaperstore.wallpaperConfig[index.value].config.musicapp == e.payload.app) {
+    timeline.value = e.payload
+  }
+})
+
+smtc.listen_media((e) => {
+  if (wallpaperstore.wallpaperConfig[index.value].config.musicapp == e.payload.app) {
+    media.value = {
+      ...e.payload,
+      thumb: convertFileSrc(e.payload.thumb)
+    }
+  }
+})
+const playstatus = ref(5);
+smtc.listen_playstatus((e) => {
+  if (
+    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
+    e.payload.app
+  ) {
+    playstatus.value = e.payload.status;
+  }
+})
+
+//////////////////////////网速////////////////////////////////
+import { Netspeed, NetSpeed } from "../../functions/sysinfo";
+const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0 })
+const netspeed = new Netspeed();
+netspeed.listen_netspeed((e) => {
+  net.value = e.payload
+})
 </script>
 
 <template>
@@ -487,7 +245,7 @@ listen("desktop", async (e: Event<MouseEvent>) => {
       top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
     }">
       <div style="width: 200px; height: 30px; text-align: center">
-        {{ city }}
+        {{ w.city }}
       </div>
       <div style="width: 200px; display: flex; height: 60px">
         <div style="
@@ -592,13 +350,7 @@ listen("desktop", async (e: Event<MouseEvent>) => {
 </template>
 
 <style scoped>
-@font-face {
-  font-family: HarmonyOS_Sans_TC_Light;
-  src: url("fonts/HarmonyOS_Sans_TC_Light.ttf") format("truetype");
-}
-
 .window {
-  font-family: HarmonyOS_Sans_TC_Light simsun;
   width: 100vw;
   height: 100vh;
   position: relative;

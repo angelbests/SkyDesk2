@@ -1,8 +1,10 @@
 import { defineStore } from "pinia"
 import { Note, ShortCut, WallpaperConfig, WallpaperList, Windows, Monitor } from "../types/storeType"
 import { availableMonitors } from "@tauri-apps/api/window"
+import { resourceDir } from "@tauri-apps/api/path"
+import { convertFileSrc } from "@tauri-apps/api/core"
 const monitors = await availableMonitors()
-
+let path = ((await resourceDir()) + "\\resources\\bg.png") as string
 const windowStore = defineStore("window", {
   state: function () {
     return {
@@ -32,12 +34,12 @@ const systemStore = defineStore("system", {
       },
       taskbar: true as boolean,
       fontcolor: "black" as string,
-      programbcakground: `white` as string,
-      leftbackground: "white" as string,
-      topbackground: "wheat" as string,
-      btnbackground: "white" as string,
+      programbcakground: `url("${convertFileSrc(path)}")` as string,
+      leftbackground: "" as string,
+      topbackground: "" as string,
+      btnbackground: "" as string,
       shortcutbackground: "rgba(123,123,123,0.2)" as string,
-      btnbarbackground: "white" as string,
+      btnbarbackground: "" as string,
     }
   },
   persist: true,
