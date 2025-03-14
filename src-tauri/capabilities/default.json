@@ -211,6 +211,14 @@
     },
     "global-shortcut:allow-register",
     "global-shortcut:allow-is-registered",
-    "updater:default"
+    "updater:default",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://github.com/angelbests/SkyDesk2"
+        }
+      ]
+    }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "productName": "skydesk2",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "identifier": "com.skydesk2.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -192,7 +192,6 @@
       "window": {
         "installMode": "passive"
       },
-      "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDExNjEwMjdGQ0VFOUY5MDUKUldRRitlbk9md0poRVkySklaaGdiaXQ0MURGMXZ5ZjhPblFUWWY0RW54Qm8yQ0NoWHR0alRKV1YK",
       "endpoints": [
         "https://github.com/angelbests/SkyDesk2/releases/latest/download/latest.json"

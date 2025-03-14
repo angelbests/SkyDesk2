@@ -1,6 +1,6 @@
 [package]
 name = "skydesk2"
-version = "1.2.2"
+version = "1.2.3"
 description = "SkyDesk2"
 authors = ["angelbests1314@live.com"]
 edition = "2021"
@@ -43,6 +43,7 @@ log = "0.4.26"
 # 按键库
 rdev = {version = "0.5.3", features = ["unstable_grab"] }
 wasapi = "0.16.0"
+tauri-plugin-opener = "2.2.6"
 # ffmpeg ffmpeg_video.rs
 # ffmpeg-next = "7.1.0"
 # cpal = "0.15.3"

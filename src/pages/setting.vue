@@ -8,7 +8,6 @@ import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Netspeed, NetSpeed } from "../functions/sysinfo";
-import skydesk_updater from "../functions/updater";
 const systemstore = systemStore();
 const drawer = ref(true);
 const colorshow = ref(false);
@@ -22,7 +21,7 @@ new Netspeed().listen_netspeed((e) => {
 
 
 onMounted(async () => {
-  skydesk_updater();
+  get_version()
   await maininit();
   // 设置窗口拖拽
   document
@@ -194,6 +193,32 @@ const wheel_status = function (e: any) {
   console.log(e);
   invoke("wheel_status", { bool: e });
 };
+
+////////////////////help/////////////////////////
+const helpshow = ref(false)
+const version = ref("");
+import { check } from "@tauri-apps/plugin-updater"
+import { openUrl } from '@tauri-apps/plugin-opener';
+import { getVersion } from "@tauri-apps/api/app"
+
+const open_github = function () {
+  // https://github.com/angelbests/SkyDesk2
+  openUrl("https://github.com/angelbests/SkyDesk2")
+}
+
+const get_version = async function () {
+  version.value = await getVersion()
+}
+const checkupdate = async function () {
+  const update = await check()
+  if (update) {
+    console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`)
+  } else {
+    console.log("失败")
+  }
+}
+
+
 </script>
 
 <template>
@@ -236,7 +261,7 @@ const wheel_status = function (e: any) {
             <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{
               Math.trunc(net.speed_s / 1024) < 1024 ? Math.trunc(net.speed_s / 1024) + "KB/s" : Math.trunc((net.speed_s /
                 1024 / 1024) * 10) / 10 + "MB/s" }} </div>
-              <v-btn style="background: transparent" icon>
+              <v-btn style="background: transparent" @click="helpshow = true" icon>
                 <v-icon>mdi-help-circle-outline</v-icon>
               </v-btn>
               <v-btn style="background: transparent" @click="colorshow = true" icon>
@@ -510,6 +535,56 @@ const wheel_status = function (e: any) {
                 <v-list-item-title>清除用户信息</v-list-item-title>
               </v-list-item>
             </v-list>
+          </v-card-item>
+        </v-card>
+      </div>
+    </v-dialog>
+    <v-dialog v-model="helpshow">
+      <div style="display: flex; justify-content: center" @click.self="helpshow = false">
+        <v-card style="width: 400px">
+          <v-card-title>
+            <div style="display: flex; flex-direction: row">
+              <div style="width: 50%; text-align: left">关于</div>
+              <div style="width: 50%; text-align: right">
+                <v-icon icon="mdi-window-close" @click="helpshow = false"></v-icon>
+              </div>
+            </div>
+          </v-card-title>
+          <v-card-item>
+            <div style="width: 100%;height: 150px;">
+              <v-list>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <v-btn style="width: 110px;" @click="open_github">
+                      <template v-slot:prepend>
+                        <v-icon>mdi-github</v-icon>
+                      </template>
+                      Github
+                    </v-btn>
+                  </template>
+                  <template v-slot:append>
+                    <div style="font-size: 20px;text-align: center;">
+                      SkyDesk2
+                    </div>
+                  </template>
+                </v-list-item>
+                <v-list-item>
+                  <template v-slot:prepend>
+                    <v-btn style="width: 110px;" @click="checkupdate">
+                      <template v-slot:prepend>
+                        <v-icon>mdi-refresh</v-icon>
+                      </template>
+                      检查更新
+                    </v-btn>
+                  </template>
+                  <template v-slot:append>
+                    <div style="font-size: 20px;text-align: center;">
+                      {{ version }}
+                    </div>
+                  </template>
+                </v-list-item>
+              </v-list>
+            </div>
           </v-card-item>
         </v-card>
       </div>
