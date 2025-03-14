@@ -34,9 +34,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Vite + Tauri
-        run: npm build
-
       # 安装 Rust
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
