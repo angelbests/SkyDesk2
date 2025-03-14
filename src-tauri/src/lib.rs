@@ -17,6 +17,7 @@ pub fn run() {
     let local: DateTime<Local> = Local::now();
     let t = local.format("%Y-%m-%d");
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(move |app| {
             let apphandle = app.handle();
             wheel::wheelclick(apphandle.clone());

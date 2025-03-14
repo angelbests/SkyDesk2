@@ -148,7 +148,10 @@
   "bundle": {
     "publisher": "angelbests1314@live.com",
     "active": true,
-    "targets": "all",
+    "targets": [
+      "msi",
+      "nsis"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -164,16 +167,36 @@
       "resources/*"
     ],
     "windows": {
-      "allowDowngrades": true,
-      "certificateThumbprint": null,
-      "digestAlgorithm": null,
-      "nsis": null,
-      "signCommand": null,
-      "timestampUrl": null,
-      "tsp": false,
+      "nsis": {
+        "installerIcon": "./icons/icon.ico",
+        "displayLanguageSelector": true,
+        "languages": [
+          "SimpChinese"
+        ]
+      },
       "wix": {
-        "language": "zh-CN"
+        "language": "zh-CN",
+        "bannerPath": "./resources/bg.png"
       }
+    },
+    "homepage": "https://github.com/angelbests/SkyDesk2",
+    "shortDescription": "一个简单易用的本地工具",
+    "longDescription": "壁纸：动态壁纸、网页壁纸、静态壁纸、锁屏壁纸、音乐可视化（支持桌面切换音乐和启停）\n快捷：轮盘快速启动应用，桌面应用合集卡片\n便签：简单易编辑，可自定义颜色、置顶方式、透明度、嵌入到桌面鼻子\nAI:支持ollama部署的模型进行对话\n录屏：支持自定义绘制录屏画面大小（无声音）\n日历：简单的日历\n",
+    "category": "Utility",
+    "copyright": "SkyDesk2",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "window": {
+        "installMode": "passive"
+      },
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU1MTc1M0RGMEFCRUUzOEUKUldTTzQ3NEszMU1YVmQzNkdHLzB6YnVtdlIxVmcwZnFZR1dwSkc3OTdKQ2dscTVwdk9GaWV0aWoK",
+      "endpoints": [
+        "https://github.com/angelbests/SkyDesk2/releases/latest/download/latest.json"
+      ]
     }
   }
 }

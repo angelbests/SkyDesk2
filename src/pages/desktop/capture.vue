@@ -7,6 +7,7 @@ import {
 import { Canvas, Rect, Point } from "fabric"; // v6
 import { onMounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+
 import {
   currentMonitor,
   LogicalPosition,
@@ -14,8 +15,8 @@ import {
   Monitor,
 } from "@tauri-apps/api/window";
 import { resolve, videoDir } from "@tauri-apps/api/path";
-import moment from "moment";
 import { emit } from "@tauri-apps/api/event";
+import { get_time } from "../../functions/date";
 let app = getCurrentWebviewWindow();
 let c: Canvas;
 let rect: Rect;
@@ -168,7 +169,9 @@ const start_capture = async function () {
         30
       )
     );
-    let title = moment().format("YYMMDDhhmmss") + ".mp4";
+
+    let time = get_time()
+    let title = time.year + time.month + time.day + time.hour + time.minute + time.second + ".mp4";
     let path = await resolve(await videoDir(), "skydesk2", title);
     await invoke("start_capture", {
       x: Math.trunc(window_size.x * monitor.value.scaleFactor),
