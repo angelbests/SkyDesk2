@@ -25,10 +25,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up environment variables
-        run: echo ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-
-      - name: Set up environment variables
-        run: echo ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        env:          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 使用之前配置的私钥
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          # 使用之前配置的私钥密码
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: echo TAURI_SIGNING_PRIVATE_KEY_PASSWORD
 
       # 然后设置 Node.js
       - name: Setup Node
