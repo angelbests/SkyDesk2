@@ -17,12 +17,6 @@ jobs:
       fail-fast: false # 某个平台构建失败不影响其他平台
       matrix:
         include:
-          - platform: "macos-latest" # for Arm based macs (M1 and above).
-            args: "--target aarch64-apple-darwin"
-          - platform: "macos-latest" # for Intel based macs.
-            args: "--target x86_64-apple-darwin"
-          - platform: "ubuntu-22.04"
-            args: ""
           - platform: "windows-latest"
             args: ""
 
@@ -30,27 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            librsvg2-dev \
-            patchelf \
-            libudev-dev \
-            libasound2-dev \
-            pkg-config \
-            libgtk-3-dev \
-            libayatana-appindicator3-dev
-
-      # 添加环境变量配置
-      - name: Set up environment variables
-        run: echo "${{ secrets.ENV_LOCAL_CONTENT }}" > .env.local
-
-      # 首先安装 pnpm
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      # 首先安装 npm
+      - name: Install npm
+        uses: npm/action-setup@v4
         with:
           version: 9
           run_install: false
@@ -60,20 +36,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Build Vite + Tauri
-        run: pnpm build
+        run: npm build
 
       # 安装 Rust
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
         with:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ '' }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
