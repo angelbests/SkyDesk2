@@ -2,24 +2,27 @@
 import { onMounted, ref } from "vue";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { listen, Event } from "@tauri-apps/api/event";
 import { systemStore, windowStore, noteStore, wallpaperStore, shortcutStore, weatherStore, captureStore, } from "../stores/window";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import { NetSpeed } from "../types/netspeedType";
+import { Netspeed, NetSpeed } from "../functions/sysinfo";
+import skydesk_updater from "../functions/updater";
 const systemstore = systemStore();
 const drawer = ref(true);
 const colorshow = ref(false);
 const settingshow = ref(false);
-const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
-listen("netspeed", (e: Event<NetSpeed>) => {
-  net.value.speed_r = e.payload.speed_r;
-  net.value.speed_s = e.payload.speed_s;
-});
 const toggleMaximizeBool = ref(false);
+// 网速
+const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
+new Netspeed().listen_netspeed((e) => {
+  net.value = e.payload
+})
+
+
 onMounted(async () => {
+  skydesk_updater();
   await maininit();
   // 设置窗口拖拽
   document

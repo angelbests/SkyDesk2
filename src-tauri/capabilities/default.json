@@ -210,6 +210,7 @@
       ]
     },
     "global-shortcut:allow-register",
-    "global-shortcut:allow-is-registered"
+    "global-shortcut:allow-is-registered",
+    "updater:default"
   ]
 }
