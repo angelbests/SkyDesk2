@@ -1,10 +1,10 @@
-name: Release CI
+name: Release
 
 on:
   push:
     tags:
       - "v*"
-
+  workflow_dispatch:
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true # 如果有新的发布任务，取消正在进行的任务
