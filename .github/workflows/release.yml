@@ -24,6 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up environment variables
+        run: echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}"
+
+      - name: Set up environment variables
+        run: echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}"
+
       # 然后设置 Node.js
       - name: Setup Node
         uses: actions/setup-node@v4
