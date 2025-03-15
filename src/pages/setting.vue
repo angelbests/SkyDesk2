@@ -214,25 +214,36 @@ const checkupdate = async function () {
   const update = await check()
   if (update) {
     updateversion.value = update.version
+  }
+}
+
+const updatestatus = ref(false)
+const updatestr = ref("")
+const updateprogram = async function () {
+  const update = await check()
+  if (update) {
+    updateversion.value = update.version
     console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`)
     let downloaded = 0;
     let contentLength = 0;
     await update.downloadAndInstall((event) => {
+      updatestatus.value = true
       switch (event.event) {
         case 'Started':
           contentLength = event.data.contentLength || 0;
-          console.log(`started downloading ${event.data.contentLength} bytes`);
+          updatestr.value = '下载开始';
           break;
         case 'Progress':
           downloaded += event.data.chunkLength;
-          console.log(`downloaded ${downloaded} from ${contentLength}`);
+          updatestr.value = Math.trunc(downloaded / contentLength * 100).toString();
           break;
         case 'Finished':
-          console.log('download finished');
+          updatestr.value = '下载完成'
+          console.log('下载完成');
           break;
       }
     });
-
+    updatestr.value = 'update installed'
     console.log('update installed');
     await relaunch();
   }
@@ -590,7 +601,13 @@ const checkupdate = async function () {
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <v-btn style="width: 110px;" @click="checkupdate">
+                    <v-btn v-show="updateversion" style="width: 110px;" @click="updateprogram">
+                      <template v-slot:prepend>
+                        <v-icon>mdi-refresh</v-icon>
+                      </template>
+                      更新程序
+                    </v-btn>
+                    <v-btn v-show="!updateversion" style="width: 110px;" @click="checkupdate">
                       <template v-slot:prepend>
                         <v-icon>mdi-refresh</v-icon>
                       </template>
@@ -598,8 +615,11 @@ const checkupdate = async function () {
                     </v-btn>
                   </template>
                   <template v-slot:append>
-                    <div style="text-align: center;">
+                    <div v-if="!updatestatus" style="text-align: center;">
                       {{ updateversion ? version + " -> " + updateversion : version }}
+                    </div>
+                    <div v-else style="text-align: center;">
+                      {{ updatestr }}%
                     </div>
                   </template>
                 </v-list-item>
