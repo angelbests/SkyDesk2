@@ -211,7 +211,10 @@
     },
     "global-shortcut:allow-register",
     "global-shortcut:allow-is-registered",
-    "updater:default",
+    "updater:allow-download-and-install",
+    "updater:allow-check",
+    "updater:allow-download",
+    "updater:allow-install",
     {
       "identifier": "opener:allow-open-url",
       "allow": [

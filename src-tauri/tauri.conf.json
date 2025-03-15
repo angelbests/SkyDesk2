@@ -1,6 +1,6 @@
 {
   "productName": "skydesk2",
-  "version": "1.2.3",
+  "version": "1.2.2",
   "identifier": "com.skydesk2.app",
   "build": {
     "beforeDevCommand": "npm run dev",

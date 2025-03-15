@@ -197,6 +197,7 @@ const wheel_status = function (e: any) {
 ////////////////////help/////////////////////////
 const helpshow = ref(false)
 const version = ref("");
+const updateversion = ref("");
 import { check } from "@tauri-apps/plugin-updater"
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { getVersion } from "@tauri-apps/api/app"
@@ -212,9 +213,28 @@ const get_version = async function () {
 const checkupdate = async function () {
   const update = await check()
   if (update) {
+    updateversion.value = update.version
     console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`)
-  } else {
-    console.log("失败")
+    let downloaded = 0;
+    let contentLength = 0;
+    await update.downloadAndInstall((event) => {
+      switch (event.event) {
+        case 'Started':
+          contentLength = event.data.contentLength || 0;
+          console.log(`started downloading ${event.data.contentLength} bytes`);
+          break;
+        case 'Progress':
+          downloaded += event.data.chunkLength;
+          console.log(`downloaded ${downloaded} from ${contentLength}`);
+          break;
+        case 'Finished':
+          console.log('download finished');
+          break;
+      }
+    });
+
+    console.log('update installed');
+    await relaunch();
   }
 }
 
@@ -563,8 +583,8 @@ const checkupdate = async function () {
                     </v-btn>
                   </template>
                   <template v-slot:append>
-                    <div style="font-size: 20px;text-align: center;">
-                      SkyDesk2
+                    <div style="text-align: center;">
+                      SkyDesk2 {{ version }}
                     </div>
                   </template>
                 </v-list-item>
@@ -578,8 +598,8 @@ const checkupdate = async function () {
                     </v-btn>
                   </template>
                   <template v-slot:append>
-                    <div style="font-size: 20px;text-align: center;">
-                      {{ version }}
+                    <div style="text-align: center;">
+                      {{ updateversion ? version + " -> " + updateversion : version }}
                     </div>
                   </template>
                 </v-list-item>
