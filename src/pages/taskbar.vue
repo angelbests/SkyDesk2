@@ -1,46 +1,51 @@
 <script setup lang="ts">
 import { listen } from "@tauri-apps/api/event";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
+import type { Event } from "@tauri-apps/api/event";
+import { NetSpeed, Netspeed } from "../functions/sysinfo";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { systemStore } from "../stores/window";
-import type { NetSpeed } from "../types/netspeedType";
-import type { Event } from "@tauri-apps/api/event";
-getCurrentWebviewWindow().show();
-const system = systemStore();
+const systemstore = systemStore();
+const cpu = ref(0);
+const memory = ref(0);
 const net = ref<NetSpeed>({
   speed_r: 0,
   speed_s: 0,
 });
-const cpu = ref(0);
-const memory = ref(0);
-onMounted(async () => {
-  listen("netspeed", (e: Event<NetSpeed>) => {
-    net.value.speed_r = e.payload.speed_r;
-    net.value.speed_s = e.payload.speed_s;
+
+new Netspeed().listen_netspeed((e) => {
+  net.value = e.payload
+})
+listen("netspeed", (e: Event<NetSpeed>) => {
+  net.value.speed_r = e.payload.speed_r;
+  net.value.speed_s = e.payload.speed_s;
+});
+listen("cpu", (e) => {
+  let str = e.payload;
+  cpu.value = Math.trunc(Math.round(Number(str)));
+});
+listen("memory", (e) => {
+  let str = e.payload;
+  memory.value = Math.trunc(Number(str) * 100);
+});
+
+onMounted(() => {
+  window.addEventListener("storage", (e) => {
+    if (e.key == "system") {
+      systemstore.$hydrate();
+    }
   });
-  listen("cpu", (e) => {
-    let str = e.payload;
-    cpu.value = Math.trunc(Math.round(Number(str)));
-  });
-  listen("memory", (e) => {
-    let str = e.payload;
-    memory.value = Math.trunc(Number(str) * 100);
-  });
-  if (system.taskbar) {
+})
+
+watch(systemstore, () => {
+  if (systemstore.taskbar) {
     getCurrentWebviewWindow().show();
   } else {
     getCurrentWebviewWindow().hide();
   }
-});
-window.addEventListener("storage", (e) => {
-  if (e.key == "system") {
-    system.$hydrate();
-    if (system.taskbar) {
-      getCurrentWebviewWindow().show();
-    } else {
-      getCurrentWebviewWindow().hide();
-    }
-  }
+}, {
+  immediate: true,
+  deep: true
 });
 </script>
 

@@ -6,7 +6,7 @@ import { initWindow } from "./window"
 import { exit } from "@tauri-apps/plugin-process"
 import { info } from "@tauri-apps/plugin-log"
 export const maininit = async function () {
-  // 检查并创建文件夹
+  ///#region  检查并创建文件夹
   await mkdir("lnk", { baseDir: BaseDirectory.AppData, recursive: true })
   await mkdir("window", { baseDir: BaseDirectory.AppData, recursive: true })
   await mkdir("wallpapers", {
@@ -43,7 +43,9 @@ export const maininit = async function () {
     recursive: true,
   })
   info("文件夹初始化完成")
-  // 注册快捷按键
+  //#endregion
+
+  //#region
   let res = await isRegistered("Control+1")
   if (!res) {
     register("Control+1", async () => {
@@ -59,6 +61,7 @@ export const maininit = async function () {
     })
   }
   info("快捷键注册完成")
+  //#endregion
   info("网速事务完成")
   await createtray()
   await traystart()

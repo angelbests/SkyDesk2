@@ -29,10 +29,10 @@ export const createWindow = async function (
     })
     const w = new WebviewWindow(label, option)
     if (w.label.indexOf("wallpaper-") < 0) {
-      listenMove(w)
-      listenSize(w)
+      await listenMove(w)
+      await listenSize(w)
     }
-    listenClose(w)
+    await listenClose(w)
     return w
   } else {
     return null

@@ -43,14 +43,16 @@ onMounted(async () => {
 
 const stop = async function () {
   let str = "STOP";
+  getCurrentWebviewWindow().hide()
+  captureWindow.value?.hide()
   await emit("capture", `${str}`);
-  await getCurrentWebviewWindow().hide();
-  await captureWindow.value?.hide();
-  setTimeout(() => {
+  setTimeout(async () => {
     capturestore.video.push({
       name: message.value.name,
       path: message.value.path,
     });
+    captureWindow.value?.close();
+    getCurrentWebviewWindow().close();
   }, 5000);
 };
 </script>

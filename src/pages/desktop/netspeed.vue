@@ -1,43 +1,39 @@
 <script setup lang="ts">
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
-import { listen, Event } from "@tauri-apps/api/event";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { onMounted, ref, watch } from "vue";
 import { systemStore } from "../../stores/window";
-import { NetSpeed } from "../../types/netspeedType";
+import { NetSpeed, Netspeed } from "../../functions/sysinfo";
 getCurrentWebviewWindow().setSize(new LogicalSize(80, 45));
-const net = ref<NetSpeed>({
-  speed_r: 0,
-  speed_s: 0,
-});
+const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
 const systemstore = systemStore();
+
+//#region  网速监听
+new Netspeed().listen_netspeed((e) => {
+  net.value = e.payload
+})
+//#endregion
+
+//#region
+getCurrentWebviewWindow().setPosition(
+  new LogicalPosition(systemstore.netspeed.x, systemstore.netspeed.y)
+);
+getCurrentWebviewWindow().listen("tauri://move", async (event: any) => {
+  const factor = await getCurrentWebviewWindow().scaleFactor();
+  systemstore.netspeed.x = event.payload.x / factor;
+  systemstore.netspeed.y = event.payload.y / factor;
+});
+//#endregion
+
 onMounted(() => {
-  getCurrentWebviewWindow().setPosition(
-    new LogicalPosition(systemstore.netspeed.x, systemstore.netspeed.y)
-  );
-  getCurrentWebviewWindow().listen("tauri://move", async (event: any) => {
-    const factor = await getCurrentWebviewWindow().scaleFactor();
-    systemstore.netspeed.x = event.payload.x / factor;
-    systemstore.netspeed.y = event.payload.y / factor;
-  });
   window.addEventListener("storage", (e) => {
     if (e.key == "system") {
       systemstore.$hydrate();
     }
   });
-  listen("netspeed", (e: Event<NetSpeed>) => {
-    net.value.speed_r = e.payload.speed_r;
-    net.value.speed_s = e.payload.speed_s;
-  });
   document.addEventListener("selectstart", (e) => {
     e.preventDefault();
   });
-
-  if (systemstore.netspeed.show) {
-    setTimeout(() => {
-      getCurrentWebviewWindow().show();
-    }, 2500);
-  }
 });
 
 watch(systemstore, () => {
@@ -46,6 +42,9 @@ watch(systemstore, () => {
   } else {
     getCurrentWebviewWindow().hide();
   }
+}, {
+  immediate: true,
+  deep: true
 });
 </script>
 

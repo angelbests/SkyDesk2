@@ -37,15 +37,42 @@ let window_size: {
 const captureWindow = ref<WebviewWindow>();
 const captureBtn = ref<WebviewWindow>();
 onMounted(async () => {
-  let all = await getAllWebviewWindows();
-  all.filter((item) => {
-    if (item.label == "captureWindow") {
-      captureWindow.value = item;
-    }
-    if (item.label == "captureBtn") {
-      captureBtn.value = item;
-    }
-  });
+  let configbtn = {
+    "x": 0,
+    "y": 0,
+    "width": 50,
+    "height": 30,
+    "shadow": false,
+    "decorations": false,
+    "transparent": true,
+    "alwaysOnTop": true,
+    "url": "/#/pages/desktop/captureBtn",
+    "title": "captureBtn",
+    "label": "captureBtn",
+    "skipTaskbar": true,
+    "visible": false,
+    "resizable": false,
+    "minimizable": false,
+    "maximizable": false
+  };
+
+  let configwindow = {
+    "x": 0,
+    "y": 0,
+    "width": 300,
+    "height": 300,
+    "shadow": false,
+    "decorations": false,
+    "transparent": true,
+    "alwaysOnTop": true,
+    "url": "/#/pages/desktop/captureWindow",
+    "title": "captureWindow",
+    "label": "captureWindow",
+    "skipTaskbar": true,
+    "visible": false
+  };
+  captureWindow.value = new WebviewWindow("captureWindow", configwindow)
+  captureBtn.value = new WebviewWindow("captureBtn", configbtn)
   let m = await currentMonitor();
   if (m) {
     monitor.value = m;

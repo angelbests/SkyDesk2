@@ -7,22 +7,21 @@ import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import { Netspeed, NetSpeed } from "../functions/sysinfo";
+
 const systemstore = systemStore();
 const drawer = ref(true);
 const colorshow = ref(false);
 const settingshow = ref(false);
 const toggleMaximizeBool = ref(false);
-// 网速
-const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
-new Netspeed().listen_netspeed((e) => {
-  net.value = e.payload
-})
-
 
 onMounted(async () => {
-  get_version()
   await maininit();
+  appbardraging();
+  get_version();
+});
+
+//#region  //appbar控制
+const appbardraging = function () {
   // 设置窗口拖拽
   document
     .getElementById("toolbar")
@@ -48,7 +47,7 @@ onMounted(async () => {
   } else {
     dom.style.setProperty("--font-color", "black");
   }
-});
+}
 
 const toggleMaximize = async function () {
   await getCurrentWebviewWindow().toggleMaximize();
@@ -66,7 +65,10 @@ const closeApp = async function () {
     getCurrentWebviewWindow().destroy();
   }
 };
+//#endregion
 
+//#region 
+// 开机自启
 const autostartsetting = function (e: any) {
   if (e) {
     enable();
@@ -74,7 +76,10 @@ const autostartsetting = function (e: any) {
     disable();
   }
 };
+//#endregion
 
+//#region  
+// 清除用户信息
 const refresh = function () {
   localStorage.clear();
   systemStore().$reset();
@@ -86,7 +91,9 @@ const refresh = function () {
   captureStore().$reset();
   relaunch();
 };
+//#endregion
 
+//#region ui颜色设置
 const getImage = async function (i: number) {
   let res = await open({
     filters: [{ extensions: ["png", "jpg", "jpeg"], name: "Image" }],
@@ -122,6 +129,7 @@ const getImage = async function (i: number) {
   }
 };
 
+// 色盘控制
 const changebtn = function (i: number) {
   let dom = document.getElementById("app") as HTMLElement;
   if (i == 1) {
@@ -188,13 +196,16 @@ const selectcolor = function () {
     }
   }, 50);
 };
+//#endregion
 
+//#region 轮盘开关
 const wheel_status = function (e: any) {
   console.log(e);
   invoke("wheel_status", { bool: e });
 };
+//#endregion
 
-////////////////////help/////////////////////////
+//#region  软件更新
 const helpshow = ref(false)
 const version = ref("");
 const updateversion = ref("");
@@ -248,8 +259,15 @@ const updateprogram = async function () {
     await relaunch();
   }
 }
+//#endregion
 
-
+//#region  网速监听
+import { Netspeed, NetSpeed } from "../functions/sysinfo";
+const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
+new Netspeed().listen_netspeed((e) => {
+  net.value = e.payload
+})
+//#endregion
 </script>
 
 <template>
