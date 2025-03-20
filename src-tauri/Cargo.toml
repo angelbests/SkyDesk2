@@ -65,7 +65,8 @@ features = [
     "Media_Control",
     "Storage_Streams",
     "Storage",
-    "Foundation_Collections"
+    "Foundation_Collections",
+    "Win32_System_LibraryLoader"
 ]
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]

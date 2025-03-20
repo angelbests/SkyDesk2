@@ -1,10 +1,10 @@
 use tauri::{AppHandle, Emitter};
 use windows::core::s;
-use windows::Win32::Foundation::{LPARAM, LRESULT, WPARAM};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, FindWindowA, FindWindowExA, SetWindowsHookExA, WindowFromPoint, HC_ACTION,
+    CallNextHookEx, EnumWindows, FindWindowExA, SetWindowsHookExA, WindowFromPoint, HC_ACTION,
     HHOOK, MSLLHOOKSTRUCT, WH_MOUSE_LL, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP,
     WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP,
 };
@@ -33,22 +33,41 @@ lazy_static! {
     static ref APP_HANDLE: Arc<Mutex<Option<AppHandle>>> = Arc::new(Mutex::new(None));
 }
 
+extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
+    unsafe {
+        // 搜索 workerw下的 SHELLDLL_DefView 窗口的位置 确定到之后 下一个窗口就是 我们需要的workerw 窗口
+        let shell_dll_def_view = FindWindowExA(window, None, s!("SHELLDLL_DefView"), None);
+        match shell_dll_def_view {
+            Ok(s) => {
+                if s == HWND(std::ptr::null_mut()) {
+                    return true.into();
+                } else {
+                    *(ref_worker_w.0 as *mut HWND) = s;
+                }
+            }
+            Err(_s) => {
+                return true.into();
+            }
+        }
+        // 查到 workerw 退出
+        return false.into();
+    }
+}
+
 static mut HOOK: Option<HHOOK> = None;
 // static mut APP_HANDLE: Option<AppHandle> = None;
 unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
     if (n_code as u32) == HC_ACTION {
         let mouse_info = *(l_param.0 as *const MSLLHOOKSTRUCT);
         let hwnd_clicked = WindowFromPoint(mouse_info.pt);
-        let progman = FindWindowA(s!("Progman"), None).unwrap();
-        let shell_dll_def_view =
-            FindWindowExA(progman, None, s!("SHELLDLL_DefView"), None).unwrap();
+        let mut shell_dll_def_view: HWND = HWND(std::ptr::null_mut());
+        let _ = EnumWindows(
+            Some(enum_window),
+            LPARAM(&mut shell_dll_def_view as *mut HWND as isize),
+        );
         let sys_list_view32_hwnd =
             FindWindowExA(shell_dll_def_view, None, s!("SysListView32"), None).unwrap();
         let mouse: Option<MouseInfo>;
-        // println!(
-        //     "{:?},{:?},{:?}",
-        //     mouse_info.pt, hwnd_clicked, sys_list_view32_hwnd
-        // );
         if hwnd_clicked == sys_list_view32_hwnd || hwnd_clicked == shell_dll_def_view {
             match w_param.0 as u32 {
                 WM_LBUTTONDOWN => {
