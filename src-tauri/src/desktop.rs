@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 use windows::core::s;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
@@ -67,8 +67,22 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
         );
         let sys_list_view32_hwnd =
             FindWindowExA(shell_dll_def_view, None, s!("SysListView32"), None).unwrap();
+        // let hwnd_taskbar = println!("{:?}", mouse_info);
+        // println!("{:?}", hwnd_clicked);
+        // WRY_WEBVIEW Chrome_WidgetWin_0  Chrome_WidgetWin_1 Chrome_RenderWidgetHostHWND
+        let app_handle = APP_HANDLE.lock().unwrap();
+        let app = app_handle.as_ref().unwrap();
+        let w = app.get_webview_window("taskbar").unwrap();
+        let mut h = w.hwnd().unwrap();
+        h = FindWindowExA(h, None, s!("WRY_WEBVIEW"), None).unwrap();
+        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_0"), None).unwrap();
+        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_1"), None).unwrap();
+        h = FindWindowExA(h, None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
         let mouse: Option<MouseInfo>;
-        if hwnd_clicked == sys_list_view32_hwnd || hwnd_clicked == shell_dll_def_view {
+        if hwnd_clicked == sys_list_view32_hwnd
+            || hwnd_clicked == shell_dll_def_view
+            || hwnd_clicked == h
+        {
             match w_param.0 as u32 {
                 WM_LBUTTONDOWN => {
                     println!("鼠标左键点击了桌面");
@@ -136,19 +150,12 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                 }
                 _ => mouse = None,
             }
-
-            let _ = APP_HANDLE
-                .lock()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .emit("desktop", mouse);
+            let _ = app.emit("desktop", mouse);
         }
     }
 
     CallNextHookEx(HOOK.unwrap_or_default(), n_code, w_param, l_param)
 }
-
 pub fn desktop_mouse_listen(app: AppHandle) {
     unsafe {
         *APP_HANDLE.lock().unwrap() = Some(app);

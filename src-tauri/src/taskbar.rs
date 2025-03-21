@@ -10,7 +10,7 @@ use windows::{
     },
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Payload {
     x: i32,
     y: i32,
@@ -50,7 +50,7 @@ pub fn listentaskbar(app: AppHandle) {
                     None,
                 )
                 .unwrap();
-                let start_rect = &mut RECT {
+                let start_rect: *mut RECT = &mut RECT {
                     left: 0,
                     right: 0,
                     top: 0,
@@ -70,22 +70,36 @@ pub fn listentaskbar(app: AppHandle) {
                 let p: Payload;
                 if start_rect.left == 0 {
                     p = Payload {
-                        x: tray_rect.left - (170 as f64 * factor) as i32,
+                        x: tray_rect.left - (270 as f64 * factor) as i32,
                         y: 0,
                         height: start_rect.bottom - start_rect.top,
-                        width: (170 as f64 * factor) as i32,
+                        width: (270 as f64 * factor) as i32,
                     };
                 } else {
                     p = Payload {
                         x: 0,
                         y: 0,
                         height: start_rect.bottom - start_rect.top,
-                        width: (170 as f64 * factor) as i32,
+                        width: (270 as f64 * factor) as i32,
                     };
                 }
-                let json = serde_json::to_string(&p).unwrap();
-                let _ = app.emit("taskbar", json);
+
                 let _ = WindowsAndMessaging::MoveWindow(h, p.x, p.y, p.width, p.height, BOOL(0));
+                let p_rect = &mut RECT {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                } as *mut RECT;
+                let _ = WindowsAndMessaging::GetWindowRect(h, p_rect);
+                let p_rect = *p_rect;
+                let p = Payload {
+                    x: p_rect.left,
+                    y: p_rect.top,
+                    width: p_rect.right - p_rect.left,
+                    height: p_rect.bottom - p_rect.top,
+                };
+                let _ = app.emit("taskbar", p);
                 thread::sleep(Duration::from_millis(300));
             }
         }
