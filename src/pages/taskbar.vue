@@ -6,6 +6,15 @@ import { NetSpeed, Netspeed } from "../functions/sysinfo";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { systemStore } from "../stores/window";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
+import { MouseAction, MouseEvent } from "../types/desktopType";
+import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
+import { invoke } from "@tauri-apps/api/core";
+import { Smtc_Control } from "../functions/smtc";
+import { wallpaperStore } from "../stores/window";
+const wallpaperstore = wallpaperStore()
+const app = ref("")
+let smtc = new Smtc_Control();
+const playstatus = ref(5);
 const systemstore = systemStore();
 const cpu = ref(0);
 const memory = ref(0);
@@ -60,6 +69,8 @@ onMounted(() => {
   window.addEventListener("storage", (e) => {
     if (e.key == "system") {
       systemstore.$hydrate();
+    } else if (e.key == "wallpaper") {
+      wallpaperstore.$hydrate();
     }
   });
 })
@@ -74,11 +85,8 @@ watch(systemstore, () => {
   immediate: true,
   deep: true
 });
-import { Smtc_Control } from "../functions/smtc";
-import { wallpaperStore } from "../stores/window";
-const wallpaperstore = wallpaperStore()
-const app = ref("")
-let smtc = new Smtc_Control();
+
+
 smtc.listen_appstatus(async (e) => {
   if (
     !e.payload.cloudmusic &&
@@ -100,7 +108,7 @@ smtc.listen_appstatus(async (e) => {
     app.value = "Spotify.exe"
   }
 })
-const playstatus = ref(5);
+
 smtc.listen_playstatus((e) => {
   if (
     wallpaperstore.wallpaperConfig[0].config.musicapp ==
@@ -110,10 +118,7 @@ smtc.listen_playstatus((e) => {
   }
 })
 
-import { MouseAction, MouseEvent } from "../types/desktopType";
-import { info } from "@tauri-apps/plugin-log";
-import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
-import { invoke } from "@tauri-apps/api/core";
+
 listen("desktop", async (e: Event<MouseEvent>) => {
   let dom = document.getElementById("previous")
   if (!dom) return;
@@ -129,17 +134,11 @@ listen("desktop", async (e: Event<MouseEvent>) => {
   if (e.payload.mouse == MouseAction.LeftUp) {
     if (rect.value.x < x && (rect.value.x + width) > x && rect.value.y < y && (rect.value.y + height) > y) {
       invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: -1 })
-      info("-1")
     } else if ((rect.value.x + width) < x && (rect.value.x + width * 2) > x && rect.value.y < y && (rect.value.y + height) > y) {
       invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 0 })
-      info("0")
     } else if ((rect.value.x + width * 2) < x && (rect.value.x + width * 3) > x && rect.value.y < y && (rect.value.y + height) > y) {
       invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 1 })
-      info("1")
     }
-    info(width + "-" + height)
-    info(e.payload.x + "-" + e.payload.y)
-    info(rect.value.x + "-" + rect.value.y)
   }
 })
 
