@@ -7,6 +7,7 @@ import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
+import { copyFile } from "@tauri-apps/plugin-fs";
 
 const systemstore = systemStore();
 const drawer = ref(true);
@@ -99,25 +100,28 @@ const getImage = async function (i: number) {
     filters: [{ extensions: ["png", "jpg", "jpeg"], name: "Image" }],
     title: "选择背景图片",
   });
+  if (!res) return;
+  let path = await resolve(await appDataDir(), "window\\" + uuid() + ".png")
+  await copyFile(res, path)
   if (res) {
     switch (i) {
       case 1:
-        systemstore.programbcakground = `url('${convertFileSrc(res)}')`;
+        systemstore.programbcakground = `url('${convertFileSrc(path)}')`;
         break;
       case 2:
-        systemstore.leftbackground = `url('${convertFileSrc(res)}')`;
+        systemstore.leftbackground = `url('${convertFileSrc(path)}')`;
         break;
       case 3:
-        systemstore.topbackground = `url('${convertFileSrc(res)}')`;
+        systemstore.topbackground = `url('${convertFileSrc(path)}')`;
         break;
       case 4:
-        systemstore.shortcutbackground = `url('${convertFileSrc(res)}')`;
+        systemstore.shortcutbackground = `url('${convertFileSrc(path)}')`;
         break;
       case 5:
-        systemstore.btnbackground = `url('${convertFileSrc(res)}')`;
+        systemstore.btnbackground = `url('${convertFileSrc(path)}')`;
         break;
       case 7:
-        systemstore.btnbarbackground = `url('${convertFileSrc(res)}')`;
+        systemstore.btnbarbackground = `url('${convertFileSrc(path)}')`;
         break;
     }
     let dom = document.getElementById("app") as HTMLElement;
@@ -263,6 +267,8 @@ const updateprogram = async function () {
 
 //#region  网速监听
 import { Netspeed, NetSpeed } from "../functions/sysinfo";
+import { uuid } from "../functions";
+import { appDataDir, resolve } from "@tauri-apps/api/path";
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
 new Netspeed().listen_netspeed((e) => {
   net.value = e.payload
