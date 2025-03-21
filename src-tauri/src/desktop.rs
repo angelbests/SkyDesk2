@@ -29,9 +29,12 @@ struct MouseInfo {
 }
 use lazy_static::lazy_static;
 use std::sync::{Arc, Mutex};
+
 lazy_static! {
     static ref APP_HANDLE: Arc<Mutex<Option<AppHandle>>> = Arc::new(Mutex::new(None));
 }
+
+static mut H: HWND = HWND(std::ptr::null_mut());
 
 extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     unsafe {
@@ -67,21 +70,10 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
         );
         let sys_list_view32_hwnd =
             FindWindowExA(shell_dll_def_view, None, s!("SysListView32"), None).unwrap();
-        // let hwnd_taskbar = println!("{:?}", mouse_info);
-        // println!("{:?}", hwnd_clicked);
-        // WRY_WEBVIEW Chrome_WidgetWin_0  Chrome_WidgetWin_1 Chrome_RenderWidgetHostHWND
-        let app_handle = APP_HANDLE.lock().unwrap();
-        let app = app_handle.as_ref().unwrap();
-        let w = app.get_webview_window("taskbar").unwrap();
-        let mut h = w.hwnd().unwrap();
-        h = FindWindowExA(h, None, s!("WRY_WEBVIEW"), None).unwrap();
-        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_0"), None).unwrap();
-        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_1"), None).unwrap();
-        h = FindWindowExA(h, None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
         let mouse: Option<MouseInfo>;
         if hwnd_clicked == sys_list_view32_hwnd
             || hwnd_clicked == shell_dll_def_view
-            || hwnd_clicked == h
+            || hwnd_clicked == H
         {
             match w_param.0 as u32 {
                 WM_LBUTTONDOWN => {
@@ -150,7 +142,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                 }
                 _ => mouse = None,
             }
-            let _ = app.emit("desktop", mouse);
+            if let Some(app_handle) = APP_HANDLE.lock().unwrap().as_ref() {
+                let _ = app_handle.emit("desktop", mouse);
+            }
         }
     }
 
@@ -158,6 +152,13 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
 }
 pub fn desktop_mouse_listen(app: AppHandle) {
     unsafe {
+        let w = app.get_webview_window("taskbar").unwrap();
+        let mut h = w.hwnd().unwrap();
+        h = FindWindowExA(h, None, s!("WRY_WEBVIEW"), None).unwrap();
+        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_0"), None).unwrap();
+        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_1"), None).unwrap();
+        h = FindWindowExA(h, None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
+        H = h;
         *APP_HANDLE.lock().unwrap() = Some(app);
         let h_instance = GetModuleHandleA(None).unwrap();
         let _hook = SetWindowsHookExA(WH_MOUSE_LL, Some(mouse_proc), h_instance, 0).unwrap();
