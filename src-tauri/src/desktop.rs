@@ -68,9 +68,19 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             Some(enum_window),
             LPARAM(&mut shell_dll_def_view as *mut HWND as isize),
         );
-        let sys_list_view32_hwnd =
-            FindWindowExA(shell_dll_def_view, None, s!("SysListView32"), None).unwrap();
+        let mut sys_list_view32_hwnd = HWND(std::ptr::null_mut());
+        let sys_list_view32 = FindWindowExA(shell_dll_def_view, None, s!("SysListView32"), None);
+        match sys_list_view32 {
+            Ok(s) => {
+                sys_list_view32_hwnd = s;
+            }
+            Err(e) => {
+                println!("{:?}", e);
+            }
+        }
+        println!("sys_list_view32:{:?}", sys_list_view32_hwnd);
         let mouse: Option<MouseInfo>;
+        println!("{:?}", hwnd_clicked);
         if hwnd_clicked == sys_list_view32_hwnd
             || hwnd_clicked == shell_dll_def_view
             || hwnd_clicked == H
