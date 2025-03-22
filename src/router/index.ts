@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router"
 
 const routes: RouteRecordRaw[] = [
   {
@@ -83,26 +83,26 @@ const routes: RouteRecordRaw[] = [
         path: "wallpapersetting",
         component: () => import("./../pages/desktop/wallpapersetting.vue"),
       },
+      {
+        path: "taskbar",
+        component: () => import("./../pages/desktop/taskbar.vue"),
+      },
     ],
   },
-  {
-    path: "/pages/taskbar",
-    component: () => import("./../pages/taskbar.vue"),
-  },
-];
+]
 
 const router = createRouter({
   routes,
   history: createWebHashHistory(),
-});
+})
 
 router.beforeEach((to) => {
-  let index = to.fullPath.indexOf("setting");
+  let index = to.fullPath.indexOf("setting")
   if (index >= 0) {
-    document.getElementsByTagName("body")[0].style.background = "white";
+    document.getElementsByTagName("body")[0].style.background = "white"
   } else {
-    document.getElementsByTagName("body")[0].style.background = "transparent";
+    document.getElementsByTagName("body")[0].style.background = "transparent"
   }
-});
+})
 
-export default router;
+export default router

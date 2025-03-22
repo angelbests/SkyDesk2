@@ -78,7 +78,6 @@ pub fn smtc_listen(window: tauri::AppHandle) {
             }
             Ok(())
         });
-
         let token = gsmtc.SessionsChanged(&sessionchangehandler).unwrap();
         println!("{:?}", token);
 
@@ -120,6 +119,7 @@ fn get_sessions(
             println!("appname:{:?}", appname);
             musicapp.spotify = true;
             session_control(session, window.clone());
+            // } else if appname == "msedgewebview2.exe" {
         }
     }
 }
@@ -313,6 +313,7 @@ pub fn play_control(appname: String, control: i32) {
                 .unwrap()
                 .to_string_lossy()
                 .to_string();
+            println!("{:?}", name);
             if name == appname {
                 if control == -1 {
                     let _ = smtc.TrySkipPreviousAsync();

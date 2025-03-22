@@ -70,7 +70,7 @@
         "shadow": false,
         "decorations": false,
         "transparent": true,
-        "url": "/#/pages/taskbar",
+        "url": "/#/pages/desktop/taskbar",
         "title": "taskbar",
         "label": "taskbar",
         "skipTaskbar": true,

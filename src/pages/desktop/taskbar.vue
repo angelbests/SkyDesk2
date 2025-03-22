@@ -2,16 +2,17 @@
 import { listen } from "@tauri-apps/api/event";
 import { computed, onMounted, ref, watch } from "vue";
 import type { Event } from "@tauri-apps/api/event";
-import { NetSpeed, Netspeed } from "../functions/sysinfo";
+import { NetSpeed, Netspeed } from "../../functions/sysinfo";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { systemStore } from "../stores/window";
+import { systemStore } from "../../stores/window";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
-import { MouseAction, MouseEvent } from "../types/desktopType";
+import { MouseAction, MouseEvent } from "../../types/desktopType";
 import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
-import { Smtc_Control } from "../functions/smtc";
-import { wallpaperStore } from "../stores/window";
+import { Smtc_Control } from "../../functions/smtc";
+import { wallpaperStore, shortcutStore } from "../../stores/window";
 const wallpaperstore = wallpaperStore()
+const shortcutstore = shortcutStore()
 const app = ref("")
 let smtc = new Smtc_Control();
 const playstatus = ref(5);
@@ -71,6 +72,8 @@ onMounted(() => {
       systemstore.$hydrate();
     } else if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
+    } else if (e.key == "shortcut") {
+      shortcutstore.$hydrate()
     }
   });
 })
@@ -106,6 +109,8 @@ smtc.listen_appstatus(async (e) => {
     "Spotify.exe"
   ) {
     app.value = "Spotify.exe"
+  } else {
+    app.value = ""
   }
 })
 
@@ -118,7 +123,7 @@ smtc.listen_playstatus((e) => {
   }
 })
 
-
+import { Command } from "@tauri-apps/plugin-shell";
 listen("desktop", async (e: Event<MouseEvent>) => {
   let dom = document.getElementById("previous")
   if (!dom) return;
@@ -133,11 +138,41 @@ listen("desktop", async (e: Event<MouseEvent>) => {
   let height = dom.clientHeight * monitor.scaleFactor;
   if (e.payload.mouse == MouseAction.LeftUp) {
     if (rect.value.x < x && (rect.value.x + width) > x && rect.value.y < y && (rect.value.y + height) > y) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: -1 })
+      if (app.value) {
+        shortcutstore.shortcutsTemp.filter((e) => {
+          if (e.targetPath.indexOf(app.value) > 0) {
+            Command.create("powershell", `& "${e.targetPath}"`, {
+              encoding: "GBK",
+            }).execute();
+          }
+        })
+      } else {
+        invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: -1 })
+      }
     } else if ((rect.value.x + width) < x && (rect.value.x + width * 2) > x && rect.value.y < y && (rect.value.y + height) > y) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 0 })
+      if (app.value) {
+        shortcutstore.shortcutsTemp.filter((e) => {
+          if (e.targetPath.indexOf(app.value) > 0) {
+            Command.create("powershell", `& "${e.targetPath}"`, {
+              encoding: "GBK",
+            }).execute();
+          }
+        })
+      } else {
+        invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 0 })
+      }
     } else if ((rect.value.x + width * 2) < x && (rect.value.x + width * 3) > x && rect.value.y < y && (rect.value.y + height) > y) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 1 })
+      if (app.value) {
+        shortcutstore.shortcutsTemp.filter((e) => {
+          if (e.targetPath.indexOf(app.value) > 0) {
+            Command.create("powershell", `& "${e.targetPath}"`, {
+              encoding: "GBK",
+            }).execute();
+          }
+        })
+      } else {
+        invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 1 })
+      }
     }
   }
 })

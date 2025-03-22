@@ -100,6 +100,7 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
         alwaysOnBottom: true,
         skipTaskbar: true,
         url: url,
+        title: label
     }, {
         x: monitor.position.x,
         y: monitor.position.y,

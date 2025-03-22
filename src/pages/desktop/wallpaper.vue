@@ -16,6 +16,7 @@ const show = ref(false);
 const path = ref();
 const type = ref();
 onMounted(async () => {
+  document.title = "skydesk2-wallpaper"
   draw();
   const monitor = await currentMonitor();
   index.value = wallpaperstore.wallpaperConfig.findIndex(
