@@ -102,7 +102,7 @@ function draw() {
   if (playstatus.value == 5) {
     dataArray = new Uint8Array(bufferLength)
   } else {
-    dataArray = getdataArray.slice(60, bufferLength + 60)
+    dataArray = getdataArray.slice(0, bufferLength)
   }
 
   const WIDTH = canvas.width,
@@ -193,6 +193,7 @@ smtc.listen_appstatus(async (e) => {
 smtc.listen_timeline((e) => {
   if (wallpaperstore.wallpaperConfig[index.value].config.musicapp == e.payload.app) {
     timeline.value = e.payload
+    // info(JSON.stringify(e.payload))
   }
 })
 
