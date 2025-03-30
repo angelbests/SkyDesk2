@@ -21,6 +21,15 @@ getCurrentWebviewWindow().setSize(
   )
 );
 show.value = true;
+
+if (shortcutWindows.value.setting.alwaysOnBottom) {
+  getCurrentWebviewWindow().setAlwaysOnTop(false);
+  getCurrentWebviewWindow().setAlwaysOnBottom(true);
+} else if (shortcutWindows.value.setting.alwaysOnTop) {
+  getCurrentWebviewWindow().setAlwaysOnBottom(false);
+  getCurrentWebviewWindow().setAlwaysOnTop(true);
+}
+
 listen(
   getCurrentWebviewWindow().label + "-setting",
   (e: { payload: { key: string; value: string } }) => {
@@ -73,8 +82,8 @@ listen(
         getCurrentWebviewWindow().setAlwaysOnBottom(false);
         getCurrentWebviewWindow().setAlwaysOnTop(true);
       } else {
-        getCurrentWebviewWindow().setAlwaysOnTop(false),
-          getCurrentWebviewWindow().setAlwaysOnBottom(true);
+        getCurrentWebviewWindow().setAlwaysOnTop(false);
+        getCurrentWebviewWindow().setAlwaysOnBottom(true);
       }
       shortcutWindows.value.setting[key] = value;
     }

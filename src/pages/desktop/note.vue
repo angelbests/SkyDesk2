@@ -2,13 +2,11 @@
 import { onMounted, reactive, ref, shallowRef } from "vue";
 import { uuid, gettime } from "../../functions";
 import RightBar from "../../components/RightBar.vue";
-
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from "@tauri-apps/plugin-dialog";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { writeFile, BaseDirectory, copyFile } from "@tauri-apps/plugin-fs";
 import { appDataDir, basename } from "@tauri-apps/api/path";
-
 import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import {
@@ -90,6 +88,7 @@ const setconfig = async function () {
     show.value = false;
   }
 };
+//#endregion
 
 //#region 监听图片文件的拖拽
 const filedrop = async function () {
@@ -137,7 +136,7 @@ const onChange = function () {
   }, 100);
 };
 
-//#endregion
+
 
 //#region wangeditor 初始化配置
 const mode = ref<string>("default");
