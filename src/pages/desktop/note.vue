@@ -399,6 +399,7 @@ const setalways = function () {
     editorData.always = "top";
     alwaysicon.value = "mdi-arrange-bring-forward";
   }
+  localStorage.setItem(appWindow.label, JSON.stringify(editorData));
   setconfig();
 };
 
