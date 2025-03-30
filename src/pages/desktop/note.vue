@@ -75,15 +75,21 @@ const setconfig = async function () {
   let con: any = document.getElementsByClassName("w-e-text-container")[0];
   con.style.background = "transparent";
   if (editorData.always == "top") {
+    alwaysicon.value = "mdi-arrange-bring-forward";
     await getCurrentWebviewWindow().setAlwaysOnBottom(false);
     await getCurrentWebviewWindow().setAlwaysOnTop(true);
   } else if (editorData.always == "bottom") {
+    alwaysicon.value = "mdi-arrange-send-backward";
     await getCurrentWebviewWindow().setAlwaysOnTop(false);
     await getCurrentWebviewWindow().setAlwaysOnBottom(true);
   } else if (editorData.always == "normal") {
+    alwaysicon.value = "mdi-rectangle";
     await getCurrentWebviewWindow().setAlwaysOnBottom(false);
     await getCurrentWebviewWindow().setAlwaysOnTop(false);
   }
+
+
+
   if (editorData.wallpaper) {
     show.value = false;
   }
