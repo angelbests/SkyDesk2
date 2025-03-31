@@ -45,7 +45,7 @@ const createnote = async function () {
     skipTaskbar: true,
     url: "/#/pages/desktop/note",
   });
-  w?.center();
+  w?.center()
 };
 
 const opennote = async function (item: { label: string }) {
