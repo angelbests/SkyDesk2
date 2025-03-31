@@ -27,15 +27,12 @@ struct MouseInfo {
     y: i32,
     mouse: MouseAction,
 }
-use lazy_static::lazy_static;
-use std::sync::{Arc, Mutex};
 
-lazy_static! {
-    static ref APP_HANDLE: Arc<Mutex<Option<AppHandle>>> = Arc::new(Mutex::new(None));
-}
+use std::sync::{LazyLock, Mutex};
 
 static mut H: HWND = HWND(std::ptr::null_mut());
-
+static APP_HANDLE: LazyLock<Mutex<Option<AppHandle>>> = LazyLock::new(|| Mutex::new(None));
+static mut HOOK: Option<HHOOK> = None;
 extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     unsafe {
         // 搜索 workerw下的 SHELLDLL_DefView 窗口的位置 确定到之后 下一个窗口就是 我们需要的workerw 窗口
@@ -57,8 +54,6 @@ extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     }
 }
 
-static mut HOOK: Option<HHOOK> = None;
-// static mut APP_HANDLE: Option<AppHandle> = None;
 unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
     if (n_code as u32) == HC_ACTION {
         let mouse_info = *(l_param.0 as *const MSLLHOOKSTRUCT);

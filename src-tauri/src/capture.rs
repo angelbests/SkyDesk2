@@ -29,7 +29,6 @@ struct Capture {
 lazy_static! {
     static ref CAPTURE_STATUS: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("")));
 }
-
 impl GraphicsCaptureApiHandler for Capture {
     type Flags = Flagset;
     type Error = Box<dyn std::error::Error + Send + Sync>;
