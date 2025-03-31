@@ -30,9 +30,9 @@ onMounted(() => {
   });
 });
 
-const createnote = function () {
+const createnote = async function () {
   let label = "note-" + uuid();
-  createWindow(label, {
+  let w = await createWindow(label, {
     x: 200,
     y: 200,
     width: 330,
@@ -43,9 +43,9 @@ const createnote = function () {
     decorations: false,
     transparent: true,
     skipTaskbar: true,
-    center: true,
     url: "/#/pages/desktop/note",
   });
+  w?.center();
 };
 
 const opennote = async function (item: { label: string }) {
