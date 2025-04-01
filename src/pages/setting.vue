@@ -267,7 +267,7 @@ const updateprogram = async function () {
 import { Netspeed, NetSpeed } from "../functions/sysinfo";
 import { uuid } from "../functions";
 import { appDataDir, resolve } from "@tauri-apps/api/path";
-import { LogicalPosition } from "@tauri-apps/api/dpi";
+// import { LogicalPosition } from "@tauri-apps/api/dpi";
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
 new Netspeed().listen_netspeed((e) => {
   net.value = e.payload
@@ -280,21 +280,21 @@ const speed_s = computed(() => {
 })
 //#endregion
 
-const hovertop = async function () {
-  let position = await getCurrentWebviewWindow().outerPosition();
-  let size = await getCurrentWebviewWindow().outerSize();
-  let scaleFactor = await getCurrentWebviewWindow().scaleFactor()
-  getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor))
-  getCurrentWebviewWindow().setAlwaysOnTop(true)
-  console.log(position)
-  console.log(size)
+// const hovertop = async function () {
+//   let position = await getCurrentWebviewWindow().outerPosition();
+//   let size = await getCurrentWebviewWindow().outerSize();
+//   let scaleFactor = await getCurrentWebviewWindow().scaleFactor()
+//   getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor))
+//   getCurrentWebviewWindow().setAlwaysOnTop(true)
+//   console.log(position)
+//   console.log(size)
 
-  setTimeout(() => {
-    for (let i = 0; i < size.height / scaleFactor; i = i + 10) {
-      getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor + i - 20))
-    }
-  }, 2000);
-}
+//   setTimeout(() => {
+//     for (let i = 0; i < size.height / scaleFactor; i = i + 10) {
+//       getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor + i - 20))
+//     }
+//   }, 2000);
+// }
 </script>
 
 <template>
