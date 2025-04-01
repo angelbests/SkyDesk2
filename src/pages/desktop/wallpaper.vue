@@ -229,10 +229,12 @@ const speed_r = computed(() => {
 const speed_s = computed(() => {
   return Math.trunc(net.value.speed_s / 1024) < 1024 ? Math.trunc(net.value.speed_s / 1024) + "KB/s" : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
 })
+
 </script>
 
 <template>
   <div class="window">
+    <!-- wallpaper -->
     <img v-if="type == 'image'" :src="convertFileSrc(path)" class="image" />
     <video id="wallpapervideo" v-else class="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
     <!-- 天气 -->

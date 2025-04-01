@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { systemStore, windowStore, noteStore, wallpaperStore, shortcutStore, weatherStore, captureStore, } from "../stores/window";
@@ -8,13 +8,11 @@ import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { copyFile } from "@tauri-apps/plugin-fs";
-
 const systemstore = systemStore();
 const drawer = ref(true);
 const colorshow = ref(false);
 const settingshow = ref(false);
 const toggleMaximizeBool = ref(false);
-
 onMounted(async () => {
   await maininit();
   appbardraging();
@@ -269,11 +267,34 @@ const updateprogram = async function () {
 import { Netspeed, NetSpeed } from "../functions/sysinfo";
 import { uuid } from "../functions";
 import { appDataDir, resolve } from "@tauri-apps/api/path";
+import { LogicalPosition } from "@tauri-apps/api/dpi";
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
 new Netspeed().listen_netspeed((e) => {
   net.value = e.payload
 })
+const speed_r = computed(() => {
+  return Math.trunc(net.value.speed_r / 1024) < 1024 ? Math.trunc(net.value.speed_r / 1024) + "KB/s" : Math.trunc((net.value.speed_r / 1024 / 1024) * 10) / 10 + "MB/s"
+})
+const speed_s = computed(() => {
+  return Math.trunc(net.value.speed_s / 1024) < 1024 ? Math.trunc(net.value.speed_s / 1024) + "KB/s" : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
+})
 //#endregion
+
+const hovertop = async function () {
+  let position = await getCurrentWebviewWindow().outerPosition();
+  let size = await getCurrentWebviewWindow().outerSize();
+  let scaleFactor = await getCurrentWebviewWindow().scaleFactor()
+  getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor))
+  getCurrentWebviewWindow().setAlwaysOnTop(true)
+  console.log(position)
+  console.log(size)
+
+  setTimeout(() => {
+    for (let i = 0; i < size.height / scaleFactor; i = i + 10) {
+      getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor + i - 20))
+    }
+  }, 2000);
+}
 </script>
 
 <template>
@@ -298,43 +319,36 @@ new Netspeed().listen_netspeed((e) => {
       <template v-slot:prepend>
         <v-app-bar-nav-icon style="background: transparent" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
-      <div :style="{
-        width: '100px',
-        display: 'flex',
-        alignItems: 'center',
-        color: systemstore.fontcolor,
-      }" data-tauri-drag-region>
-        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{
-          Math.trunc(net.speed_r / 1024) < 1024 ? Math.trunc(net.speed_r / 1024) + "KB/s" : Math.trunc((net.speed_r / 1024
-            / 1024) * 10) / 10 + "MB/s" }} </div>
-          <div :style="{
-            width: '100px',
-            display: 'flex',
-            alignItems: 'center',
-            color: systemstore.fontcolor,
-          }" data-tauri-drag-region>
-            <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{
-              Math.trunc(net.speed_s / 1024) < 1024 ? Math.trunc(net.speed_s / 1024) + "KB/s" : Math.trunc((net.speed_s /
-                1024 / 1024) * 10) / 10 + "MB/s" }} </div>
-              <v-btn style="background: transparent" @click="helpshow = true" icon>
-                <v-icon>mdi-help-circle-outline</v-icon>
-              </v-btn>
-              <v-btn style="background: transparent" @click="colorshow = true" icon>
-                <v-icon>mdi-palette</v-icon>
-              </v-btn>
-              <v-btn style="background: transparent" icon @click="settingshow = true">
-                <v-icon>mdi-cog-outline</v-icon>
-              </v-btn>
-              <v-btn style="background: transparent" icon @click="minus">
-                <v-icon>mdi-window-minimize</v-icon>
-              </v-btn>
-              <v-btn style="background: transparent" icon @click="toggleMaximize">
-                <v-icon v-show="toggleMaximizeBool">mdi-window-restore</v-icon>
-                <v-icon v-show="!toggleMaximizeBool">mdi-window-maximize</v-icon>
-              </v-btn>
-              <v-btn style="background: transparent" icon @click="closeApp">
-                <v-icon>mdi-window-close</v-icon>
-              </v-btn>
+      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor, }"
+        data-tauri-drag-region>
+        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{ speed_r }}
+      </div>
+      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor, }"
+        data-tauri-drag-region>
+        <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{ speed_s }}
+      </div>
+      <v-btn style="background: transparent" @click="helpshow = true" icon>
+        <v-icon>mdi-help-circle-outline</v-icon>
+      </v-btn>
+      <!-- <v-btn style="background: transparent" @click="hovertop" icon>
+        <v-icon>mdi-dock-top</v-icon>
+      </v-btn> -->
+      <v-btn style="background: transparent" @click="colorshow = true" icon>
+        <v-icon>mdi-palette</v-icon>
+      </v-btn>
+      <v-btn style="background: transparent" icon @click="settingshow = true">
+        <v-icon>mdi-cog-outline</v-icon>
+      </v-btn>
+      <v-btn style="background: transparent" icon @click="minus">
+        <v-icon>mdi-window-minimize</v-icon>
+      </v-btn>
+      <v-btn style="background: transparent" icon @click="toggleMaximize">
+        <v-icon v-show="toggleMaximizeBool">mdi-window-restore</v-icon>
+        <v-icon v-show="!toggleMaximizeBool">mdi-window-maximize</v-icon>
+      </v-btn>
+      <v-btn style="background: transparent" icon @click="closeApp">
+        <v-icon>mdi-window-close</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-main style="height: calc(100vh); overflow-y: auto; width: 100%">
@@ -656,56 +670,56 @@ new Netspeed().listen_netspeed((e) => {
   </v-layout>
 </template>
 
-        <style>
-        .v-btn {
-          color: var(--font-color) !important;
-          background: var(--btn-background);
-          background-size: cover;
-        }
+<style>
+.v-btn {
+  color: var(--font-color) !important;
+  background: var(--btn-background);
+  background-size: cover;
+}
 
-        .v-text-field {
-          color: var(--font-color) !important;
-        }
+.v-text-field {
+  color: var(--font-color) !important;
+}
 
-        .v-list-item-title {
-          color: var(--font-color) !important;
-        }
+.v-list-item-title {
+  color: var(--font-color) !important;
+}
 
-        .v-card {
-          color: var(--font-color) !important;
-        }
+.v-card {
+  color: var(--font-color) !important;
+}
 
-        .home {
-          width: 100vw;
-          height: 100vh;
-          overflow: hidden;
-        }
+.home {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 
-        .toolbar {
-          cursor: default;
-        }
+.toolbar {
+  cursor: default;
+}
 
-        .v-list-group__items {
-          --parent-padding: calc(0px);
-        }
+.v-list-group__items {
+  --parent-padding: calc(0px);
+}
 
-        .fade-leave-active,
-        .fade-enter-active {
-          transition: all 0.3s;
-        }
+.fade-leave-active,
+.fade-enter-active {
+  transition: all 0.3s;
+}
 
-        .fade-enter-from {
-          opacity: 0;
-          transform: translateX(-10px);
-        }
+.fade-enter-from {
+  opacity: 0;
+  transform: translateX(-10px);
+}
 
-        .fade-enter-to {
-          opacity: 1;
-          transform: translateX(0px);
-        }
+.fade-enter-to {
+  opacity: 1;
+  transform: translateX(0px);
+}
 
-        .fade-leave-to {
-          opacity: 0;
-          transform: translateX(30px);
-        }
-      </style>
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+</style>
