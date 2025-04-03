@@ -1,4 +1,4 @@
-use tauri::{path::BaseDirectory, Manager};
+use tauri::{path::BaseDirectory, AppHandle, Emitter, Manager};
 use tauri_plugin_autostart::MacosLauncher;
 mod capture;
 mod icotopng;
@@ -70,7 +70,46 @@ pub fn run() {
             lockscreen::setlockscreen,
             wheel::wheel_status,
             smtc::play_control,
+            hovertop
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn hovertop(app: AppHandle, label: String, show: bool) {
+    tauri::async_runtime::spawn(async move {
+        let webview = app.get_webview_window(&label).unwrap();
+        let p = webview.outer_position().unwrap();
+        let s = webview.outer_size().unwrap();
+        let h = s.height;
+        let mut n = 0;
+        if show {
+            loop {
+                n += 5;
+                if n >= h {
+                    n = h;
+                }
+                let _ = webview.set_position(tauri::PhysicalPosition::new(p.x, p.y + (n as i32)));
+                std::thread::sleep(std::time::Duration::from_millis(2));
+                if n >= h {
+                    break;
+                }
+            }
+        } else {
+            loop {
+                n += 5;
+                if n >= h {
+                    n = h;
+                }
+                let _ = webview.set_position(tauri::PhysicalPosition::new(p.x, 0 - n as i32));
+                std::thread::sleep(std::time::Duration::from_millis(2));
+                if n >= h {
+                    break;
+                }
+            }
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        app.emit("hovertop_status", false)
+    });
 }

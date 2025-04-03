@@ -20,7 +20,7 @@ export const cancelwallpaper = function (label: string, x: number, y: number, wi
 // let a =await mouseMonitor((monitor,mouse)=>{
 //     console.log(monitor,mouse)
 // })
-import { currentMonitor, Monitor } from "@tauri-apps/api/window"
+import { availableMonitors, currentMonitor, Monitor } from "@tauri-apps/api/window"
 type mousecallback = (monitor: Monitor | null, mouse: { x: number; f: number }) => void
 export const mouseMonitor = async function (f: mousecallback) {
   const monitor = await currentMonitor()
@@ -29,4 +29,19 @@ export const mouseMonitor = async function (f: mousecallback) {
     f(monitor, mouse)
   })
   return unlisten
+}
+
+export const windowxy = async function () {
+  let monitor = await availableMonitors()
+  let x: number[] = []
+  let y: number[] = []
+  monitor.forEach((e) => {
+    x.push(e.position.x, e.position.x + e.size.width)
+    y.push(e.position.y, e.position.y + e.size.height)
+  })
+  let xmin = Math.min(...x)
+  let xmax = Math.max(...x)
+  let ymin = Math.min(...y)
+  let ymax = Math.max(...y)
+  return { xmin, xmax, ymin, ymax }
 }

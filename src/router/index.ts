@@ -87,6 +87,10 @@ const routes: RouteRecordRaw[] = [
         path: "taskbar",
         component: () => import("./../pages/desktop/taskbar.vue"),
       },
+      {
+        path: "hovertop",
+        component: () => import("./../pages/desktop/hovertop.vue"),
+      },
     ],
   },
 ]

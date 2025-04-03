@@ -267,6 +267,7 @@ const updateprogram = async function () {
 import { Netspeed, NetSpeed } from "../functions/sysinfo";
 import { uuid } from "../functions";
 import { appDataDir, resolve } from "@tauri-apps/api/path";
+import { createWindow } from "../functions/window";
 // import { LogicalPosition } from "@tauri-apps/api/dpi";
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
 new Netspeed().listen_netspeed((e) => {
@@ -280,21 +281,23 @@ const speed_s = computed(() => {
 })
 //#endregion
 
-// const hovertop = async function () {
-//   let position = await getCurrentWebviewWindow().outerPosition();
-//   let size = await getCurrentWebviewWindow().outerSize();
-//   let scaleFactor = await getCurrentWebviewWindow().scaleFactor()
-//   getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor))
-//   getCurrentWebviewWindow().setAlwaysOnTop(true)
-//   console.log(position)
-//   console.log(size)
-
-//   setTimeout(() => {
-//     for (let i = 0; i < size.height / scaleFactor; i = i + 10) {
-//       getCurrentWebviewWindow().setPosition(new LogicalPosition(position.x / scaleFactor, 10 - size.height / scaleFactor + i - 20))
-//     }
-//   }, 2000);
-// }
+const hovertop = async function () {
+  await createWindow("hovertop", {
+    x: 400,
+    y: 0,
+    width: 400,
+    height: 500,
+    decorations: false,
+    transparent: true,
+    dragDropEnabled: true,
+    shadow: true,
+    maximizable: false,
+    resizable: true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    url: "/#/pages/desktop/hovertop"
+  });
+}
 </script>
 
 <template>
@@ -330,9 +333,9 @@ const speed_s = computed(() => {
       <v-btn style="background: transparent" @click="helpshow = true" icon>
         <v-icon>mdi-help-circle-outline</v-icon>
       </v-btn>
-      <!-- <v-btn style="background: transparent" @click="hovertop" icon>
+      <v-btn style="background: transparent" @click="hovertop" icon>
         <v-icon>mdi-dock-top</v-icon>
-      </v-btn> -->
+      </v-btn>
       <v-btn style="background: transparent" @click="colorshow = true" icon>
         <v-icon>mdi-palette</v-icon>
       </v-btn>
@@ -343,8 +346,8 @@ const speed_s = computed(() => {
         <v-icon>mdi-window-minimize</v-icon>
       </v-btn>
       <v-btn style="background: transparent" icon @click="toggleMaximize">
-        <v-icon v-show="toggleMaximizeBool">mdi-window-restore</v-icon>
-        <v-icon v-show="!toggleMaximizeBool">mdi-window-maximize</v-icon>
+        <v-icon v-if="toggleMaximizeBool">mdi-window-restore</v-icon>
+        <v-icon v-else="!toggleMaximizeBool">mdi-window-maximize</v-icon>
       </v-btn>
       <v-btn style="background: transparent" icon @click="closeApp">
         <v-icon>mdi-window-close</v-icon>
