@@ -12,7 +12,6 @@ const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
 const tab = ref(0);
 onMounted(() => {
-    getCurrentWebviewWindow().setSkipTaskbar(false)
     window.addEventListener("storage", (e) => {
         if (e.key == "shortcut") {
             shortcutstore.$hydrate();
