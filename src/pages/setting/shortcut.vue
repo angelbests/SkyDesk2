@@ -267,22 +267,6 @@ const cancelsubmit = function () {
   dialog.value = false;
 };
 
-const mouseenter = function (i: number) {
-  let el = document.getElementById("img" + i);
-  if (el) {
-    el.style.width = "40px";
-    el.style.height = "40px";
-  }
-};
-
-const mouseleave = function (i: number) {
-  let el = document.getElementById("img" + i);
-  if (el) {
-    el.style.width = "35px";
-    el.style.height = "35px";
-  }
-};
-
 const clone = function (element: any) {
   if (wheels.value.length < 8) {
     return {
@@ -551,11 +535,10 @@ const drop = function (e: DragEvent) {
                     backgroundSize: 'cover',
                   }" class="shortcut-container">
                     <div class="icon-div" @click="exec(item)">
-                      <img @mouseenter="mouseenter(index)" @mouseleave="mouseleave(index)" :id="'img' + index"
-                        class="icon" :src="item.icoPath == ''
-                          ? '/icons/program.png'
-                          : convertFileSrc(item.icoPath)
-                          " />
+                      <img class="icon" :src="item.icoPath == ''
+                        ? '/icons/program.png'
+                        : convertFileSrc(item.icoPath)
+                        " />
                     </div>
                     <div style="
                         font-size: 10px;
@@ -712,6 +695,11 @@ const drop = function (e: DragEvent) {
   height: 35px;
   border-radius: 5px;
   transition: all 0.1s linear;
+}
+
+.icon:hover {
+  width: 40px;
+  height: 40px;
 }
 
 .shortcut-container {

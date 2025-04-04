@@ -19,22 +19,6 @@ onMounted(() => {
     });
 })
 
-const mouseenter = function (i: number) {
-    let el = document.getElementById("img" + i);
-    if (el) {
-        el.style.width = "40px";
-        el.style.height = "40px";
-    }
-};
-
-const mouseleave = function (i: number) {
-    let el = document.getElementById("img" + i);
-    if (el) {
-        el.style.width = "35px";
-        el.style.height = "35px";
-    }
-};
-
 // 关闭窗口
 const close = async function () {
     getCurrentWebviewWindow().hide();
@@ -118,11 +102,10 @@ listen("hovertop_status", (e: { payload: boolean }) => {
             <v-tabs-window-item v-for="item1 in shortcuts" style="width: 100%; height: 100%; min-height: 100%">
                 <GridContainer v-model="item1.shortcut" :animation="150" :gridwidth="90" :gridheight="90"
                     :group="{ name: 'shortcut', pull: 'clone' }">
-                    <template v-slot="{ item, index }">
+                    <template v-slot="{ item }">
                         <div :style="{ height: '80px', backgroundSize: 'cover', }" class="shortcut-container">
                             <div class="icon-div" @click="exec(item)">
-                                <img :id="'img' + index" @mouseenter="mouseenter(index)" @mouseleave="mouseleave(index)"
-                                    class="icon"
+                                <img class="icon"
                                     :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                             </div>
                             <div
@@ -143,6 +126,11 @@ listen("hovertop_status", (e: { payload: boolean }) => {
     height: 100vh;
     border-radius: 10px;
     backdrop-filter: blur(12px);
+}
+
+.icon:hover {
+    width: 40px;
+    height: 40px;
 }
 
 .shortcut-container {
