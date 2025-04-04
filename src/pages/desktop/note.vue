@@ -433,7 +433,7 @@ const close = async function () {
   });
   console.log(res);
   if (index >= 0) {
-    notestore.note[index].option = res[0].option;
+    notestore.note[index]['option'] = res[0].option;
   }
   appWindow.close();
 };
