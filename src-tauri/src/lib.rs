@@ -91,7 +91,7 @@ fn hovertop(app: AppHandle, label: String, show: bool) {
                     n = h;
                 }
                 let _ = webview.set_position(tauri::PhysicalPosition::new(p.x, p.y + (n as i32)));
-                std::thread::sleep(std::time::Duration::from_millis(2));
+                std::thread::sleep(std::time::Duration::from_millis(1));
                 if n >= h {
                     break;
                 }
@@ -103,13 +103,13 @@ fn hovertop(app: AppHandle, label: String, show: bool) {
                     n = h;
                 }
                 let _ = webview.set_position(tauri::PhysicalPosition::new(p.x, 0 - n as i32));
-                std::thread::sleep(std::time::Duration::from_millis(2));
+                std::thread::sleep(std::time::Duration::from_millis(1));
                 if n >= h {
                     break;
                 }
             }
         }
-        std::thread::sleep(std::time::Duration::from_millis(50));
+        std::thread::sleep(std::time::Duration::from_millis(40));
         app.emit("hovertop_status", false)
     });
 }
