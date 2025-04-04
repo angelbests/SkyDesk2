@@ -79,6 +79,7 @@ const getmodellist = async function () {
       method: "get",
       mode: "cors",
     });
+    console.log(res)
     let json = await res.json();
     console.log(json);
     return json.models;
@@ -90,7 +91,6 @@ const getmodellist = async function () {
     setTimeout(() => {
       snackbar.value.bool = false;
     }, 1000);
-    console.log(error);
     return null;
   }
 };
