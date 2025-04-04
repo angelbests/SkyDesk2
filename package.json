@@ -34,6 +34,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-highlightjs": "^4.2.0",
     "npm": "^10.9.0",
+    "ollama": "^0.5.14",
     "pcm-player": "^0.0.18",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^3.2.2",
