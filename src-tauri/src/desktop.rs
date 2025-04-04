@@ -1,6 +1,6 @@
 use tauri::{AppHandle, Emitter, Manager};
-use windows::core::s;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, WPARAM};
+use windows::core::{s, BOOL};
+use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 
 use windows::Win32::UI::WindowsAndMessaging::{
@@ -36,7 +36,7 @@ static mut HOOK: Option<HHOOK> = None;
 extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     unsafe {
         // 搜索 workerw下的 SHELLDLL_DefView 窗口的位置 确定到之后 下一个窗口就是 我们需要的workerw 窗口
-        let shell_dll_def_view = FindWindowExA(window, None, s!("SHELLDLL_DefView"), None);
+        let shell_dll_def_view = FindWindowExA(Some(window), None, s!("SHELLDLL_DefView"), None);
         match shell_dll_def_view {
             Ok(s) => {
                 if s == HWND(std::ptr::null_mut()) {
@@ -64,7 +64,8 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             LPARAM(&mut shell_dll_def_view as *mut HWND as isize),
         );
         let mut sys_list_view32_hwnd = HWND(std::ptr::null_mut());
-        let sys_list_view32 = FindWindowExA(shell_dll_def_view, None, s!("SysListView32"), None);
+        let sys_list_view32 =
+            FindWindowExA(Some(shell_dll_def_view), None, s!("SysListView32"), None);
         match sys_list_view32 {
             Ok(s) => {
                 sys_list_view32_hwnd = s;
@@ -151,20 +152,26 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
         }
     }
 
-    CallNextHookEx(HOOK.unwrap_or_default(), n_code, w_param, l_param)
+    CallNextHookEx(Some(HOOK.unwrap_or_default()), n_code, w_param, l_param)
 }
 pub fn desktop_mouse_listen(app: AppHandle) {
     unsafe {
         let w = app.get_webview_window("taskbar").unwrap();
         let mut h = w.hwnd().unwrap();
-        h = FindWindowExA(h, None, s!("WRY_WEBVIEW"), None).unwrap();
-        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_0"), None).unwrap();
-        h = FindWindowExA(h, None, s!("Chrome_WidgetWin_1"), None).unwrap();
-        h = FindWindowExA(h, None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
+        h = FindWindowExA(Some(h), None, s!("WRY_WEBVIEW"), None).unwrap();
+        h = FindWindowExA(Some(h), None, s!("Chrome_WidgetWin_0"), None).unwrap();
+        h = FindWindowExA(Some(h), None, s!("Chrome_WidgetWin_1"), None).unwrap();
+        h = FindWindowExA(Some(h), None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
         H = h;
         *APP_HANDLE.lock().unwrap() = Some(app);
         let h_instance = GetModuleHandleA(None).unwrap();
-        let _hook = SetWindowsHookExA(WH_MOUSE_LL, Some(mouse_proc), h_instance, 0).unwrap();
+        let _hook = SetWindowsHookExA(
+            WH_MOUSE_LL,
+            Some(mouse_proc),
+            Some(HINSTANCE(h_instance.0)),
+            0,
+        )
+        .unwrap();
         HOOK = Some(_hook);
     }
 }

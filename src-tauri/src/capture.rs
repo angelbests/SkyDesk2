@@ -32,17 +32,17 @@ lazy_static! {
 impl GraphicsCaptureApiHandler for Capture {
     type Flags = Flagset;
     type Error = Box<dyn std::error::Error + Send + Sync>;
-    fn new(flagset: Self::Flags) -> Result<Self, Self::Error> {
+    fn new(flagset: windows_capture::capture::Context<Flagset>) -> Result<Self, Self::Error> {
         let encoder = VideoEncoder::new(
-            VideoSettingsBuilder::new(flagset.width, flagset.height),
+            VideoSettingsBuilder::new(flagset.flags.width, flagset.flags.height),
             AudioSettingsBuilder::default().disabled(true),
             ContainerSettingsBuilder::default(),
-            flagset.path.clone(),
+            flagset.flags.path.clone(),
         )?;
         Ok(Self {
             encoder: Some(encoder),
             start: Instant::now(),
-            flag: flagset,
+            flag: flagset.flags,
         })
     }
     fn on_frame_arrived(
@@ -66,7 +66,7 @@ impl GraphicsCaptureApiHandler for Capture {
             .unwrap();
         let w = framecrop.width() as usize;
         let h = framecrop.height() as usize;
-        let nopad = framecrop.as_raw_nopadding_buffer().unwrap();
+        let nopad = framecrop.as_nopadding_buffer().unwrap();
         let b = convert_rgba_to_bgra_and_flip(&nopad, w, h);
         self.encoder.as_mut().unwrap().send_frame_buffer(&b, time)?; //纯视频
         let mut status = CAPTURE_STATUS.lock().unwrap();

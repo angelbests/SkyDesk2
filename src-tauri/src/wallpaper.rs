@@ -1,9 +1,9 @@
 use std::{thread, time::Duration};
 use tauri::{AppHandle, Manager};
 use windows::{
-    core::s,
+    core::{s, BOOL},
     Win32::{
-        Foundation::{BOOL, COLORREF, HWND, LPARAM, POINT, WPARAM},
+        Foundation::{COLORREF, HWND, LPARAM, POINT, WPARAM},
         Graphics::Gdi,
         UI::WindowsAndMessaging::{
             self, SetLayeredWindowAttributes, GWL_EXSTYLE, HWND_BOTTOM, HWND_NOTOPMOST, HWND_TOP,
@@ -48,7 +48,7 @@ extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     unsafe {
         // 搜索 workerw下的 SHELLDLL_DefView 窗口的位置 确定到之后 下一个窗口就是 我们需要的workerw 窗口
         let shell_dll_def_view =
-            WindowsAndMessaging::FindWindowExA(window, None, s!("SHELLDLL_DefView"), None);
+            WindowsAndMessaging::FindWindowExA(Some(window), None, s!("SHELLDLL_DefView"), None);
         match shell_dll_def_view {
             Ok(s) => {
                 if s == HWND(std::ptr::null_mut()) {
@@ -60,7 +60,7 @@ extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
             }
         }
 
-        let worker_w = WindowsAndMessaging::FindWindowExA(None, window, s!("WorkerW"), None);
+        let worker_w = WindowsAndMessaging::FindWindowExA(None, Some(window), s!("WorkerW"), None);
         match worker_w {
             Ok(s) => {
                 if s == HWND(std::ptr::null_mut()) {
@@ -102,8 +102,8 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             LPARAM(&mut worker_w as *mut HWND as isize),
         );
         if worker_w == HWND(std::ptr::null_mut()) {
-            worker_w =
-                WindowsAndMessaging::FindWindowExA(progman, None, s!("WorkerW"), None).unwrap();
+            worker_w = WindowsAndMessaging::FindWindowExA(Some(progman), None, s!("WorkerW"), None)
+                .unwrap();
             if worker_w == HWND(std::ptr::null_mut()) {
                 panic!("Could not find worker_w window");
             }
@@ -117,7 +117,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
         // 修改tauri的窗口样式 防止窗口被强行关闭导致出现异常window框
         let _ = WindowsAndMessaging::SetWindowPos(
             hwnd,
-            HWND_BOTTOM,
+            Some(HWND_BOTTOM),
             99999999,
             99999999,
             w,
@@ -131,12 +131,12 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED.0 as isize,
         );
         let _ = SetLayeredWindowAttributes(hwnd, COLORREF(0), 255, LWA_ALPHA);
-        let _ = WindowsAndMessaging::SetParent(hwnd, worker_w);
+        let _ = WindowsAndMessaging::SetParent(hwnd, Some(worker_w));
         // thread::sleep(Duration::from_millis(100));
         if z == 1 {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,
-                HWND_TOP,
+                Some(HWND_TOP),
                 0 - p.x + x,
                 0 - p.y + y,
                 w,
@@ -146,7 +146,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
         } else {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,
-                HWND_BOTTOM,
+                Some(HWND_BOTTOM),
                 0 - p.x + x,
                 0 - p.y + y,
                 w,
@@ -155,7 +155,7 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             );
         };
         let shell_dll_def_view =
-            WindowsAndMessaging::FindWindowExA(progman, None, s!("SHELLDLL_DefView"), None)
+            WindowsAndMessaging::FindWindowExA(Some(progman), None, s!("SHELLDLL_DefView"), None)
                 .unwrap();
         let _ = WindowsAndMessaging::ShowWindow(shell_dll_def_view, SW_HIDE);
         thread::sleep(Duration::from_millis(0));
@@ -171,6 +171,14 @@ fn detach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
             GWL_EXSTYLE,
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED.0 as isize,
         );
-        let _ = WindowsAndMessaging::SetWindowPos(hwnd, HWND_NOTOPMOST, x, y, w, h, SWP_SHOWWINDOW);
+        let _ = WindowsAndMessaging::SetWindowPos(
+            hwnd,
+            Some(HWND_NOTOPMOST),
+            x,
+            y,
+            w,
+            h,
+            SWP_SHOWWINDOW,
+        );
     };
 }

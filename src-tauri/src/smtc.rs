@@ -73,7 +73,7 @@ pub fn smtc_listen(window: tauri::AppHandle) {
             SessionsChangedEventArgs,
         >::new(move |sender, _args| {
             println!("session change");
-            if let Some(gsmtc) = sender {
+            if let Some(gsmtc) = sender.as_ref() {
                 get_sessions(gsmtc, window1.clone());
             }
             Ok(())
@@ -140,7 +140,7 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
         GlobalSystemMediaTransportControlsSession,
         TimelinePropertiesChangedEventArgs,
     >::new(move |sender, _args| {
-        if let Some(gsmtc) = sender {
+        if let Some(gsmtc) = sender.as_ref() {
             let timeline = gsmtc.GetTimelineProperties();
             match timeline {
                 Ok(timeline) => {
@@ -169,7 +169,7 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
         GlobalSystemMediaTransportControlsSession,
         MediaPropertiesChangedEventArgs,
     >::new(move |sender, _args| {
-        if let Some(session) = sender {
+        if let Some(session) = sender.as_ref() {
             let isession = session.TryGetMediaPropertiesAsync();
             match isession {
                 Ok(isession) => {
@@ -236,7 +236,7 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
         PlaybackInfoChangedEventArgs,
     >::new(move |sender, _args| {
         println!("play change");
-        if let Some(session) = sender {
+        if let Some(session) = sender.as_ref() {
             let playinfo = session.GetPlaybackInfo();
             match playinfo {
                 Ok(playinfo) => {

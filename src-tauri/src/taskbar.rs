@@ -4,10 +4,7 @@ use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 use windows::{
     core::s,
-    Win32::{
-        Foundation::{BOOL, RECT},
-        UI::WindowsAndMessaging,
-    },
+    Win32::{Foundation::RECT, UI::WindowsAndMessaging},
 };
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -27,7 +24,7 @@ pub fn listentaskbar(app: AppHandle) {
         unsafe {
             let shell_tray_wnd =
                 WindowsAndMessaging::FindWindowA(s!("Shell_TrayWnd"), None).unwrap();
-            let _ = WindowsAndMessaging::SetParent(h, shell_tray_wnd);
+            let _ = WindowsAndMessaging::SetParent(h, Some(shell_tray_wnd));
         }
         loop {
             unsafe {
@@ -40,11 +37,15 @@ pub fn listentaskbar(app: AppHandle) {
                 }
                 let shell_tray_wnd =
                     WindowsAndMessaging::FindWindowA(s!("Shell_TrayWnd"), None).unwrap();
-                let start =
-                    WindowsAndMessaging::FindWindowExA(shell_tray_wnd, None, s!("Start"), None)
-                        .unwrap();
+                let start = WindowsAndMessaging::FindWindowExA(
+                    Some(shell_tray_wnd),
+                    None,
+                    s!("Start"),
+                    None,
+                )
+                .unwrap();
                 let tray = WindowsAndMessaging::FindWindowExA(
-                    shell_tray_wnd,
+                    Some(shell_tray_wnd),
                     None,
                     s!("TrayNotifyWnd"),
                     None,
@@ -84,7 +85,7 @@ pub fn listentaskbar(app: AppHandle) {
                     };
                 }
 
-                let _ = WindowsAndMessaging::MoveWindow(h, p.x, p.y, p.width, p.height, BOOL(0));
+                let _ = WindowsAndMessaging::MoveWindow(h, p.x, p.y, p.width, p.height, false);
                 let p_rect = &mut RECT {
                     left: 0,
                     right: 0,
