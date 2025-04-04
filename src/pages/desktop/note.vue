@@ -18,6 +18,16 @@ import {
 } from "@wangeditor/editor";
 import { emit } from "@tauri-apps/api/event";
 import { windowStore, noteStore } from "../../stores/window";
+import { createWindow } from "../../functions/window";
+// 监听storage事件
+window.addEventListener("storage", (e) => {
+  if (e.key === "note") {
+    noteStore().$hydrate();
+  }
+  if (e.key === "window") {
+    windowStore().$hydrate();
+  }
+});
 //#region vue
 const appWindow = getCurrentWebviewWindow();
 const editorData = reactive({
@@ -434,6 +444,25 @@ const rightClick = function () {
 };
 
 //#endregion
+
+// 创建新窗口
+const createnote = async function () {
+  let label = "note-" + uuid();
+  let w = await createWindow(label, {
+    x: 200,
+    y: 200,
+    width: 330,
+    height: 330,
+    minWidth: 330,
+    minHeight: 100,
+    shadow: false,
+    decorations: false,
+    transparent: true,
+    skipTaskbar: true,
+    url: "/#/pages/desktop/note",
+  });
+  w?.center()
+};
 </script>
 
 <template>
@@ -445,10 +474,11 @@ const rightClick = function () {
         width: 100%;
         height: 100%;
       " data-tauri-drag-region>
+      <v-btn icon="mdi-plus" size="small" @click="createnote"></v-btn>
       <v-btn icon="mdi-opacity" size="small" @click="transparentbool = !transparentbool"></v-btn>
       <v-btn icon="mdi-palette" size="small" @click="colorChange"></v-btn>
       <v-btn :icon="alwaysicon" size="small" @click="setalways"></v-btn>
-      <v-btn icon="mdi-close" size="small" @click="close()"></v-btn>
+      <v-btn icon="mdi-close" size="small" @click="close"></v-btn>
     </div>
   </right-bar>
   <!-- 背景色选择 -->
