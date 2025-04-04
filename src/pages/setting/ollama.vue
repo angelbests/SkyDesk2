@@ -77,8 +77,8 @@ const getmodellist = async function () {
   try {
     let res = await fetch(baseurl + "/tags", {
       method: "get",
+      mode: "cors",
     });
-    console.log(res)
     let json = await res.json();
     console.log(json);
     return json.models;
@@ -90,6 +90,7 @@ const getmodellist = async function () {
     setTimeout(() => {
       snackbar.value.bool = false;
     }, 1000);
+    console.log(error);
     return null;
   }
 };
@@ -144,6 +145,7 @@ const sendmessage = async function () {
   messages.value.push(m);
   let res = await fetch(baseurl + "/chat", {
     method: "post",
+    mode: "cors",
     body: JSON.stringify({
       messages: [...messages.value],
       model: model.value.name,
