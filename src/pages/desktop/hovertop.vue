@@ -70,7 +70,7 @@ listen("hovertop_status", (e: { payload: boolean }) => {
 
 <template>
     <div class="main">
-        <RightBar>
+        <RightBar :background="'rgba(123,123,123,0.3)'">
             <div style="
             display: flex;
             justify-content: space-evenly;

@@ -18,8 +18,8 @@ export const createtray = async function () {
           let all = await getAllWebviewWindows()
           all.filter(async (item) => {
             if (item.label == "tray") {
-              let factor = await item.scaleFactor()
-              e.position.y = Math.trunc(e.position.y - 100 * factor)
+              let size = await item.outerSize()
+              e.position.y = Math.trunc(e.position.y - size.height - 10)
               item.setPosition(e.position)
               item.show()
               item.setFocus()

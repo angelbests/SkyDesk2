@@ -423,13 +423,14 @@ const setalways = function () {
 
 const close = async function () {
   const windowstore = windowStore();
+  let label = getCurrentWebviewWindow().label;
   console.log(windowstore.windows);
   let res = windowstore.windows.filter((item) => {
-    return item.label == getCurrentWebviewWindow().label;
+    return item.label == label
   });
   const notestore = noteStore();
   let index = notestore.note.findIndex((item) => {
-    return item.label == getCurrentWebviewWindow().label;
+    return item.label == label;
   });
   console.log(res);
   if (index >= 0) {

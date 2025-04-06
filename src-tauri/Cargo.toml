@@ -20,7 +20,7 @@ tauri-plugin-process = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-clipboard-manager = "2"
-tauri-plugin-http = { version = "2", features = ["unsafe-headers"] }
+tauri-plugin-http = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 tauri-plugin-log = "2"
 serde = { version = "1", features = ["derive"] }
@@ -35,7 +35,6 @@ sysinfo = "0.33.1"
 log = "0.4.26"
 rdev = {version = "0.5.3", features = ["unstable_grab"] }
 wasapi = "0.16.0"
-
 [target."cfg(windows)".dependencies.windows]
 version = "0.60.0"
 features = [
