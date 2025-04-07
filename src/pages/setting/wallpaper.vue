@@ -10,7 +10,6 @@ import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
 import { availableMonitors, LogicalSize, Monitor } from "@tauri-apps/api/window";
 import { getAllWebviewWindows, WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { downloadload } from "../../api/download";
 import wallpaperfall from "../../components/WallpaperFall.vue";
 import GridContainer from "../../components/GridContainer.vue";
 import { getpoi } from "./../../api/weather"
@@ -218,7 +217,7 @@ const addWallpaper = async function () {
     let dirid = uuid()
     let name = await basename(addWallPaperData.value.preview);
     let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
-    await invoke('zipimage', {
+    p_path = await invoke('zipimage', {
         imgpath: addWallPaperData.value.preview,
         savepath: p_path
     });
@@ -295,16 +294,18 @@ const setwallpaper = async function (src: string) {
 }
 
 // 下载壁纸
-const downloadwallpaper = async (src: string): Promise<string> => {
+import { download } from "@tauri-apps/plugin-upload"
+const downloadwallpaper = async function (src: string) {
     let name = await basename(src);
     let path = await pictureDir() + "\\skydesk2\\" + name;
+
     if (!await exists(path)) {
-        let res = await downloadload(path, src);
-        if (res) {
-            return path
+        await download(src, path, ({ total, progressTotal, transferSpeed }) => {
+            console.log(`name:${name},percentage :${Math.trunc(progressTotal / total * 100)}%,speed:${transferSpeed / 1024}KB/s`)
         }
+        )
     }
-    return "";
+    return path;
 }
 
 // 天气

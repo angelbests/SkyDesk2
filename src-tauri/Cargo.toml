@@ -35,6 +35,7 @@ sysinfo = "0.33.1"
 log = "0.4.26"
 rdev = {version = "0.5.3", features = ["unstable_grab"] }
 wasapi = "0.16.0"
+tauri-plugin-upload = "2"
 [target."cfg(windows)".dependencies.windows]
 version = "0.60.0"
 features = [

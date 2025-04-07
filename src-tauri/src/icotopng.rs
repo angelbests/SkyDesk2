@@ -17,18 +17,22 @@ pub async fn ico_to_png(from: String, to: String) -> i32 {
 }
 
 #[tauri::command]
-pub async fn zipimage(imgpath: String, savepath: String) {
-    let img = ImageReader::open(imgpath).unwrap();
+pub async fn zipimage(imgpath: String, savepath: String) -> String {
+    let img = ImageReader::open(&imgpath).unwrap();
     let de = img.decode();
     match de {
         Ok(d) => {
             let w = d.width();
             let h = d.height();
-            let e = d.resize(400, w / 400 * h as u32, FilterType::Triangle);
-            e.save(savepath).unwrap();
+            if w < 500 {
+                let e = d.resize(400, w / 400 * h as u32, FilterType::Triangle);
+                e.save(&savepath).unwrap();
+                return savepath;
+            }
         }
         Err(e) => {
             println!("{:?}", e);
         }
     }
+    return imgpath;
 }

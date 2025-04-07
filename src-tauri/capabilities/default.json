@@ -217,6 +217,8 @@
     "updater:allow-check",
     "updater:allow-download",
     "updater:allow-install",
+    "upload:allow-download",
+    "upload:allow-upload",
     {
       "identifier": "opener:allow-open-url",
       "allow": [
