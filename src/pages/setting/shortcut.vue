@@ -152,6 +152,7 @@ const createDocker = async function () {
     resizable: false,
     skipTaskbar: true,
     url: "/#/pages/desktop/shortcut?label=" + label,
+    title: "shorcut"
   });
 };
 

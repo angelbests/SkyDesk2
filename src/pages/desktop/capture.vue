@@ -69,7 +69,7 @@ onMounted(async () => {
     "title": "captureWindow",
     "label": "captureWindow",
     "skipTaskbar": true,
-    "visible": false
+    "visible": false,
   };
   captureWindow.value = new WebviewWindow("captureWindow", configwindow)
   captureBtn.value = new WebviewWindow("captureBtn", configbtn)

@@ -36,6 +36,7 @@ const selectcapture = function () {
         alwaysOnTop: true,
         resizable: false,
         url: "/#/pages/desktop/capture",
+        title: "capture"
       })
     );
   });

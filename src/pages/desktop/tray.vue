@@ -19,6 +19,7 @@ const createnote = async function () {
     transparent: true,
     skipTaskbar: true,
     url: "/#/pages/desktop/note",
+    title: "note"
   });
   w?.center()
 };

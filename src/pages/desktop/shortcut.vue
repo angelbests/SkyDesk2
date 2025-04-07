@@ -155,6 +155,7 @@ const opensetting = function () {
     url:
       "/#/pages/desktop/shortcutSetting?label=" +
       getCurrentWebviewWindow().label,
+    title: "shortcutSetting"
   });
 };
 
