@@ -1,3 +1,4 @@
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow"
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router"
 
 const routes: RouteRecordRaw[] = [
@@ -100,7 +101,8 @@ const router = createRouter({
   history: createWebHashHistory(),
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
+  document.title = "skydesk2-" + (await getCurrentWebviewWindow().label)
   let index = to.fullPath.indexOf("setting")
   if (index >= 0) {
     document.getElementsByTagName("body")[0].style.background = "white"

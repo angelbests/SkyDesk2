@@ -295,7 +295,8 @@ const hovertop = async function () {
     resizable: true,
     skipTaskbar: true,
     alwaysOnTop: true,
-    url: "/#/pages/desktop/hovertop"
+    url: "/#/pages/desktop/hovertop",
+    title: "hovertop",
   });
 }
 </script>

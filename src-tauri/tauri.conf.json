@@ -106,8 +106,7 @@
           "$APPDATA/**",
           "$RESOURCE/**",
           "$VIDEO/**",
-          "$PICTURE/**",
-          "http://**"
+          "$PICTURE/**"
         ]
       }
     },
