@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { onMounted, ref, toRefs } from 'vue';
+import { ref, toRefs } from 'vue';
 import { shortcutStore } from '../../stores/window';
 import { exec } from "../../functions/open";
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
@@ -11,24 +11,14 @@ import { listen } from '@tauri-apps/api/event';
 const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
 const tab = ref(0);
-onMounted(() => {
-    window.addEventListener("storage", (e) => {
-        if (e.key == "shortcut") {
-            shortcutstore.$hydrate();
-        }
-    });
-})
-
-// 关闭窗口
-const close = async function () {
-    getCurrentWebviewWindow().hide();
-    getCurrentWebviewWindow().close();
-};
 
 // 监测是否在边上
 let loading = false
 let show = false
 let timer: any;
+listen("hovertop_status", (e: { payload: boolean }) => {
+    loading = e.payload
+})
 listen("mouse-move", async (e: { payload: { message: string } }) => {
     console.log(loading)
     if (loading) return
@@ -59,18 +49,25 @@ listen("mouse-move", async (e: { payload: { message: string } }) => {
             show = true
             invoke("hovertop", { label: "hovertop", show: false })
         }, 100)
-
     }
 })
 
-listen("hovertop_status", (e: { payload: boolean }) => {
-    loading = e.payload
-})
+window.addEventListener("storage", (e) => {
+    if (e.key == "shortcut") {
+        shortcutstore.$hydrate();
+    }
+});
+
+// 关闭窗口
+const close = async function () {
+    getCurrentWebviewWindow().hide();
+    getCurrentWebviewWindow().close();
+};
 </script>
 
 <template>
     <div class="main">
-        <RightBar :background="'rgba(123,123,123,0.3)'">
+        <RightBar :background="'rgba(123,123,123,0.3)'" :border-radius="'10px'">
             <div style="
             display: flex;
             justify-content: space-evenly;
