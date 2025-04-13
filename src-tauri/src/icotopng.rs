@@ -24,7 +24,7 @@ pub async fn zipimage(imgpath: String, savepath: String) -> String {
         Ok(d) => {
             let w = d.width();
             let h = d.height();
-            if w < 500 {
+            if w > 500 {
                 let e = d.resize(400, w / 400 * h as u32, FilterType::Triangle);
                 e.save(&savepath).unwrap();
                 return savepath;
