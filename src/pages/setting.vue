@@ -364,18 +364,18 @@ const hovertop = async function () {
         backgroundSize: 'cover',
       }" width="150" temporary v-model="drawer" :permanent="true" expand-on-hover>
         <v-list style="height: 100%">
-          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-apps" title="快捷"
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-apps" title="快捷"
             :href="'/#/pages/setting/shortcut'"></v-list-item>
-          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper" title="壁纸"
-            :href="'/#/pages/setting/wallpaper'"></v-list-item>
-          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-note-outline" title="便签"
-            :href="'/#/pages/setting/note'"></v-list-item>
-          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline" title="AI"
-            :href="'/#/pages/setting/ollama'"></v-list-item>
-          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper" title="录屏"
-            :href="'/#/pages/setting/capture'"></v-list-item>
-          <v-list-item :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range" title="日历"
-            :href="'/#/pages/setting/datenote'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper"
+            title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-note-outline"
+            title="便签" :href="'/#/pages/setting/note'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline"
+            title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-image-plus-outline"
+            title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range"
+            title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
         </v-list>
       </v-navigation-drawer>
       <router-view v-slot="{ Component }" :key="$route.fullPath"
