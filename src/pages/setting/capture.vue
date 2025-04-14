@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { captureStore, systemStore, windowStore } from "../../stores/window";
+import { windowStore } from "../../stores/window";
+import { captureStore } from "../../stores/capture";
+import { systemStore } from "../../stores/system";
 import { storeToRefs } from "pinia";
 import { uuid } from "../../functions";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";

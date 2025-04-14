@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
-import { wallpaperStore } from "../../stores/window";
+import { wallpaperStore } from "../../stores/wallpaper";
 import { listen, Event } from "@tauri-apps/api/event";
 import "qweather-icons/font/qweather-icons.css";
 import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";

@@ -17,7 +17,8 @@ import {
   IEditorConfig,
 } from "@wangeditor/editor";
 import { emit } from "@tauri-apps/api/event";
-import { windowStore, noteStore } from "../../stores/window";
+import { noteStore } from "../../stores/note";
+import { windowStore } from "../../stores/window"
 import { createWindow } from "../../functions/window";
 // 监听storage事件
 window.addEventListener("storage", (e) => {

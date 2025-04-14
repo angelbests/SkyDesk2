@@ -73,8 +73,7 @@ pub fn run() {
             lockscreen::setlockscreen,
             wheel::wheel_status,
             smtc::play_control,
-            hovertop::hovertop,
-            hovertop::window_transparent
+            hovertop::hovertop
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

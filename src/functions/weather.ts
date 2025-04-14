@@ -1,5 +1,5 @@
 import { getWeather } from "../api/weather"
-import { weatherStore } from "../stores/window"
+import { weatherStore } from "../stores/weather"
 
 type WeatherType = {
   temp: string // 温度

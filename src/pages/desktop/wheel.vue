@@ -5,7 +5,7 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { onMounted, reactive, ref } from "vue";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { Command } from "@tauri-apps/plugin-shell";
-import { shortcutStore } from "../../stores/window";
+import { shortcutStore } from "../../stores/shortcut";
 const shortcutstore = shortcutStore();
 const wheel = ref<any[]>([]);
 const app = getCurrentWebviewWindow();

@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 // import { lunar2solar } from '../../functions/calendar'
 import vMonth from "../../components/Month.vue";
-import { systemStore } from "../../stores/window";
+import { systemStore } from "../../stores/system";
 const systemstore = systemStore();
 window.addEventListener("storage", (e) => {
   if (e.key == "system") {

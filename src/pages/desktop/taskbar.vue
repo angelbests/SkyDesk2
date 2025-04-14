@@ -4,13 +4,14 @@ import { computed, onMounted, ref, watch } from "vue";
 import type { Event } from "@tauri-apps/api/event";
 import { NetSpeed, Netspeed } from "../../functions/sysinfo";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { systemStore } from "../../stores/window";
+import { systemStore } from "../../stores/system";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { MouseAction, MouseEvent } from "../../types/desktopType";
 import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { Smtc_Control } from "../../functions/smtc";
-import { wallpaperStore, shortcutStore } from "../../stores/window";
+import { wallpaperStore } from "../../stores/wallpaper";
+import { shortcutStore } from "../../stores/shortcut";
 const wallpaperstore = wallpaperStore()
 const shortcutstore = shortcutStore()
 const app = ref("")

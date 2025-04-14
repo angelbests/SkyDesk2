@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, toRefs, onMounted } from "vue";
-import { systemStore, wallpaperStore, weatherStore } from "../../stores/window";
+import { weatherStore } from "../../stores/weather";
+import { systemStore } from "../../stores/system";
+import { wallpaperStore } from "../../stores/wallpaper";
 import { setWindowToMonitor } from "../../functions/monitor";
 import { scanFiles, uuid } from "../../functions";
 import { createWindow } from "../../functions/window";

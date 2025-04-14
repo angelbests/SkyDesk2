@@ -16,7 +16,7 @@ import {
 import { md5 } from "js-md5";
 import { Command } from "@tauri-apps/plugin-shell";
 import { useRouter } from "vue-router";
-import { systemStore } from "../../stores/window";
+import { systemStore } from "../../stores/system";
 import { fileToBase64, uuid } from "../../functions";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 const systemstore = systemStore();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { wallpaperStore } from "../../stores/window";
+import { wallpaperStore } from "../../stores/wallpaper";
 import { onMounted, ref } from "vue";
 const wallpaperstore = wallpaperStore();
 const tab = ref(0);

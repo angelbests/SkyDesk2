@@ -2,7 +2,8 @@
 import { onMounted, ref, toRefs } from "vue";
 import { setIcon } from "../../functions/peIcon";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { shortcutStore, systemStore } from "../../stores/window";
+import { systemStore } from "../../stores/system";
+import { shortcutStore } from "../../stores/shortcut";
 import { VueDraggable } from "vue-draggable-plus";
 import { createWindow } from "../../functions/window";
 import { uuid } from "../../functions";

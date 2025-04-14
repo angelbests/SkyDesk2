@@ -6,7 +6,7 @@ import {
 } from "@tauri-apps/api/webviewWindow";
 import { onMounted, ref } from "vue";
 import { emit, listen } from "@tauri-apps/api/event";
-import { captureStore } from "../../stores/window";
+import { captureStore } from "../../stores/capture";
 const capturestore = captureStore();
 const captureWindow = ref<WebviewWindow>();
 const message = ref<{

@@ -1,7 +1,7 @@
 import { resourceDir } from "@tauri-apps/api/path"
 import { TrayIcon, TrayIconEvent } from "@tauri-apps/api/tray"
 import { getAllWebviewWindows, getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow"
-import { systemStore } from "./../stores/window"
+import { systemStore } from "./../stores/system"
 import { info } from "@tauri-apps/plugin-log"
 import { invoke } from "@tauri-apps/api/core"
 export const createtray = async function () {

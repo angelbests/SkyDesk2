@@ -2,7 +2,13 @@
 import { computed, onMounted, ref } from "vue";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { systemStore, windowStore, noteStore, wallpaperStore, shortcutStore, weatherStore, captureStore, } from "../stores/window";
+import { windowStore } from "../stores/window";
+import { systemStore } from "../stores/system";
+import { noteStore } from "../stores/note";
+import { wallpaperStore } from "../stores/wallpaper";
+import { shortcutStore } from "../stores/shortcut";
+import { weatherStore } from "../stores/weather";
+import { captureStore } from "../stores/capture";
 import { disable, enable } from "@tauri-apps/plugin-autostart";
 import { maininit } from "../functions/maininit";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";

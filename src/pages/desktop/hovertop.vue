@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ref, toRefs } from 'vue';
-import { shortcutStore } from '../../stores/window';
+import { shortcutStore } from '../../stores/shortcut';
 import { exec } from "../../functions/open";
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import GridContainer from '../../components/GridContainer.vue';
@@ -11,8 +11,6 @@ import { listen } from '@tauri-apps/api/event';
 const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
 const tab = ref(0);
-
-// 监测是否在边上
 let loading = false
 let show = false
 let timer: any;

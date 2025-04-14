@@ -2,7 +2,7 @@
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { onMounted, ref, watch } from "vue";
-import { systemStore } from "../../stores/window";
+import { systemStore } from "../../stores/system";
 import { NetSpeed, Netspeed } from "../../functions/sysinfo";
 getCurrentWebviewWindow().setSize(new LogicalSize(80, 45));
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0, });
