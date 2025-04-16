@@ -19,14 +19,16 @@ pub fn netspeed(app: AppHandle) {
                 speed_s: 0,
             };
             for (name, network) in &networks {
-                // 排除 vEthernet Bridge Virtual Filter Qos 网络
+                // 排除 vEthernet Bridge Virtual Filter Qos Npcap 网络
                 if (name.contains("vEthernet")
                     || name.contains("Bridge")
                     || name.contains("Virtual")
                     || name.contains("Filter")
-                    || name.contains("Qos"))
+                    || name.contains("Qos")
+                    || name.contains("Npcap"))
                     == false
                 {
+                    // println!("name:{:?}", name);
                     netspeed.speed_r = netspeed.speed_r + network.received();
                     netspeed.speed_s = netspeed.speed_s + network.transmitted();
                 }
