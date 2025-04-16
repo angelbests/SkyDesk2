@@ -45,6 +45,7 @@
     "vue-audio-visual": "^3.0.9",
     "vue-data-ui": "^2.6.25-beta.1",
     "vue-draggable-plus": "^0.5.3",
+    "vue-i18n": "^10.0.7",
     "vue-router": "^4.4.3",
     "vuetify": "^3.7.1"
   },

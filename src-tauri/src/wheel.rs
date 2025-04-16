@@ -27,11 +27,8 @@ pub fn wheelclick(window: AppHandle) {
                     }
                 }
                 EventType::MouseMove { x, y } => {
-                    let status = WHEEL_STATUS.lock().unwrap();
-                    if *status {
-                        let s = format!("{{\"x\":{:?},\"y\":{:?}}}", x, y);
-                        window.emit("mouse-move", Payload { message: s }).unwrap();
-                    }
+                    let s = format!("{{\"x\":{:?},\"y\":{:?}}}", x, y);
+                    window.emit("mouse-move", Payload { message: s }).unwrap();
                     Some(event)
                 }
                 _ => Some(event),
