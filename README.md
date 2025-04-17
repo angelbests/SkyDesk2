@@ -1,12 +1,12 @@
 # SkyDesk2 - 一个简单易用的本地工具
 
-![Static Badge](https://img.shields.io/badge/Tauri-2.0.1-blue?logo=tauri)
+![Static Badge](https://img.shields.io/badge/Tauri-2-blue?logo=tauri)
 ![Static Badge](https://img.shields.io/badge/Rust-1.81.0-blue?logo=rust)
 ![Static Badge](https://img.shields.io/badge/vue3-vuetifyjs-gray)
 
 ## 下载
 
-[下载](https://github.com/angelbests/SkyDesk2/releases) 程序 SkyDesk2
+[SkyDesk2下载](https://github.com/angelbests/SkyDesk2/releases)
 
 ## 开发
 

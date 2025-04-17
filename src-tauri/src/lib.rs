@@ -12,6 +12,7 @@ mod audio;
 mod desktop;
 mod hovertop;
 mod lockscreen;
+mod search;
 mod smtc;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -73,7 +74,8 @@ pub fn run() {
             lockscreen::setlockscreen,
             wheel::wheel_status,
             smtc::play_control,
-            hovertop::hovertop
+            hovertop::hovertop,
+            search::search_query
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
