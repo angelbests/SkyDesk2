@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, onMounted } from "vue"
 // import { lunar2solar } from '../../functions/calendar'
 import vMonth from "../../components/Month.vue"
 import { systemStore } from "../../stores/system"
+import { invoke } from "@tauri-apps/api/core"
+
 const systemstore = systemStore()
 window.addEventListener("storage", (e) => {
   if (e.key == "system") {
@@ -15,6 +17,11 @@ const date = ref<{
 }>({
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
+})
+
+onMounted(async () => {
+  let a = await invoke("search_query", { str: "lnk" })
+  console.log(a)
 })
 
 const wheelyear = function (e: WheelEvent) {
