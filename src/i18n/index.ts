@@ -5,7 +5,37 @@ const i18n = createI18n({
   messages: {
     zhHans: {
       message: {
-        hello: "你好，世界",
+        menu: {
+          shortcut: "快捷",
+          wallpaper: "壁纸",
+          note: "便签",
+          ai: "AI",
+          capture: "录屏",
+          datenote: "日历",
+        },
+        setting: {
+          tray: "启动到托盘",
+          start: "开机自启",
+          netspeed: "网速控件",
+          Taskbar: "任务栏",
+          wheel: "轮盘",
+          clearuser: "清除用户数据",
+          clear: "clear",
+        },
+        background: {
+          backgroundsetting: "背景设置",
+          mainwindow: "主窗",
+          menu: "菜单",
+          title: "标题",
+          shortcut: "快捷",
+          button: "按钮",
+          buttonbar: "按钮栏",
+          text: "文本",
+        },
+        about: {
+          title: "关于",
+          check: "检查更新",
+        },
       },
     },
   },
