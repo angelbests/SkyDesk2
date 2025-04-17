@@ -24,7 +24,8 @@ pub fn netspeed(app: AppHandle) {
                     || name.contains("Bridge")
                     || name.contains("Virtual")
                     || name.contains("Filter")
-                    || name.contains("Qos"))
+                    || name.contains("Qos")
+                    || name.contains("Npcap"))
                     == false
                 {
                     netspeed.speed_r = netspeed.speed_r + network.received();
