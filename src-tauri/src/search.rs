@@ -10,68 +10,80 @@ use windows::{
     },
 };
 
+#[derive(Clone, serde::Serialize)]
+pub struct SearchItem {
+    kind: String,
+    name: String,
+    path: String,
+    ext: String,
+}
+
 #[tauri::command]
-pub fn search_query() {
-    tauri::async_runtime::spawn(async move {
-        unsafe {
-            // 初始化 OLE / COM
-            let _ = OleInitialize(Some(std::ptr::null_mut()));
+pub async fn search_query(str: String) -> Vec<SearchItem> {
+    unsafe {
+        // 初始化 OLE / COM
+        let _ = OleInitialize(Some(std::ptr::null_mut()));
 
-            // 创建 ADODB.Connection 对象
-            let conn: IDispatch = CoCreateInstance(
-                &CLSIDFromProgID(w!("ADODB.Connection")).unwrap(),
-                None,
-                CLSCTX_ALL,
-            )
-            .unwrap();
+        // 创建 ADODB.Connection 对象
+        let conn: IDispatch = CoCreateInstance(
+            &CLSIDFromProgID(w!("ADODB.Connection")).unwrap(),
+            None,
+            CLSCTX_ALL,
+        )
+        .unwrap();
 
-            // 调用 .Open() 方法
-            let open_dispid = get_dispid(&conn, w!("Open"));
-            let conn_str = VARIANT::from(
-                r#"Provider=Search.CollatorDSO.1;EXTENDED PROPERTIES="Application=Windows""#,
-            );
-            let mut args = [
-                VARIANT::default(), // Options
-                VARIANT::default(), // UserID
-                VARIANT::default(), // Password
-                conn_str,
-            ];
-            invoke_method(&conn, open_dispid, &mut args);
-
-            // 调用 .Execute() 执行查询
-            let execute_dispid = get_dispid(&conn, w!("Execute"));
-            let sql = VARIANT::from(
-            // "SELECT System.ItemName, System.ItemPathDisplay FROM SYSTEMINDEX WHERE System.ItemName like '%.png%'",
-            "SELECT System.ItemName,System.ItemPathDisplay,System.Kind,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%鑫信达%'",
-            // "SELECT System.Kind  FROM SYSTEMINDEX WHERE 1=1 GROUP BY System.Kind",
+        // 调用 .Open() 方法
+        let open_dispid = get_dispid(&conn, w!("Open"));
+        let conn_str = VARIANT::from(
+            r#"Provider=Search.CollatorDSO.1;EXTENDED PROPERTIES="Application=Windows""#,
         );
-            let mut execute_args = [sql];
-            let recordset = invoke_method_return_dispatch(&conn, execute_dispid, &mut execute_args);
+        let mut args = [
+            VARIANT::default(), // Options
+            VARIANT::default(), // UserID
+            VARIANT::default(), // Password
+            conn_str,
+        ];
+        invoke_method(&conn, open_dispid, &mut args);
 
-            // 遍历 Recordset
-            loop {
-                if get_property_bool(&recordset, w!("EOF")) {
-                    break;
-                }
-
-                let fields = get_property_dispatch(&recordset, w!("Fields"));
-                let name = get_field_value(&fields, "System.ItemName");
-                let path = get_field_value(&fields, "System.ItemPathDisplay");
-                let file_extension = get_field_value(&fields, "System.FileExtension");
-                let kind = get_field_value(&fields, "System.Kind");
-
-                if name.is_empty() {
-                    break;
-                }
-                println!("{} - {} - {} - {}", name, path, kind, file_extension);
-                // println!("{}", kind);
-                let move_next_dispid = get_dispid(&recordset, w!("MoveNext"));
-                invoke_method(&recordset, move_next_dispid, &mut []);
+        // 调用 .Execute() 执行查询
+        let execute_dispid = get_dispid(&conn, w!("Execute"));
+        let sql = format!("SELECT System.ItemName,System.ItemPathDisplay,System.Kind,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%'",str);
+        println!("{:?}", sql);
+        let sql = VARIANT::from(sql.as_str());
+        let mut execute_args = [sql];
+        let recordset = invoke_method_return_dispatch(&conn, execute_dispid, &mut execute_args);
+        let mut vec: Vec<SearchItem> = vec![];
+        // 遍历 Recordset
+        loop {
+            if get_property_bool(&recordset, w!("EOF")) {
+                break;
             }
 
-            OleUninitialize();
+            let fields = get_property_dispatch(&recordset, w!("Fields"));
+            let name = get_field_value(&fields, "System.ItemName");
+            let path = get_field_value(&fields, "System.ItemPathDisplay");
+            let ext = get_field_value(&fields, "System.FileExtension");
+            let kind = get_field_value(&fields, "System.Kind");
+
+            if name.is_empty() {
+                break;
+            }
+            println!("{} - {} - {} - {}", name, path, kind, ext);
+            let item = SearchItem {
+                name,
+                path,
+                ext,
+                kind,
+            };
+            vec.push(item);
+            // println!("{}", kind);
+            let move_next_dispid = get_dispid(&recordset, w!("MoveNext"));
+            invoke_method(&recordset, move_next_dispid, &mut []);
         }
-    });
+
+        OleUninitialize();
+        return vec;
+    }
 }
 
 unsafe fn get_dispid(conn: &IDispatch, name: PCWSTR) -> i32 {
