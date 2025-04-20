@@ -56,6 +56,7 @@ let timer: string | number | NodeJS.Timeout | undefined;
 const search = async function (e: any) {
     if (e.target.value == "") {
         clearTimeout(timer);
+        focusindex.value = -1
         searchresult.value = []
         return
     }
@@ -102,11 +103,76 @@ const openfile = async function (item: searchResult) {
 }
 
 const searchenter = function (e: any) {
-    getCurrentWebviewWindow().hide()
-    openUrl("https://cn.bing.com/search?q=" + e.target.value)
+    if (focusindex.value >= 0) {
+        openPath(searchresult.value[focusindex.value].path)
+    } else {
+        getCurrentWebviewWindow().hide()
+        openUrl("https://cn.bing.com/search?q=" + e.target.value)
+    }
+
     inputvalue.value = ""
     searchresult.value = []
 }
+
+const focusindex = ref(-1);
+let isPressed = false;
+window.addEventListener("keydown", (e) => {
+    console.log(e)
+    if (isPressed) return
+    let dom = document.getElementById("search-result")
+    if (!dom) return
+    if (e.key == 'ArrowDown') {
+        isPressed = true;
+        if (focusindex.value == -1) {
+            focusindex.value = 0
+            return
+        }
+        if (focusindex.value < searchresult.value.length - 1) {
+            focusindex.value += 1;
+            let domitem = document.getElementById("search-" + focusindex.value)
+            if (!domitem) return
+            let height = domitem.offsetHeight
+            dom.scrollBy({
+                "behavior": "smooth",
+                "top": height
+            })
+        } else {
+            focusindex.value = 0
+            dom.scrollTo({
+                "behavior": "smooth",
+                "top": 0
+            })
+        }
+
+
+    } else if (e.key == 'ArrowUp') {
+        if (focusindex.value == -1) {
+            focusindex.value = 0
+            return
+        }
+        if (focusindex.value == 0) {
+            focusindex.value = searchresult.value.length - 1;
+            dom.scrollTo({
+                "behavior": "smooth",
+                "top": dom.scrollHeight
+            })
+        } else {
+            focusindex.value -= 1;
+            let domitem = document.getElementById("search-" + focusindex.value)
+            if (!domitem) return
+            let height = domitem.offsetHeight
+            dom.scrollBy({
+                "behavior": "smooth",
+                "top": -height
+            })
+        }
+
+    }
+})
+
+window.addEventListener("keyup", () => {
+    isPressed = false;
+});
 </script>
 
 <template>
@@ -116,10 +182,11 @@ const searchenter = function (e: any) {
             <input @input="search" v-model="inputvalue" type="text" @keyup.enter="searchenter" placeholder="请输入搜索内容"
                 class="search-input" />
         </div>
-        <div class="search-result" v-if="searchresult.length > 0">
-            <div v-for="item in searchresult" :key="item.path" class="search-item" @click="openfile(item)">
+        <div id="search-result" class="search-result" v-if="searchresult.length > 0">
+            <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
+                @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                 <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                }}</v-chip>
+                    }}</v-chip>
                 <div class="search-item-name">{{ item.name }}</div>
             </div>
         </div>
@@ -166,6 +233,10 @@ const searchenter = function (e: any) {
 </template>
 
 <style scoped>
+::-webkit-scrollbar {
+    display: none;
+}
+
 .container {
     width: 100vw;
     height: 99vh;
@@ -219,7 +290,6 @@ const searchenter = function (e: any) {
 
 .search-item:hover {
     background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
-    border-radius: 25px;
 }
 
 .icon:hover {
