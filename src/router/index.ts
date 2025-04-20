@@ -92,6 +92,10 @@ const routes: RouteRecordRaw[] = [
         path: "hovertop",
         component: () => import("./../pages/desktop/hovertop.vue"),
       },
+      {
+        path: "search",
+        component: () => import("./../pages/desktop/search.vue"),
+      },
     ],
   },
 ]

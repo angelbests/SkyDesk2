@@ -96,6 +96,23 @@
         "minimizable": false,
         "maximizable": false,
         "visible": false
+      },
+      {
+        "width": 600,
+        "height": 50,
+        "decorations": false,
+        "transparent": true,
+        "dragDropEnabled": true,
+        "shadow": false,
+        "maximizable": false,
+        "resizable": true,
+        "skipTaskbar": true,
+        "center": true,
+        "alwaysOnTop": true,
+        "url": "/#/pages/desktop/search",
+        "title": "search",
+        "label": "search",
+        "visible": false
       }
     ],
     "security": {

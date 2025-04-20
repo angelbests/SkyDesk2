@@ -42,7 +42,9 @@ export const createWindow = async function (
 export const initWindow = async function () {
   const windowstore = windowStore()
   windowstore.windows.forEach((e) => {
-    let w = new WebviewWindow(e.label, e.option)
+    let w = new WebviewWindow(e.label, {
+      ...e.option,
+    })
     listenMove(w)
     listenSize(w)
     listenClose(w)
@@ -62,8 +64,8 @@ const listenMove = async function (w: WebviewWindow) {
     let index = windowstore.windows.findIndex((item) => {
       return item.label === label
     })
-    windowstore.windows[index].option.x = event.payload.x / factor
-    windowstore.windows[index].option.y = event.payload.y / factor
+    windowstore.windows[index].option.x = Math.trunc(event.payload.x / factor)
+    windowstore.windows[index].option.y = Math.trunc(event.payload.y / factor)
   })
 }
 
@@ -87,7 +89,7 @@ const listenSize = async function (w: WebviewWindow) {
     let index = windowstore.windows.findIndex((item) => {
       return item.label === label
     })
-    windowstore.windows[index].option.width = event.payload.width / factor
-    windowstore.windows[index].option.height = event.payload.height / factor
+    windowstore.windows[index].option.width = Math.trunc(event.payload.width / factor)
+    windowstore.windows[index].option.height = Math.trunc(event.payload.height / factor)
   })
 }

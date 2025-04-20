@@ -17,38 +17,41 @@ let timer: any;
 listen("hovertop_status", (e: { payload: boolean }) => {
     loading = e.payload
 })
-listen("mouse-move", async (e: { payload: { message: string } }) => {
-    console.log(loading)
-    if (loading) return
-    let { x, y } = JSON.parse(e.payload.message as string);
-    let position = await getCurrentWebviewWindow().outerPosition();
-    let size = await getCurrentWebviewWindow().outerSize();
-    let cmonitor = await currentMonitor();
-    if (!position) return;
-    if (!size) return;
-    if (!cmonitor) return;
-    let mouseX = x / cmonitor.scaleFactor
-    let mouseY = y / cmonitor.scaleFactor
-    let windowLeftTopX = position.x / cmonitor.scaleFactor
-    let windowLeftTopY = position.y / cmonitor.scaleFactor
-    let windowRightBottomX = (position.x + size.width) / cmonitor.scaleFactor
-    let windowRightBottomY = (position.y + size.height) / cmonitor.scaleFactor
-    let bool = windowLeftTopX <= mouseX && windowRightBottomX >= mouseX && windowLeftTopY <= mouseY && windowRightBottomY >= mouseY
-    if (timer != undefined) {
-        clearTimeout(timer)
-    }
-    if (bool && show) {
-        loading = true
-        show = false
-        invoke("hovertop", { label: "hovertop", show: true })
-    } else if (!bool && !show) {
-        timer = setTimeout(() => {
+
+setTimeout(() => {
+    listen("mouse-move", async (e: { payload: { message: string } }) => {
+        console.log(loading)
+        if (loading) return
+        let { x, y } = JSON.parse(e.payload.message as string);
+        let position = await getCurrentWebviewWindow().outerPosition();
+        let size = await getCurrentWebviewWindow().outerSize();
+        let cmonitor = await currentMonitor();
+        if (!position) return;
+        if (!size) return;
+        if (!cmonitor) return;
+        let mouseX = x / cmonitor.scaleFactor
+        let mouseY = y / cmonitor.scaleFactor
+        let windowLeftTopX = position.x / cmonitor.scaleFactor
+        let windowLeftTopY = position.y / cmonitor.scaleFactor
+        let windowRightBottomX = (position.x + size.width) / cmonitor.scaleFactor
+        let windowRightBottomY = (position.y + size.height) / cmonitor.scaleFactor
+        let bool = windowLeftTopX <= mouseX && windowRightBottomX >= mouseX && windowLeftTopY <= mouseY && windowRightBottomY >= mouseY
+        if (timer != undefined) {
+            clearTimeout(timer)
+        }
+        if (bool && show) {
             loading = true
-            show = true
-            invoke("hovertop", { label: "hovertop", show: false })
-        }, 100)
-    }
-})
+            show = false
+            invoke("hovertop", { label: "hovertop", show: true })
+        } else if (!bool && !show) {
+            timer = setTimeout(() => {
+                loading = true
+                show = true
+                invoke("hovertop", { label: "hovertop", show: false })
+            }, 100)
+        }
+    })
+}, 1000)
 
 window.addEventListener("storage", (e) => {
     if (e.key == "shortcut") {

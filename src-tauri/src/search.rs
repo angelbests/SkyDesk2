@@ -17,7 +17,8 @@ pub struct SearchItem {
     path: String,
     ext: String,
 }
-
+//  https://learn.microsoft.com/zh-cn/windows/win32/search/windows-search
+// https://learn.microsoft.com/zh-cn/windows/win32/search/-search-3x-wds-propertymappings?redirectedfrom=MSDN
 #[tauri::command]
 pub async fn search_query(str: String) -> Vec<SearchItem> {
     unsafe {
@@ -47,7 +48,7 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
 
         // 调用 .Execute() 执行查询
         let execute_dispid = get_dispid(&conn, w!("Execute"));
-        let sql = format!("SELECT System.ItemName,System.ItemPathDisplay,System.Kind,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%'",str);
+        let sql = format!("SELECT TOP 50 System.ItemName,System.ItemUrl,System.KindText,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%' and System.Kind is not null ORDER BY System.DateModified DESC",str);
         println!("{:?}", sql);
         let sql = VARIANT::from(sql.as_str());
         let mut execute_args = [sql];
@@ -60,9 +61,9 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
             }
             let fields = get_property_dispatch(&recordset, w!("Fields"));
             let name = get_field_value(&fields, "System.ItemName");
-            let path = get_field_value(&fields, "System.ItemPathDisplay");
+            let path = get_field_value(&fields, "System.ItemUrl");
             let ext = get_field_value(&fields, "System.FileExtension");
-            let kind = get_field_value(&fields, "System.Kind");
+            let kind = get_field_value(&fields, "System.KindText");
             println!("{} - {} - {} - {}", name, path, kind, ext);
             let item = SearchItem {
                 name,

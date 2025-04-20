@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue"
+import { ref, watch } from "vue"
 // import { lunar2solar } from '../../functions/calendar'
 import vMonth from "../../components/Month.vue"
 import { systemStore } from "../../stores/system"
-import { invoke } from "@tauri-apps/api/core"
 
 const systemstore = systemStore()
 window.addEventListener("storage", (e) => {
@@ -17,11 +16,6 @@ const date = ref<{
 }>({
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
-})
-
-onMounted(async () => {
-  let a = await invoke("search_query", { str: "lnk" })
-  console.log(a)
 })
 
 const wheelyear = function (e: WheelEvent) {
@@ -308,48 +302,24 @@ const endupdate = function (e: any) {
 
 <template>
   <div class="window">
-    <v-dialog
-      v-model="show"
-      style="width: 600px"
-    >
+    <v-dialog v-model="show" style="width: 600px">
       <v-card>
         <template v-slot:title>新建日程</template>
         <template v-slot:text>
           <v-list>
             <v-list-item>
-              <v-select
-                v-model="schedule.repeat"
-                label="重复"
-                density="compact"
-                hide-details="auto"
-                :items="repeat"
-              ></v-select>
+              <v-select v-model="schedule.repeat" label="重复" density="compact" hide-details="auto"
+                :items="repeat"></v-select>
             </v-list-item>
             <v-list-item>
-              <v-text-field
-                v-model="schedule.title"
-                label="标题"
-                density="compact"
-                hide-details="auto"
-              ></v-text-field>
+              <v-text-field v-model="schedule.title" label="标题" density="compact" hide-details="auto"></v-text-field>
             </v-list-item>
             <v-list-item>
-              <v-text-field
-                v-model="schedule.address"
-                label="地点"
-                density="compact"
-                hide-details="auto"
-              ></v-text-field>
+              <v-text-field v-model="schedule.address" label="地点" density="compact" hide-details="auto"></v-text-field>
             </v-list-item>
             <v-list-item v-show="schedule.repeat == 2">
-              <v-select
-                v-model="schedule.week"
-                density="compact"
-                hide-details="auto"
-                :items="weekday"
-                label="周"
-                multiple
-              >
+              <v-select v-model="schedule.week" density="compact" hide-details="auto" :items="weekday" label="周"
+                multiple>
                 <template v-slot:selection="{ item }">
                   <v-chip>
                     {{ item.title }}
@@ -358,79 +328,33 @@ const endupdate = function (e: any) {
               </v-select>
             </v-list-item>
             <v-list-item v-show="schedule.repeat == 2 || schedule.repeat == 1">
-              <v-select
-                v-model="schedule.start.time"
-                style="width: 100%"
-                density="compact"
-                hide-details="auto"
-                label="时间"
-                :items="gettimearr()"
-              ></v-select>
+              <v-select v-model="schedule.start.time" style="width: 100%" density="compact" hide-details="auto"
+                label="时间" :items="gettimearr()"></v-select>
             </v-list-item>
             <v-list-item v-show="schedule.repeat != 2 && schedule.repeat != 1">
               <div style="width: 100%; display: flex">
-                <v-date-input
-                  v-model="schedule.start.date"
-                  @update:model-value="startupdate"
-                  cancel-text="取消"
-                  ok-text="确定"
-                  style="width: 50%"
-                  density="compact"
-                  hide-details="auto"
-                  label="开始日期"
-                  prepend-icon=""
-                ></v-date-input>
-                <v-select
-                  v-model="schedule.start.time"
-                  style="width: 50%"
-                  density="compact"
-                  hide-details="auto"
-                  label="时间"
-                  :items="gettimearr()"
-                ></v-select>
+                <v-date-input v-model="schedule.start.date" @update:model-value="startupdate" cancel-text="取消"
+                  ok-text="确定" style="width: 50%" density="compact" hide-details="auto" label="开始日期"
+                  prepend-icon=""></v-date-input>
+                <v-select v-model="schedule.start.time" style="width: 50%" density="compact" hide-details="auto"
+                  label="时间" :items="gettimearr()"></v-select>
               </div>
             </v-list-item>
             <v-list-item v-show="schedule.repeat != 2 && schedule.repeat != 1">
               <div style="width: 100%; display: flex">
-                <v-date-input
-                  :min="minend"
-                  :max="maxend"
-                  v-model="schedule.end.date"
-                  @update:model-value="endupdate"
-                  cancel-text="取消"
-                  ok-text="确定"
-                  style="width: 50%"
-                  density="compact"
-                  hide-details="auto"
-                  label="结束日期"
-                  prepend-icon=""
-                ></v-date-input>
-                <v-select
-                  v-model="schedule.end.time"
-                  style="width: 50%"
-                  density="compact"
-                  hide-details="auto"
-                  label="时间"
-                  :items="gettimearr()"
-                ></v-select>
+                <v-date-input :min="minend" :max="maxend" v-model="schedule.end.date" @update:model-value="endupdate"
+                  cancel-text="取消" ok-text="确定" style="width: 50%" density="compact" hide-details="auto" label="结束日期"
+                  prepend-icon=""></v-date-input>
+                <v-select v-model="schedule.end.time" style="width: 50%" density="compact" hide-details="auto"
+                  label="时间" :items="gettimearr()"></v-select>
               </div>
             </v-list-item>
             <v-list-item>
-              <v-select
-                v-model="schedule.clock"
-                label="提醒"
-                density="compact"
-                hide-details="auto"
-                :items="reminder"
-              ></v-select>
+              <v-select v-model="schedule.clock" label="提醒" density="compact" hide-details="auto"
+                :items="reminder"></v-select>
             </v-list-item>
             <v-list-item>
-              <v-textarea
-                v-model="schedule.text"
-                density="compact"
-                hide-details="auto"
-                label="描述"
-              ></v-textarea>
+              <v-textarea v-model="schedule.text" density="compact" hide-details="auto" label="描述"></v-textarea>
             </v-list-item>
           </v-list>
         </template>
@@ -440,16 +364,11 @@ const endupdate = function (e: any) {
         </template>
       </v-card>
     </v-dialog>
-    <v-card
-      @wheel.self="wheelmonth"
-      :style="{
-        background: systemstore.btnbarbackground,
-        backgroundSize: 'cover',
-      }"
-      class="btnbar"
-    >
-      <div
-        style="
+    <v-card @wheel.self="wheelmonth" :style="{
+      background: systemstore.btnbarbackground,
+      backgroundSize: 'cover',
+    }" class="btnbar">
+      <div style="
           display: flex;
           flex-direction: row;
           justify-content: center;
@@ -458,51 +377,35 @@ const endupdate = function (e: any) {
           height: 100%;
           margin-right: 20px;
           width: 150px;
-        "
-      >
-        <div
-          @wheel="wheelyear"
-          style="height: 100%; line-height: 300%"
-        >
+        ">
+        <div @wheel="wheelyear" style="height: 100%; line-height: 300%">
           {{ date.year }} 年
         </div>
-        <div
-          @wheel="wheelmonth"
-          style="height: 100%; line-height: 300%"
-        >
-          {{ date.month < 10 ? "0" + date.month : date.month }} 月
+        <div @wheel="wheelmonth" style="height: 100%; line-height: 300%">
+          {{ date.month < 10 ? "0" + date.month : date.month }} 月 </div>
         </div>
-      </div>
-      <!-- <v-btn style="margin-right: 20px;" @click="show = true">
+        <!-- <v-btn style="margin-right: 20px;" @click="show = true">
                     <template v-slot:prepend>
                         <v-icon>mdi-clipboard-text-clock</v-icon>
                     </template>
                     新建日程
                 </v-btn> -->
     </v-card>
-    <v-progress-linear
-      color="black"
-      :indeterminate="false"
-    ></v-progress-linear>
-    <div
-      @wheel="wheelmonth"
-      style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden"
-    >
+    <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
+    <div @wheel="wheelmonth" style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden">
       <v-month v-model:date="date">
         <template v-slot:default="{ day }">
-          <div
-            :style="{
-              width: '100%',
-              height: '20px',
-              textAlign: 'center',
-              background:
-                new Date().getFullYear() == day.cYear &&
+          <div :style="{
+            width: '100%',
+            height: '20px',
+            textAlign: 'center',
+            background:
+              new Date().getFullYear() == day.cYear &&
                 new Date().getMonth() + 1 == day.cMonth &&
                 new Date().getDate() == day.cDay
-                  ? 'rgba(133,133,133,1)'
-                  : '',
-            }"
-          >
+                ? 'rgba(133,133,133,1)'
+                : '',
+          }">
             {{ day.cDay }}
             {{ day.IMonthCn }}
             {{ day.IDayCn }}
@@ -512,10 +415,8 @@ const endupdate = function (e: any) {
               {{ day.Term }}
             </span>
           </div>
-          <div
-            v-for="item in filterschedule(day)"
-            style="background-color: bisque; width: 100%; height: calc(100% - 20px); height: 20px; margin-bottom: 2px"
-          >
+          <div v-for="item in filterschedule(day)"
+            style="background-color: bisque; width: 100%; height: calc(100% - 20px); height: 20px; margin-bottom: 2px">
             {{ item.first ? item.start.time + " " + item.title : "" }}
           </div>
         </template>

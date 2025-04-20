@@ -55,7 +55,7 @@ export const getlnks = async function () {
 }
 
 // 获取lnk文件列表
-const getLnkFile = async function () {
+export const getLnkFile = async function () {
   let lnkFiles = []
   let files = []
   // 桌面桌面文件夹不递归。

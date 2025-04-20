@@ -1,7 +1,7 @@
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{Emitter, Manager, Window};
 
 #[tauri::command]
-pub fn hovertop(app: AppHandle, label: String, show: bool) {
+pub fn hovertop(app: Window, label: String, show: bool) {
     tauri::async_runtime::spawn(async move {
         let webview = app.get_webview_window(&label).unwrap();
         let p = webview.outer_position().unwrap();

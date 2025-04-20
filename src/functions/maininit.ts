@@ -77,8 +77,8 @@ export const maininit = async function () {
   const factor = await getCurrentWebviewWindow().scaleFactor()
   getCurrentWebviewWindow().listen("tauri://resize", (e: any) => {
     let size = {
-      width: e.payload.width / factor,
-      height: e.payload.height / factor,
+      width: Math.trunc(e.payload.width / factor),
+      height: Math.trunc(e.payload.height / factor),
     }
     localStorage.setItem("size", JSON.stringify(size))
   })

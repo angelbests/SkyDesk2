@@ -223,7 +223,19 @@
       "identifier": "opener:allow-open-url",
       "allow": [
         {
-          "url": "https://github.com/angelbests/SkyDesk2"
+          "url": "https://**"
+        },
+        {
+          "url": "http://**"
+        }
+      ]
+    },
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        {
+          "path": "**",
+          "app": true
         }
       ]
     }
