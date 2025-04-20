@@ -8,6 +8,7 @@ import GridContainer from '../../components/GridContainer.vue';
 import RightBar from '../../components/RightBar.vue';
 import { currentMonitor } from '@tauri-apps/api/window';
 import { listen } from '@tauri-apps/api/event';
+
 const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
 const tab = ref(0);
