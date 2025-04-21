@@ -105,13 +105,11 @@ const search = async function (e: any) {
             let shortcutres = shortcutstore.shortcutsTemp.filter(item => {
                 let path = item.name.toLocaleLowerCase();
                 let str = e.target.value.trim().toLocaleLowerCase()
-                console.log(path, str)
                 return path.indexOf(str) >= 0
             });
             searchshortcut.value = [...shortcutres]
-            console.log(searchshortcut.value)
         }
-    }, 200);
+    }, 300);
 }
 
 // 添加窗口失焦事件
@@ -168,7 +166,6 @@ const searchenter = async function (e: any) {
 // 添加键盘上下选择
 
 window.addEventListener("keydown", (e) => {
-    console.log(e)
     if (isPressed) return
     let dom = document.getElementById("search-system")
     if (!dom) return
@@ -251,7 +248,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
