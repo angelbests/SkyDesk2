@@ -23,10 +23,10 @@ const { shortcuts } = toRefs(shortcutstore)
 const tab = ref(0);
 const inputvalue = ref("");
 onMounted(async () => {
-    let res = await isRegistered("Ctrl+Alt+Space")
+    let res = await isRegistered("Alt+Space")
     console.log("未注册");
     if (!res) {
-        register("Ctrl+Alt+Space", async (e) => {
+        register("Alt+Space", async (e) => {
             inputvalue.value = ""
             searchresult.value = []
             if (e.state !== "Pressed") return;
@@ -199,7 +199,7 @@ window.addEventListener("keyup", () => {
             <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                 @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                 <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                }}</v-chip>
                 <div class="search-item-name">{{ item.name }}</div>
             </div>
         </div>
