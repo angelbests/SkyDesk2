@@ -34,6 +34,9 @@ const { shortcuts, shortcutsTemp, wheels } = toRefs(shortcutstore);
 const scanbtn = ref<boolean>(true);
 const scanbar = ref(false);
 onMounted(async () => {
+  if (shortcutstore.shortcutsTemp.length == 0) {
+    scanProgram()
+  }
   window.addEventListener("storage", (e) => {
     if (e.key == "system") {
       systemstore.$hydrate();

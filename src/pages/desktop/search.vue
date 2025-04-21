@@ -109,7 +109,7 @@ const search = async function (e: any) {
             });
             searchshortcut.value = [...shortcutres]
         }
-    }, 300);
+    }, 500);
 }
 
 // 添加窗口失焦事件
@@ -248,7 +248,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                        }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
