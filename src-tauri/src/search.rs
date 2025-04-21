@@ -16,8 +16,14 @@ pub struct SearchItem {
     name: String,
     path: String,
     ext: String,
+    title: String,
+    mime: String,
+    itemtype: String,
+    pathdisplay: String,
+    namedisplay: String,
 }
-//  https://learn.microsoft.com/zh-cn/windows/win32/search/windows-search
+// https://learn.microsoft.com/zh-cn/windows/win32/properties/props
+// https://learn.microsoft.com/zh-cn/windows/win32/search/windows-search
 // https://learn.microsoft.com/zh-cn/windows/win32/search/-search-3x-wds-propertymappings?redirectedfrom=MSDN
 #[tauri::command]
 pub async fn search_query(str: String) -> Vec<SearchItem> {
@@ -48,7 +54,7 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
 
         // 调用 .Execute() 执行查询
         let execute_dispid = get_dispid(&conn, w!("Execute"));
-        let sql = format!("SELECT TOP 100 System.ItemName,System.ItemUrl,System.KindText,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%' and System.Kind is not null ORDER BY System.DateModified DESC",str);
+        let sql = format!("SELECT TOP 100 System.ItemNameDisplay,System.ItemPathDisplay,System.ItemTypeText,System.MIMEType,System.Title,System.ItemName,System.ItemUrl,System.KindText,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%' and System.Kind is not null ORDER BY System.DateModified DESC",str);
         println!("{:?}", sql);
         let sql = VARIANT::from(sql.as_str());
         let mut execute_args = [sql];
@@ -60,6 +66,11 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
                 break;
             }
             let fields = get_property_dispatch(&recordset, w!("Fields"));
+            let namedisplay = get_field_value(&fields, "System.ItemNameDisplay");
+            let pathdisplay = get_field_value(&fields, "System.ItemPathDisplay");
+            let itemtype = get_field_value(&fields, "System.ItemTypeText");
+            let mime = get_field_value(&fields, "System.MIMEType");
+            let title = get_field_value(&fields, "System.Title");
             let name = get_field_value(&fields, "System.ItemName");
             let path = get_field_value(&fields, "System.ItemUrl");
             let ext = get_field_value(&fields, "System.FileExtension");
@@ -70,6 +81,11 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
                 path,
                 ext,
                 kind,
+                title,
+                mime,
+                itemtype,
+                pathdisplay,
+                namedisplay,
             };
             vec.push(item);
             let move_next_dispid = get_dispid(&recordset, w!("MoveNext"));

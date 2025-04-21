@@ -67,7 +67,7 @@ const search = async function (e: any) {
         console.log(e.target.value)
         let show = await getCurrentWebviewWindow().isVisible();
         if (show) {
-            let res: searchResult[] = await invoke('search_query', { str: e.target.value });
+            let res: searchResult[] = await invoke('search_query', { str: e.target.value.trim() });
             res = res.filter((e) => {
 
                 return e.path.indexOf("$Recycle.Bin") < 0
@@ -120,7 +120,7 @@ const searchenter = async function (e: any) {
         }
     } else {
         getCurrentWebviewWindow().hide()
-        openUrl("https://cn.bing.com/search?q=" + e.target.value)
+        openUrl("https://cn.bing.com/search?q=" + e.target.value.trim())
     }
 
     inputvalue.value = ""
