@@ -9,20 +9,25 @@ import { exists } from '@tauri-apps/plugin-fs';
 import { isRegistered, register } from '@tauri-apps/plugin-global-shortcut';
 import { shortcutStore } from '../../stores/shortcut';
 import { exec } from "../../functions/open";
-
+import { ShortCut } from '../../types/storeType';
 type searchResult = {
     name: string,
     path: string,
     kind: string,
     ext: string,
     dir?: string
-
 }
 const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
 const tab = ref(0);
 const inputvalue = ref("");
+const searchresult = ref<searchResult[]>([]);
+const searchshortcut = ref<ShortCut[]>([]);
+const focusindex = ref(-1);
+let timer: string | number | NodeJS.Timeout | undefined;
+let isPressed = false;
 onMounted(async () => {
+    // 注册快捷组合键
     let res = await isRegistered("Alt+Space")
     console.log("未注册");
     if (!res) {
@@ -45,19 +50,20 @@ onMounted(async () => {
     }
 })
 
+// 监听缓存shortcut变化
 window.addEventListener("storage", (e) => {
     if (e.key == "shortcut") {
         shortcutstore.$hydrate();
     }
 });
 
-const searchresult = ref<searchResult[]>([]);
-let timer: string | number | NodeJS.Timeout | undefined;
+// windows search 查询
 const search = async function (e: any) {
     if (e.target.value == "") {
         clearTimeout(timer);
         focusindex.value = -1
         searchresult.value = []
+        searchshortcut.value = []
         return
     }
     if (timer) {
@@ -69,18 +75,46 @@ const search = async function (e: any) {
         if (show) {
             let res: searchResult[] = await invoke('search_query', { str: e.target.value.trim() });
             res = res.filter((e) => {
-
                 return e.path.indexOf("$Recycle.Bin") < 0
             })
             res.forEach(e => {
                 e.dir = e.path.replace(e.name, "");
             });
-            searchresult.value = res
-            console.log(searchresult.value)
+            let program = res.filter(e => {
+                return e.kind == "程序"
+            })
+            let dir = res.filter(e => {
+                return e.kind == "文件夹"
+            })
+            let image = res.filter(e => {
+                return e.kind == "图片"
+            })
+            let video = res.filter(e => {
+                return e.kind == "视频"
+            })
+            let document = res.filter(e => {
+                return e.kind == "文档"
+            })
+            let url = res.filter(e => {
+                return e.kind == "链接"
+            })
+            let music = res.filter(e => {
+                return e.kind == "音乐"
+            })
+            searchresult.value = [...program, ...url, ...document, ...image, ...video, ...music, ...dir,]
+            let shortcutres = shortcutstore.shortcutsTemp.filter(item => {
+                let path = item.name.toLocaleLowerCase();
+                let str = e.target.value.trim().toLocaleLowerCase()
+                console.log(path, str)
+                return path.indexOf(str) >= 0
+            });
+            searchshortcut.value = [...shortcutres]
+            console.log(searchshortcut.value)
         }
-    }, 500);
+    }, 200);
 }
 
+// 添加窗口失焦事件
 getCurrentWebviewWindow().listen("tauri://blur", () => {
     getCurrentWebviewWindow().hide()
     let dom = document.getElementById("container")
@@ -91,6 +125,8 @@ getCurrentWebviewWindow().listen("tauri://blur", () => {
     }, 300)
 })
 const focusbool = ref(false)
+
+// 添加窗口聚焦事件
 getCurrentWebviewWindow().listen("tauri://focus", () => {
     getCurrentWebviewWindow().setSize(new LogicalSize(800, 500));
     let dom = document.getElementById("container")
@@ -98,6 +134,7 @@ getCurrentWebviewWindow().listen("tauri://focus", () => {
     focusbool.value = true
 })
 
+// 鼠标点击打开程序或文件或路径
 const openfile = async function (item: searchResult) {
     console.log(item.path)
     let bool = await exists(item.path)
@@ -110,6 +147,7 @@ const openfile = async function (item: searchResult) {
     inputvalue.value = ""
 }
 
+// 添加enter支持
 const searchenter = async function (e: any) {
     if (focusindex.value >= 0) {
         let bool = await exists(searchresult.value[focusindex.value].path)
@@ -127,12 +165,12 @@ const searchenter = async function (e: any) {
     searchresult.value = []
 }
 
-const focusindex = ref(-1);
-let isPressed = false;
+// 添加键盘上下选择
+
 window.addEventListener("keydown", (e) => {
     console.log(e)
     if (isPressed) return
-    let dom = document.getElementById("search-result")
+    let dom = document.getElementById("search-system")
     if (!dom) return
     if (e.key == 'ArrowDown') {
         isPressed = true;
@@ -196,14 +234,29 @@ window.addEventListener("keyup", () => {
                 class="search-input" />
         </div>
         <div id="search-result" class="search-result" v-if="searchresult.length > 0">
-            <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
-                @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
-                <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                }}</v-chip>
-                <div class="search-item-name">{{ item.name }}</div>
+            <div class="search-shortcut" :style="{ height: searchshortcut.length == 0 ? '0px' : '80px' }">
+                <div v-for="item in searchshortcut" class="shortcut-container">
+                    <div class="icon-div" @click="exec(item)">
+                        <img class="icon"
+                            :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
+                    </div>
+                    <div
+                        style="font-size: 10px;width: 60px;height: 30px;filter: drop-shadow(0px 5px 5px gray);text-wrap: balance;text-align: center; text-overflow: clip;overflow: hidden;">
+                        {{ item.name }}
+                    </div>
+                </div>
+            </div>
+            <div class="search-system" id="search-system"
+                :style="{ height: searchshortcut.length == 0 ? '440px' : '360px' }">
+                <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
+                    @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
+                    <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
+                        }}</v-chip>
+                    <div class="search-item-name">{{ item.name }}</div>
+                </div>
             </div>
         </div>
-        <div class=" search-result" v-show="searchresult.length == 0 && focusbool">
+        <div class="search-result" v-show="searchresult.length == 0 && focusbool">
             <v-tabs id="shortcuttab" density="compact" v-model="tab" center-active style="
             height: 36px;
             width: 100%;
@@ -283,6 +336,33 @@ window.addEventListener("keyup", () => {
     transition: all 0.3s ease-in-out;
 }
 
+.search-shortcut {
+    box-sizing: border-box;
+    padding: 0px 30px;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow: hidden;
+    overflow-y: scroll;
+    transition: all 0.3s ease-in-out;
+    background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+}
+
+.search-system {
+    width: 100vw;
+    height: 360px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px;
+    overflow: hidden;
+    overflow-y: scroll;
+    transition: all 0.3s ease-in-out;
+}
+
 .search-item {
     width: 100vw;
     padding: 10px 0px 10px 30px;
@@ -317,6 +397,7 @@ window.addEventListener("keyup", () => {
     border-radius: 10px;
     box-shadow: 0px 0px 15px 2px rgba(223, 223, 223, 0.2);
     transition: height 0.1s linear;
+    background-size: cover;
 }
 
 .icon-div {
