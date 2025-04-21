@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, toRefs } from 'vue';
-import RightBar from '../../components/RightBar.vue';
 import GridContainer from '../../components/GridContainer.vue';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { LogicalSize } from '@tauri-apps/api/dpi';
@@ -15,7 +14,9 @@ type searchResult = {
     name: string,
     path: string,
     kind: string,
-    ext: string
+    ext: string,
+    dir?: string
+
 }
 const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
@@ -26,20 +27,19 @@ onMounted(async () => {
     console.log("未注册");
     if (!res) {
         register("Ctrl+Alt+Space", async (e) => {
+            inputvalue.value = ""
+            searchresult.value = []
             if (e.state !== "Pressed") return;
             let show = await getCurrentWebviewWindow().isVisible();
             if (show) {
                 getCurrentWebviewWindow().hide()
                 let dom = document.getElementById("container")
                 if (dom) dom.style.height = '50px'
-                getCurrentWebviewWindow().setSize(new LogicalSize(600, 50));
+                getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
             } else {
-                searchresult.value = []
-                inputvalue.value = ""
                 getCurrentWebviewWindow().show()
                 getCurrentWebviewWindow().center()
                 getCurrentWebviewWindow().setFocus();
-
             }
         })
     }
@@ -67,7 +67,15 @@ const search = async function (e: any) {
         console.log(e.target.value)
         let show = await getCurrentWebviewWindow().isVisible();
         if (show) {
-            searchresult.value = await invoke('search_query', { str: e.target.value });
+            let res: searchResult[] = await invoke('search_query', { str: e.target.value });
+            res = res.filter((e) => {
+
+                return e.path.indexOf("$Recycle.Bin") < 0
+            })
+            res.forEach(e => {
+                e.dir = e.path.replace(e.name, "");
+            });
+            searchresult.value = res
             console.log(searchresult.value)
         }
     }, 500);
@@ -79,12 +87,12 @@ getCurrentWebviewWindow().listen("tauri://blur", () => {
     if (dom) dom.style.height = '50px'
     focusbool.value = false
     setTimeout(() => {
-        getCurrentWebviewWindow().setSize(new LogicalSize(600, 50));
+        getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
     }, 300)
 })
 const focusbool = ref(false)
 getCurrentWebviewWindow().listen("tauri://focus", () => {
-    getCurrentWebviewWindow().setSize(new LogicalSize(600, 500));
+    getCurrentWebviewWindow().setSize(new LogicalSize(800, 500));
     let dom = document.getElementById("container")
     if (dom) dom.style.height = '500px'
     focusbool.value = true
@@ -102,9 +110,14 @@ const openfile = async function (item: searchResult) {
     inputvalue.value = ""
 }
 
-const searchenter = function (e: any) {
+const searchenter = async function (e: any) {
     if (focusindex.value >= 0) {
-        openPath(searchresult.value[focusindex.value].path)
+        let bool = await exists(searchresult.value[focusindex.value].path)
+        if (bool) {
+            openPath(searchresult.value[focusindex.value].path)
+        } else {
+            console.log("文件不存在")
+        }
     } else {
         getCurrentWebviewWindow().hide()
         openUrl("https://cn.bing.com/search?q=" + e.target.value)
@@ -190,7 +203,7 @@ window.addEventListener("keyup", () => {
                 <div class="search-item-name">{{ item.name }}</div>
             </div>
         </div>
-        <div class="search-result" v-show="searchresult.length == 0 && focusbool">
+        <div class=" search-result" v-show="searchresult.length == 0 && focusbool">
             <v-tabs id="shortcuttab" density="compact" v-model="tab" center-active style="
             height: 36px;
             width: 100%;
@@ -225,10 +238,6 @@ window.addEventListener("keyup", () => {
                 </v-tabs-window-item>
             </v-tabs-window>
         </div>
-        <RightBar style="width: 100vw;height: 100vh;display: flex;justify-content: center;align-items: center;"
-            border-radius=" 25px" background="rgba(123,123,123,0.3)">
-            <v-btn icon="mdi-close" size="small" @click="getCurrentWebviewWindow().close"></v-btn>
-        </RightBar>
     </div>
 </template>
 

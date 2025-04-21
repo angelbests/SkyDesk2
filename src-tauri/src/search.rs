@@ -48,7 +48,7 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
 
         // 调用 .Execute() 执行查询
         let execute_dispid = get_dispid(&conn, w!("Execute"));
-        let sql = format!("SELECT TOP 50 System.ItemName,System.ItemUrl,System.KindText,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%' and System.Kind is not null ORDER BY System.DateModified DESC",str);
+        let sql = format!("SELECT TOP 100 System.ItemName,System.ItemUrl,System.KindText,System.FileExtension FROM SYSTEMINDEX WHERE System.ItemName like '%{}%' and System.Kind is not null ORDER BY System.DateModified DESC",str);
         println!("{:?}", sql);
         let sql = VARIANT::from(sql.as_str());
         let mut execute_args = [sql];
