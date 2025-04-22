@@ -124,6 +124,7 @@ const focusbool = ref(false)
 
 // 添加窗口聚焦事件
 getCurrentWebviewWindow().listen("tauri://focus", () => {
+    document.getElementById("input")?.focus()
     getCurrentWebviewWindow().setSize(new LogicalSize(800, 500));
     let dom = document.getElementById("container")
     if (dom) dom.style.height = '500px'
@@ -225,8 +226,8 @@ window.addEventListener("keyup", () => {
     <div class="container" id="container">
         <div class="search-bar">
             <v-icon style="font-size: 25px;margin-left: 25px;color:rgba(123,123,123,0.8);">mdi-magnify</v-icon>
-            <input @input="search" v-model="inputvalue" type="text" @keyup.enter="searchenter" placeholder="请输入搜索内容"
-                class="search-input" />
+            <input id="input" @input="search" v-model="inputvalue" type="text" @keyup.enter="searchenter"
+                placeholder="请输入搜索内容" class="search-input" />
         </div>
         <div id="search-result" class="search-result" v-if="searchresult.length > 0">
             <div class="search-shortcut" :style="{ height: searchshortcut.length == 0 ? '0px' : '80px' }">
@@ -246,7 +247,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
