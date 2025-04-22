@@ -75,9 +75,6 @@ const search = async function (e: any) {
         if (show) {
             focusindex.value = 0;
             let res: searchResult[] = await invoke('search_query', { str: e.target.value.trim() });
-            res = res.filter((e) => {
-                return e.path.indexOf("$Recycle.Bin") < 0
-            })
             res.forEach(e => {
                 e.dir = e.path.replace(e.name, "");
             });
@@ -249,7 +246,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                        }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
@@ -301,8 +298,6 @@ window.addEventListener("keyup", () => {
 .container {
     width: 100vw;
     height: 99vh;
-
-    /* background: rgba(223, 223, 223, 0.2); */
     border-radius: 25px;
     transition: all 0.2s ease-in-out;
 }
