@@ -73,6 +73,7 @@ const search = async function (e: any) {
         console.log(e.target.value)
         let show = await getCurrentWebviewWindow().isVisible();
         if (show) {
+            focusindex.value = 0;
             let res: searchResult[] = await invoke('search_query', { str: e.target.value.trim() });
             res = res.filter((e) => {
                 return e.path.indexOf("$Recycle.Bin") < 0
@@ -248,7 +249,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
@@ -268,10 +269,11 @@ window.addEventListener("keyup", () => {
                     </div>
                 </v-tab>
             </v-tabs>
-            <v-tabs-window v-model="tab" style="width: 100%; height: calc(100% - 36px); padding: 10px;">
-                <v-tabs-window-item v-for="item1 in shortcuts" style="width: 100%; height: 100%; min-height: 100%">
+            <v-tabs-window v-model="tab" style="width: 100%; height: calc(100% - 36px);">
+                <v-tabs-window-item v-for="item1 in shortcuts" style="width: 100%;height: 100%;">
                     <GridContainer v-model="item1.shortcut" :animation="150" :gridwidth="90" :gridheight="90"
-                        :group="{ name: 'shortcut', pull: 'clone' }">
+                        :group="{ name: 'shortcut', pull: 'clone' }"
+                        style="box-sizing: border-box;padding-top: 10px;border-radius: 0px;">
                         <template v-slot="{ item }">
                             <div :style="{ height: '80px', backgroundSize: 'cover', }" class="shortcut-container">
                                 <div class="icon-div" @click="exec(item)">
@@ -299,7 +301,8 @@ window.addEventListener("keyup", () => {
 .container {
     width: 100vw;
     height: 99vh;
-    background-image: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%);
+
+    /* background: rgba(223, 223, 223, 0.2); */
     border-radius: 25px;
     transition: all 0.2s ease-in-out;
 }
@@ -309,7 +312,7 @@ window.addEventListener("keyup", () => {
     height: 50px;
     display: flex;
     align-items: center;
-    background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+    background-image: linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%);
     border-radius: 25px;
     margin-bottom: 10px;
 }
@@ -331,9 +334,11 @@ window.addEventListener("keyup", () => {
     overflow: hidden;
     overflow-y: scroll;
     transition: all 0.3s ease-in-out;
+    background-image: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%);
 }
 
 .search-shortcut {
+    background-image: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%);
     box-sizing: border-box;
     padding: 0px 30px;
     width: 100%;
@@ -346,7 +351,6 @@ window.addEventListener("keyup", () => {
     overflow: hidden;
     overflow-y: scroll;
     transition: all 0.3s ease-in-out;
-    background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
 }
 
 .search-system {
@@ -366,7 +370,7 @@ window.addEventListener("keyup", () => {
     display: flex;
     flex-direction: row;
     align-items: center;
-    border-radius: 25px;
+    /* border-radius: 25px; */
     transition: all 0.3s ease-in-out;
 }
 
@@ -392,7 +396,6 @@ window.addEventListener("keyup", () => {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    box-shadow: 0px 0px 15px 2px rgba(223, 223, 223, 0.2);
     transition: height 0.1s linear;
     background-size: cover;
 }
