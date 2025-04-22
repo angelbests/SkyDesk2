@@ -25,7 +25,13 @@ npm run tauri build
 
 ### 快捷
 
-扫描程序：扫描电脑内的快捷文件，并抓取对应程序的程序图标和名称。通过拖拽的方法拖拽到右侧的快捷栏。
+扫描：扫描电脑内的快捷文件，并抓取对应程序的程序图标和名称。通过拖拽的方法拖拽到右侧的快捷栏。
+
+添加：添加本地程序到快捷列表
+
+设置：删除tab，删除快捷，修改快捷
+
+合计：添加合集tab
 
 ![](./screenshot/2.png)
 
@@ -39,24 +45,56 @@ npm run tauri build
 
 ![](./screenshot/3.png)
 
+快捷搜索：组合键 Alt+Space，可搜索windows本地文件和程序等；效果跟随windows 搜索设置。
+
+输入搜索文本+回车->调起本地浏览器，使用bing网络搜索
+
+输入搜索文本+键盘up 或 键盘 down+回车->调起本地搜索的选择项
+
+![](./screenshot/16.png)
+
+![](./screenshot/17.png)
+
+windows搜索设置：设置->隐私和安全性->搜索windows;
+
+![](./screenshot/18.png)
+
+![](./screenshot/19.png)
+
 ### 壁纸
 
-1.可以添加图片壁纸、视频壁纸、html 网页壁纸。可实现分屏壁纸<br/>
+添加：添加静态壁纸、视频壁纸、网页壁纸，适应多屏。可设置锁屏。
+
+关闭：关闭所有壁纸
+
+在线壁纸：在线下载静态壁纸；壁纸源 [wallhaven](https://wallhaven.cc/) ，壁纸界面右键可弹出搜索选项，壁纸下载在windows->图片->skydesk2文件夹，添加的壁纸会自动添加到列表
+
+天气：配置天气api的key，以及配置城市；天气api：[和风天气](https://www.qweather.com/)
 
 ![](./screenshot/4.png)
 
-2.在线壁纸设置和下载，可配置天气等信息，显示在壁纸上层。
-
-3.在线壁纸鼠标右键调起查询选项，添加壁纸后会自动添加到壁纸列表。<br/>
-
 ![](./screenshot/7.png)
 
-壁纸源：[wallhaven](https://wallhaven.cc/) <br/>
-天气 api：[和风天气](https://www.qweather.com/)<br/>
+设置：配置壁纸的天气，音频，音乐，时间等显示。
+
+音乐支持网易云音乐（需要betterncm支持并安装smtc插件），QQ音乐,Spotify
+
+点击桌面封面控制音乐的播放和暂停
+
+在封面上按住左键向右滑动并释放，切换下一曲
+
+在封面上按住左键向左滑动并释放，切换上一曲
+
+![](./screenshot/20.png)
 
 ### 便签
 
 添加桌面便签，输入内容或拖拽图片进入即可保存对应信息，鼠标右键点击弹起自定义配置选项。
+
+自定义配置包含背景色配置，透明度配置，窗口置顶，置底和正常配置。
+
+映入：将便签嵌入到windows 壁纸层。
+映出：将便签恢复到windows 桌面层。
 
 ![](./screenshot/5.png)
 
@@ -71,9 +109,13 @@ npm run tauri build
 ### AI
 
 需要安装 ollama，并下载安装对应的 AI 模型。
+
 环境变量配置：
+
 变量名：OLLAMA_HOST 变量值:0.0.0.0
+
 变量名：OLLAMA_ORIGINS 变量值：\*
+
 ![](./screenshot/10.png)
 
 ### 录屏
@@ -88,15 +130,20 @@ npm run tauri build
 
 ### 任务栏和网速
 
-![](./screenshot/8.png)
+任务栏：根据壁纸桌面1配置 控制音乐的播放、上一曲、下一曲。音乐程序关闭状态下，点击播放控制可打开对应的音乐程序（需要扫描桌面快捷）
 
+![](./screenshot/21.png)
+
+网速
 ![](./screenshot/9.png)
 
 ### 设置主程序界面和配置
 
 ![](./screenshot/15.png)
 
-![](./screenshot/14.png)
+![](./screenshot/22.png)
+
+![](./screenshot/23.png)
 
 ## 感谢
 
