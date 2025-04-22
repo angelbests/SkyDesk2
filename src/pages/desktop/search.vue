@@ -249,7 +249,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                        }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
@@ -358,7 +358,8 @@ window.addEventListener("keyup", () => {
     height: 360px;
     display: flex;
     flex-direction: column;
-    border-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
     overflow: hidden;
     overflow-y: scroll;
     transition: all 0.3s ease-in-out;
@@ -370,7 +371,6 @@ window.addEventListener("keyup", () => {
     display: flex;
     flex-direction: row;
     align-items: center;
-    /* border-radius: 25px; */
     transition: all 0.3s ease-in-out;
 }
 
