@@ -249,7 +249,7 @@ window.addEventListener("keyup", () => {
                 <div v-for="(item, index) in searchresult" :id="'search-' + index" :key="item.path" class="search-item"
                     @click="openfile(item)" :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
             </div>
@@ -312,7 +312,7 @@ window.addEventListener("keyup", () => {
     height: 50px;
     display: flex;
     align-items: center;
-    background-image: linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%);
+    background-image: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%);
     border-radius: 25px;
     margin-bottom: 10px;
 }
