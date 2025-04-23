@@ -226,6 +226,7 @@ const open_github = function () {
 
 const get_version = async function () {
   version.value = await getVersion()
+  checkupdate()
 }
 const checkupdate = async function () {
   const update = await check()
@@ -237,6 +238,7 @@ const checkupdate = async function () {
 const updatestatus = ref(false)
 const updatestr = ref("")
 const updateprogram = async function () {
+  if (updatestatus.value) return
   const update = await check()
   if (update) {
     updateversion.value = update.version
@@ -310,81 +312,172 @@ const hovertop = async function () {
 </script>
 
 <template>
-  <v-layout :style="{
-    background: systemstore.programbcakground ? systemstore.programbcakground : 'transparent',
-    backgroundSize: 'cover',
-    color: systemstore.fontcolor,
-  }">
-    <v-app-bar :style="{
-      background: systemstore.topbackground ? systemstore.topbackground : 'transparent',
+  <v-layout
+    :style="{
+      background: systemstore.programbcakground ? systemstore.programbcakground : 'transparent',
       backgroundSize: 'cover',
-    }" :absolute="true" :height="48" id="toolbar" class="toolbar" data-tauri-drag-region>
+      color: systemstore.fontcolor,
+    }"
+  >
+    <v-app-bar
+      :style="{
+        background: systemstore.topbackground ? systemstore.topbackground : 'transparent',
+        backgroundSize: 'cover',
+      }"
+      :absolute="true"
+      :height="48"
+      id="toolbar"
+      class="toolbar"
+      data-tauri-drag-region
+    >
       <template v-slot:title>
-        <div :style="{ color: systemstore.fontcolor }" data-tauri-drag-region>
+        <div
+          :style="{ color: systemstore.fontcolor }"
+          data-tauri-drag-region
+        >
           SkyDesk2
         </div>
       </template>
       <template v-slot:prepend>
-        <v-app-bar-nav-icon style="background: transparent" @click="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon
+          style="background: transparent"
+          @click="drawer = !drawer"
+        ></v-app-bar-nav-icon>
       </template>
-      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
-        data-tauri-drag-region>
+      <div
+        :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
+        data-tauri-drag-region
+      >
         <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>
         {{ speed_r }}
       </div>
-      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
-        data-tauri-drag-region>
+      <div
+        :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
+        data-tauri-drag-region
+      >
         <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>
         {{ speed_s }}
       </div>
-      <v-btn style="background: transparent" @click="helpshow = true" icon>
+      <v-btn
+        style="background: transparent"
+        @click="helpshow = true"
+        icon
+      >
         <v-icon>mdi-help-circle-outline</v-icon>
       </v-btn>
-      <v-btn style="background: transparent" @click="hovertop" icon>
+      <v-btn
+        style="background: transparent"
+        @click="hovertop"
+        icon
+      >
         <v-icon>mdi-dock-top</v-icon>
       </v-btn>
-      <v-btn style="background: transparent" @click="colorshow = true" icon>
+      <v-btn
+        style="background: transparent"
+        @click="colorshow = true"
+        icon
+      >
         <v-icon>mdi-palette</v-icon>
       </v-btn>
-      <v-btn style="background: transparent" icon @click="settingshow = true">
+      <v-btn
+        style="background: transparent"
+        icon
+        @click="settingshow = true"
+      >
         <v-icon>mdi-cog-outline</v-icon>
       </v-btn>
-      <v-btn style="background: transparent" icon @click="minus">
+      <v-btn
+        style="background: transparent"
+        icon
+        @click="minus"
+      >
         <v-icon>mdi-window-minimize</v-icon>
       </v-btn>
-      <v-btn style="background: transparent" icon @click="toggleMaximize">
+      <v-btn
+        style="background: transparent"
+        icon
+        @click="toggleMaximize"
+      >
         <v-icon v-if="toggleMaximizeBool">mdi-window-restore</v-icon>
         <v-icon v-else="!toggleMaximizeBool">mdi-window-maximize</v-icon>
       </v-btn>
-      <v-btn style="background: transparent" icon @click="closeApp">
+      <v-btn
+        style="background: transparent"
+        icon
+        @click="closeApp"
+      >
         <v-icon>mdi-window-close</v-icon>
       </v-btn>
     </v-app-bar>
 
     <v-main style="height: calc(100vh); overflow-y: auto; width: 100%">
-      <v-navigation-drawer :style="{
-        boxShadow: drawer ? '5px 0px 5px rgba(123,123,123,0.5)' : 'none',
-        background: systemstore.leftbackground ? systemstore.leftbackground : 'transparent',
-        backgroundSize: 'cover',
-      }" width="150" temporary v-model="drawer" :permanent="true" expand-on-hover>
+      <v-navigation-drawer
+        :style="{
+          boxShadow: drawer ? '5px 0px 5px rgba(123,123,123,0.5)' : 'none',
+          background: systemstore.leftbackground ? systemstore.leftbackground : 'transparent',
+          backgroundSize: 'cover',
+        }"
+        width="150"
+        temporary
+        v-model="drawer"
+        :permanent="true"
+        expand-on-hover
+      >
         <v-list style="height: 100%">
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-apps" title="快捷"
-            :href="'/#/pages/setting/shortcut'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper"
-            title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-note-outline"
-            title="便签" :href="'/#/pages/setting/note'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline"
-            title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-image-plus-outline"
-            title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range"
-            title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-apps"
+            title="快捷"
+            :href="'/#/pages/setting/shortcut'"
+          ></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-wallpaper"
+            title="壁纸"
+            :href="'/#/pages/setting/wallpaper'"
+          ></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-note-outline"
+            title="便签"
+            :href="'/#/pages/setting/note'"
+          ></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-robot-outline"
+            title="AI"
+            :href="'/#/pages/setting/ollama'"
+          ></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-image-plus-outline"
+            title="录屏"
+            :href="'/#/pages/setting/capture'"
+          ></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-calendar-range"
+            title="日历"
+            :href="'/#/pages/setting/datenote'"
+          ></v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <router-view v-slot="{ Component }" :key="$route.fullPath"
-        style="width: auto; height: 100%; box-sizing: border-box; padding: 10px">
-        <transition name="fade" mode="out-in" appear>
+      <router-view
+        v-slot="{ Component }"
+        :key="$route.fullPath"
+        style="width: auto; height: 100%; box-sizing: border-box; padding: 10px"
+      >
+        <transition
+          name="fade"
+          mode="out-in"
+          appear
+        >
           <!-- <keep-alive> -->
           <component :is="Component" />
           <!-- </keep-alive> -->
@@ -392,30 +485,54 @@ const hovertop = async function () {
       </router-view>
     </v-main>
     <v-dialog v-model="colorshow">
-      <div style="width: 100%; height: 100%; display: flex; justify-content: center; position: relative"
-        @click.self="colorshow = false">
-        <input id="palette" @input="selectcolor" v-model="colorv" style="position: absolute; left: 10; top: 10"
-          type="color" />
+      <div
+        style="width: 100%; height: 100%; display: flex; justify-content: center; position: relative"
+        @click.self="colorshow = false"
+      >
+        <input
+          id="palette"
+          @input="selectcolor"
+          v-model="colorv"
+          style="position: absolute; left: 10; top: 10"
+          type="color"
+        />
         <v-card style="width: 400px">
           <v-card-title>
             <div style="display: flex; flex-direction: row">
               <div style="width: 50%; text-align: left">背景设置</div>
               <div style="width: 50%; text-align: right">
-                <v-icon icon="mdi-window-close" @click="colorshow = false"></v-icon>
+                <v-icon
+                  icon="mdi-window-close"
+                  @click="colorshow = false"
+                ></v-icon>
               </div>
             </div>
           </v-card-title>
           <v-list style="width: 400px">
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.programbcakground" width="280" hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.programbcakground"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="getImage(1)" style="margin-right: 5px">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(1)"
+                      style="margin-right: 5px"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
                     </v-btn>
-                    <v-btn variant="tonal" size="mini" @click="palette(1)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(1)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -428,14 +545,28 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.leftbackground" width="280" hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.leftbackground"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="getImage(2)" style="margin-right: 5px">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(2)"
+                      style="margin-right: 5px"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
                     </v-btn>
-                    <v-btn variant="tonal" size="mini" @click="palette(2)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(2)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -448,14 +579,28 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.topbackground" width="280" hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.topbackground"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="getImage(3)" style="margin-right: 5px">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(3)"
+                      style="margin-right: 5px"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
                     </v-btn>
-                    <v-btn variant="tonal" size="mini" @click="palette(3)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(3)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -468,15 +613,28 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.shortcutbackground" width="280" hide-details="auto"
-                  density="compact">
+                <v-text-field
+                  v-model="systemstore.shortcutbackground"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="getImage(4)" style="margin-right: 5px">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(4)"
+                      style="margin-right: 5px"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
                     </v-btn>
-                    <v-btn variant="tonal" size="mini" @click="palette(4)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(4)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -489,15 +647,29 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.btnbackground" @update:model-value="changebtn(1)" width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.btnbackground"
+                  @update:model-value="changebtn(1)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="getImage(5)" style="margin-right: 5px">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(5)"
+                      style="margin-right: 5px"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
                     </v-btn>
-                    <v-btn variant="tonal" size="mini" @click="palette(5)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(5)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -510,15 +682,29 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.btnbarbackground" @update:model-value="changebtn(2)" width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.btnbarbackground"
+                  @update:model-value="changebtn(2)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="getImage(7)" style="margin-right: 5px">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="getImage(7)"
+                      style="margin-right: 5px"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-image</v-icon>
                       </template>
                     </v-btn>
-                    <v-btn variant="tonal" size="mini" @click="palette(7)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(7)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -531,10 +717,19 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.fontcolor" @update:model-value="changebtn(2)" width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.fontcolor"
+                  @update:model-value="changebtn(2)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact"
+                >
                   <template v-slot:prepend-inner>
-                    <v-btn variant="tonal" size="mini" @click="palette(6)">
+                    <v-btn
+                      variant="tonal"
+                      size="mini"
+                      @click="palette(6)"
+                    >
                       <template v-slot:append>
                         <v-icon>mdi-palette</v-icon>
                       </template>
@@ -551,13 +746,19 @@ const hovertop = async function () {
     </v-dialog>
     <!-- 设置 -->
     <v-dialog v-model="settingshow">
-      <div style="display: flex; justify-content: center" @click.self="settingshow = false">
+      <div
+        style="display: flex; justify-content: center"
+        @click.self="settingshow = false"
+      >
         <v-card style="width: 400px">
           <v-card-title>
             <div style="display: flex; flex-direction: row">
               <div style="width: 50%; text-align: left">设置</div>
               <div style="width: 50%; text-align: right">
-                <v-icon icon="mdi-window-close" @click="settingshow = false"></v-icon>
+                <v-icon
+                  icon="mdi-window-close"
+                  @click="settingshow = false"
+                ></v-icon>
               </div>
             </div>
           </v-card-title>
@@ -565,33 +766,53 @@ const hovertop = async function () {
             <v-list>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.traystart" hide-details></v-switch>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.traystart"
+                    hide-details
+                  ></v-switch>
                 </template>
                 <v-list-item-title>启动到托盘</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.autostart" @update:model-value="autostartsetting"
-                    hide-details></v-switch>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.autostart"
+                    @update:model-value="autostartsetting"
+                    hide-details
+                  ></v-switch>
                 </template>
                 <v-list-item-title>开机自启</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.netspeed.show" hide-details></v-switch>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.netspeed.show"
+                    hide-details
+                  ></v-switch>
                 </template>
                 <v-list-item-title>网速控件</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.taskbar" hide-details></v-switch>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.taskbar"
+                    hide-details
+                  ></v-switch>
                 </template>
                 <v-list-item-title>任务栏</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.wheel" @update:model-value="wheel_status"
-                    hide-details></v-switch>
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.wheel"
+                    @update:model-value="wheel_status"
+                    hide-details
+                  ></v-switch>
                 </template>
                 <v-list-item-title>轮盘开关</v-list-item-title>
               </v-list-item>
@@ -612,13 +833,19 @@ const hovertop = async function () {
       </div>
     </v-dialog>
     <v-dialog v-model="helpshow">
-      <div style="display: flex; justify-content: center" @click.self="helpshow = false">
+      <div
+        style="display: flex; justify-content: center"
+        @click.self="helpshow = false"
+      >
         <v-card style="width: 400px">
           <v-card-title>
             <div style="display: flex; flex-direction: row">
               <div style="width: 50%; text-align: left">关于</div>
               <div style="width: 50%; text-align: right">
-                <v-icon icon="mdi-window-close" @click="helpshow = false"></v-icon>
+                <v-icon
+                  icon="mdi-window-close"
+                  @click="helpshow = false"
+                ></v-icon>
               </div>
             </div>
           </v-card-title>
@@ -627,7 +854,10 @@ const hovertop = async function () {
               <v-list>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <v-btn style="width: 110px" @click="open_github">
+                    <v-btn
+                      style="width: 110px"
+                      @click="open_github"
+                    >
                       <template v-slot:prepend>
                         <v-icon>mdi-github</v-icon>
                       </template>
@@ -640,13 +870,21 @@ const hovertop = async function () {
                 </v-list-item>
                 <v-list-item>
                   <template v-slot:prepend>
-                    <v-btn v-show="updateversion" style="width: 110px" @click="updateprogram">
+                    <v-btn
+                      v-show="updateversion"
+                      style="width: 110px"
+                      @click="updateprogram"
+                    >
                       <template v-slot:prepend>
                         <v-icon>mdi-refresh</v-icon>
                       </template>
                       更新程序
                     </v-btn>
-                    <v-btn v-show="!updateversion" style="width: 110px" @click="checkupdate">
+                    <v-btn
+                      v-show="!updateversion"
+                      style="width: 110px"
+                      @click="checkupdate"
+                    >
                       <template v-slot:prepend>
                         <v-icon>mdi-refresh</v-icon>
                       </template>
@@ -654,10 +892,16 @@ const hovertop = async function () {
                     </v-btn>
                   </template>
                   <template v-slot:append>
-                    <div v-if="!updatestatus" style="text-align: center">
+                    <div
+                      v-if="!updatestatus"
+                      style="text-align: center"
+                    >
                       {{ updateversion ? version + " -> " + updateversion : version }}
                     </div>
-                    <div v-else style="text-align: center">
+                    <div
+                      v-else
+                      style="text-align: center"
+                    >
                       {{ updatestr }}%
                     </div>
                   </template>
