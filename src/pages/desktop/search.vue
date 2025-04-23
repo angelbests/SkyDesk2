@@ -222,6 +222,7 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", () => {
     isPressed = false;
 });
+
 </script>
 
 <template>
@@ -236,7 +237,7 @@ window.addEventListener("keyup", () => {
         <div id="search-result" class="search-result" v-if="inputvalue">
             <div class="search-shortcut" :style="{ height: searchshortcut.length == 0 ? '0px' : '80px' }">
                 <div v-for="item in searchshortcut" class="shortcut-container">
-                    <div class="icon-div" @click="exec(item)">
+                    <div tabindex="0" class="icon-div" @click="exec(item)" @keyup.enter="exec(item)">
                         <img class="icon"
                             :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                     </div>
@@ -248,9 +249,9 @@ window.addEventListener("keyup", () => {
             </div>
             <div class="search-system" id="search-system"
                 :style="{ height: searchshortcut.length == 0 ? '440px' : '360px' }">
-                <div v-if="searchresult.length > 0" v-for="(item, index) in searchresult" :id="'search-' + index"
-                    :key="item.path" class="search-item" @click="openfile(item)"
-                    :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
+                <div v-if="searchresult.length > 0" tabindex="0" v-for="(item, index) in searchresult"
+                    :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
+                    :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
                     }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
@@ -288,7 +289,7 @@ window.addEventListener("keyup", () => {
                         style="box-sizing: border-box;padding-top: 10px;border-radius: 0px;">
                         <template v-slot="{ item }">
                             <div :style="{ height: '80px', backgroundSize: 'cover', }" class="shortcut-container">
-                                <div class="icon-div" @click="exec(item)">
+                                <div tabindex="0" class="icon-div" @click="exec(item)" @keyup.enter="exec(item)">
                                     <img class="icon"
                                         :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                                 </div>
@@ -306,6 +307,13 @@ window.addEventListener("keyup", () => {
 </template>
 
 <style scoped>
+div:focus-visible {
+    outline: none;
+    background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+    border-radius: 3px;
+    border: none;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }
