@@ -75,8 +75,14 @@ const search = async function (e: any) {
         let value = e.target.value.trim().replace("'", "");
         let show = await getCurrentWebviewWindow().isVisible();
         if (show) {
-            let res: searchResult[] = await invoke('search_query', { str: value });
-            console.log(res)
+            let searchinvoke: {
+                str: string,
+                result: searchResult[]
+            } = await invoke('search_query', { str: value });
+            if (searchinvoke.str != inputvalue.value) return
+            let res = searchinvoke.result;
+            console.log(searchinvoke)
+
             res.forEach(e => {
                 e.dir = e.path.replace(e.name, "");
             });
@@ -246,7 +252,7 @@ window.addEventListener("keyup", () => {
                     :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                        }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">

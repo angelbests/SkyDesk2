@@ -22,11 +22,17 @@ pub struct SearchItem {
     pathdisplay: String,
     namedisplay: String,
 }
+
+#[derive(Clone, serde::Serialize)]
+pub struct SearchResult {
+    str: String,
+    result: Vec<SearchItem>,
+}
 // https://learn.microsoft.com/zh-cn/windows/win32/properties/props
 // https://learn.microsoft.com/zh-cn/windows/win32/search/windows-search
 // https://learn.microsoft.com/zh-cn/windows/win32/search/-search-3x-wds-propertymappings?redirectedfrom=MSDN
 #[tauri::command]
-pub async fn search_query(str: String) -> Vec<SearchItem> {
+pub async fn search_query(str: String) -> SearchResult {
     unsafe {
         // 初始化 OLE / COM
         let _ = OleInitialize(Some(std::ptr::null_mut()));
@@ -114,7 +120,10 @@ pub async fn search_query(str: String) -> Vec<SearchItem> {
         }
 
         OleUninitialize();
-        return vec;
+        return SearchResult {
+            str: str,
+            result: vec,
+        };
     }
 }
 
