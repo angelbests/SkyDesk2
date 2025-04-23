@@ -79,7 +79,7 @@ const search = async function (e: any) {
                 str: string,
                 result: searchResult[]
             } = await invoke('search_query', { str: value });
-            if (searchinvoke.str != inputvalue.value) return
+            if (searchinvoke.str != (inputvalue.value.trim().replace("'", ""))) return
             let res = searchinvoke.result;
             console.log(searchinvoke)
 
@@ -252,7 +252,7 @@ window.addEventListener("keyup", () => {
                     :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
