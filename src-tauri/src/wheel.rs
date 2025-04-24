@@ -1,6 +1,5 @@
-use rdev::{grab, Button, Event, EventType};
+use rdev::{grab, simulate, Button, Event, EventType, Key, SimulateError};
 use tauri::{AppHandle, Emitter};
-
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     message: String,
@@ -45,4 +44,23 @@ pub fn wheelclick(window: AppHandle) {
 pub fn wheel_status(bool: bool) {
     let mut status = WHEEL_STATUS.lock().unwrap();
     *status = bool;
+}
+
+#[tauri::command]
+pub fn screen() {
+    send(&EventType::KeyPress(Key::PrintScreen));
+    send(&EventType::KeyRelease(Key::PrintScreen));
+}
+
+fn send(event_type: &EventType) {
+    use std::{thread, time};
+    let delay = time::Duration::from_millis(20);
+    match simulate(event_type) {
+        Ok(()) => (),
+        Err(SimulateError) => {
+            println!("We could not send {:?}", event_type);
+        }
+    }
+    // Let ths OS catchup (at least MacOS)
+    thread::sleep(delay);
 }

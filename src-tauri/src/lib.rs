@@ -77,7 +77,8 @@ pub fn run() {
             smtc::play_control,
             hovertop::hovertop,
             search::search_query,
-            shelllink::shelllink
+            shelllink::shelllink,
+            wheel::screen
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

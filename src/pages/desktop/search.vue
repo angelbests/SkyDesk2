@@ -10,6 +10,9 @@ import { isRegistered, register } from '@tauri-apps/plugin-global-shortcut';
 import { shortcutStore } from '../../stores/shortcut';
 import { exec } from "../../functions/open";
 import { ShortCut } from '../../types/storeType';
+import { homeDir } from '@tauri-apps/api/path';
+import { createWindow } from '../../functions/window';
+import { uuid } from '../../functions';
 type searchResult = {
     name: string,
     path: string,
@@ -33,6 +36,13 @@ window.addEventListener("storage", (e) => {
         shortcutstore.$hydrate();
     }
 });
+
+type SettingBottomItem = {
+    path: string;
+    cmd: string;
+};
+const settingbottom = ref<SettingBottomItem[]>([]);
+
 onMounted(async () => {
     // 注册快捷组合键
     let res = await isRegistered("Alt+Space")
@@ -53,6 +63,58 @@ onMounted(async () => {
             }
         })
     }
+    let path = await homeDir()
+    console.log(path)
+    settingbottom.value = [
+        {
+            path: "/icons/Folder Documents.png",
+            cmd: path + "\\Documents\\"
+        },
+        {
+            path: "/icons/Folder Downloads.png",
+            cmd: path + "\\Downloads\\"
+        },
+        {
+            path: "/icons/Folder Music.png",
+            cmd: path + "\\Music\\"
+        },
+        {
+            path: "/icons/Folder Pictures.png",
+            cmd: path + "\\Pictures\\"
+        },
+        {
+            path: "/icons/Folder Videos.png",
+            cmd: path + "\\Videos\\"
+        },
+        {
+            path: "/icons/Folder Desktop.png",
+            cmd: path + "\\Desktop\\"
+        },
+        {
+            path: "/icons/Folder User.png",
+            cmd: path
+        },
+        {
+            path: "/icons/Folder Blue.png",
+            cmd: "explorer"
+        },
+        {
+            path: "/icons/setting.png",
+            cmd: "ms-settings:"
+        },
+        {
+            path: "/icons/Control Panel.png",
+            cmd: "control"
+        },
+        {
+            path: "/icons/cmd.png",
+            cmd: "cmd"
+        },
+        {
+            path: "/icons/calc.png",
+            cmd: "calc"
+        },
+    ]
 })
 
 const searchstatus = ref(false)
@@ -223,6 +285,29 @@ window.addEventListener("keyup", () => {
     isPressed = false;
 });
 
+const screen = async function () {
+    await getCurrentWebviewWindow().hide();
+    invoke('screen')
+}
+
+const createnote = async function () {
+    let label = "note-" + uuid();
+    let w = await createWindow(label, {
+        x: 200,
+        y: 200,
+        width: 330,
+        height: 330,
+        minWidth: 330,
+        minHeight: 100,
+        shadow: false,
+        decorations: false,
+        transparent: true,
+        skipTaskbar: true,
+        url: "/#/pages/desktop/note",
+        title: "note"
+    });
+    w?.center()
+};
 </script>
 
 <template>
@@ -282,7 +367,7 @@ window.addEventListener("keyup", () => {
                     </div>
                 </v-tab>
             </v-tabs>
-            <v-tabs-window v-model="tab" style="width: 100%; height: calc(100% - 36px);">
+            <v-tabs-window v-model="tab" style="width: 100%; height: calc(100% - 86px);">
                 <v-tabs-window-item v-for="item1 in shortcuts" style="width: 100%;height: 100%;">
                     <GridContainer v-model="item1.shortcut" :animation="150" :gridwidth="90" :gridheight="90"
                         :group="{ name: 'shortcut', pull: 'clone' }"
@@ -302,11 +387,41 @@ window.addEventListener("keyup", () => {
                     </GridContainer>
                 </v-tabs-window-item>
             </v-tabs-window>
+            <div
+                style="width: 100%;height: 50px;background: white;display: flex;align-items: center;box-sizing: border-box;padding: 0px 20px;">
+                <div v-for="item in settingbottom" class="settingbottom" @click="openPath(item.cmd)">
+                    <img :src="item.path" class="settingbottom-icon" />
+                </div>
+                <div class="settingbottom" @click="screen">
+                    <img src="/icons/screenshot.png" class="settingbottom-icon" />
+                </div>
+                <div class="settingbottom" @click="createnote">
+                    <img src="/icons/note.png" class="settingbottom-icon" />
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+.settingbottom {
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settingbottom-icon {
+
+    width: 40px;
+    transition: all 0.1s linear;
+    filter: drop-shadow(0px 5px 5px gray);
+}
+
+.settingbottom-icon:hover {
+    width: 50px;
+}
+
 div:focus-visible {
     outline: none;
     background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
