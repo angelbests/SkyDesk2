@@ -38,8 +38,9 @@ window.addEventListener("storage", (e) => {
 });
 
 type SettingBottomItem = {
-    path: string;
-    cmd: string;
+    path: string
+    cmd: string
+    label: string
 };
 const settingbottom = ref<SettingBottomItem[]>([]);
 
@@ -350,7 +351,7 @@ const createnote = async function () {
                     :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
