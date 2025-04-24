@@ -68,51 +68,63 @@ onMounted(async () => {
     settingbottom.value = [
         {
             path: "/icons/Folder Documents.png",
-            cmd: path + "\\Documents\\"
+            cmd: path + "\\Documents\\",
+            label: "文档"
         },
         {
             path: "/icons/Folder Downloads.png",
-            cmd: path + "\\Downloads\\"
+            cmd: path + "\\Downloads\\",
+            label: "下载"
         },
         {
             path: "/icons/Folder Music.png",
-            cmd: path + "\\Music\\"
+            cmd: path + "\\Music\\",
+            label: "音乐"
         },
         {
             path: "/icons/Folder Pictures.png",
-            cmd: path + "\\Pictures\\"
+            cmd: path + "\\Pictures\\",
+            label: "图片"
         },
         {
             path: "/icons/Folder Videos.png",
-            cmd: path + "\\Videos\\"
+            cmd: path + "\\Videos\\",
+            label: "视频"
         },
         {
             path: "/icons/Folder Desktop.png",
-            cmd: path + "\\Desktop\\"
+            cmd: path + "\\Desktop\\",
+            label: "桌面"
         },
         {
             path: "/icons/Folder User.png",
-            cmd: path
+            cmd: path,
+            label: "用户"
         },
         {
             path: "/icons/Folder Blue.png",
-            cmd: "explorer"
+            cmd: "explorer",
+            label: "资源管理器"
         },
         {
             path: "/icons/setting.png",
-            cmd: "ms-settings:"
+            cmd: "ms-settings:",
+            label: "设置"
         },
         {
             path: "/icons/Control Panel.png",
-            cmd: "control"
+            cmd: "control",
+            label: "控制面板"
         },
         {
             path: "/icons/cmd.png",
-            cmd: "cmd"
+            cmd: "cmd",
+            label: "终端"
         },
         {
             path: "/icons/calc.png",
-            cmd: "calc"
+            cmd: "calc",
+            label: "计算器"
         },
     ]
 })
@@ -338,7 +350,7 @@ const createnote = async function () {
                     :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                        }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
@@ -387,16 +399,24 @@ const createnote = async function () {
                     </GridContainer>
                 </v-tabs-window-item>
             </v-tabs-window>
-            <div
-                style="width: 100%;height: 50px;background: white;display: flex;align-items: center;box-sizing: border-box;padding: 0px 20px;">
-                <div v-for="item in settingbottom" class="settingbottom" @click="openPath(item.cmd)">
+            <div class="settingbottom">
+                <div v-for="item in settingbottom" class="settingbottom-item" @click="openPath(item.cmd)">
                     <img :src="item.path" class="settingbottom-icon" />
+                    <v-tooltip activator="parent" location="top">
+                        {{ item.label }}
+                    </v-tooltip>
                 </div>
-                <div class="settingbottom" @click="screen">
+                <div class="settingbottom-item" @click="screen">
                     <img src="/icons/screenshot.png" class="settingbottom-icon" />
+                    <v-tooltip activator="parent" location="top">
+                        截图
+                    </v-tooltip>
                 </div>
-                <div class="settingbottom" @click="createnote">
+                <div class="settingbottom-item" @click="createnote">
                     <img src="/icons/note.png" class="settingbottom-icon" />
+                    <v-tooltip activator="parent" location="top">
+                        便签
+                    </v-tooltip>
                 </div>
             </div>
         </div>
@@ -404,24 +424,6 @@ const createnote = async function () {
 </template>
 
 <style scoped>
-.settingbottom {
-    width: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.settingbottom-icon {
-
-    width: 40px;
-    transition: all 0.1s linear;
-    filter: drop-shadow(0px 5px 5px gray);
-}
-
-.settingbottom-icon:hover {
-    width: 50px;
-}
-
 div:focus-visible {
     outline: none;
     background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
@@ -546,5 +548,34 @@ div:focus-visible {
     height: 35px;
     border-radius: 5px;
     transition: all 0.1s linear;
+}
+
+.settingbottom {
+    width: 100%;
+    height: 50px;
+    background: rgba(123, 123, 123, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0px 20px;
+}
+
+.settingbottom-item {
+    width: 55px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settingbottom-icon {
+
+    width: 40px;
+    transition: all 0.1s linear;
+    filter: drop-shadow(0px 5px 5px gray);
+}
+
+.settingbottom-icon:hover {
+    width: 50px;
 }
 </style>
