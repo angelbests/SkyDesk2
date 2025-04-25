@@ -78,7 +78,8 @@ pub fn run() {
             hovertop::hovertop,
             search::search_query,
             shelllink::shelllink,
-            wheel::screen
+            wheel::screen,
+            taskbar::gettaskbarlist
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

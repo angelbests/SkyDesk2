@@ -104,7 +104,7 @@ onMounted(async () => {
         },
         {
             path: "/icons/Folder Blue.png",
-            cmd: "explorer",
+            cmd: '::{20D04FE0-3AEA-1069-A2D8-08002B30309D}',
             label: "资源管理器"
         },
         {
@@ -119,7 +119,7 @@ onMounted(async () => {
         },
         {
             path: "/icons/cmd.png",
-            cmd: "cmd",
+            cmd: "wt",
             label: "终端"
         },
         {
@@ -127,6 +127,11 @@ onMounted(async () => {
             cmd: "calc",
             label: "计算器"
         },
+        // {
+        //     path: "/icons/screenshot.png",
+        //     cmd: "start ms-screenclip:",
+        //     label: "截图"
+        // }
     ]
 })
 
