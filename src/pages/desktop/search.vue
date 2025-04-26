@@ -141,7 +141,7 @@ const search = async function (e: any) {
     focusindex.value = -1
     searchresult.value = []
     searchshortcut.value = []
-    if (e.target.value == "") {
+    if (e.target.value.trim() == "") {
         clearTimeout(timer);
         searchstatus.value = false
         return
@@ -203,12 +203,12 @@ const search = async function (e: any) {
 // 添加窗口失焦事件
 getCurrentWebviewWindow().listen("tauri://blur", () => {
     getCurrentWebviewWindow().hide()
-    let dom = document.getElementById("container")
-    if (dom) dom.style.height = '50px'
     focusindex.value = -1
     searchresult.value = []
     searchshortcut.value = []
     inputvalue.value = ""
+    let dom = document.getElementById("container")
+    if (dom) dom.style.height = '50px'
     getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
 })
 
@@ -356,7 +356,7 @@ const createnote = async function () {
                     :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip>
+                        }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
@@ -445,7 +445,7 @@ div:focus-visible {
     width: 100vw;
     height: 99vh;
     border-radius: 25px;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s linear;
 }
 
 .search-bar {
@@ -474,7 +474,7 @@ div:focus-visible {
     border-radius: 25px;
     overflow: hidden;
     overflow-y: scroll;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s linear;
     background-image: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%);
 }
 
@@ -491,7 +491,7 @@ div:focus-visible {
     flex-wrap: wrap;
     overflow: hidden;
     overflow-y: scroll;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s linear;
 }
 
 .search-system {
@@ -503,7 +503,7 @@ div:focus-visible {
     border-bottom-right-radius: 25px;
     overflow: hidden;
     overflow-y: scroll;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s linear;
 }
 
 .search-item {
@@ -512,7 +512,7 @@ div:focus-visible {
     display: flex;
     flex-direction: row;
     align-items: center;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s linear;
 }
 
 .search-item-kind {
@@ -537,7 +537,7 @@ div:focus-visible {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    transition: height 0.1s linear;
+    transition: height 0.2s linear;
     background-size: cover;
 }
 
@@ -553,7 +553,7 @@ div:focus-visible {
     width: 35px;
     height: 35px;
     border-radius: 5px;
-    transition: all 0.1s linear;
+    transition: all 0.2s linear;
 }
 
 .settingbottom {
@@ -577,7 +577,7 @@ div:focus-visible {
 .settingbottom-icon {
 
     width: 40px;
-    transition: all 0.1s linear;
+    transition: all 0.2s linear;
     filter: drop-shadow(0px 5px 5px gray);
 }
 
