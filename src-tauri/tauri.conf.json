@@ -102,7 +102,7 @@
         "height": 50,
         "decorations": false,
         "transparent": true,
-        "dragDropEnabled": true,
+        "dragDropEnabled": false,
         "shadow": false,
         "maximizable": false,
         "resizable": true,
