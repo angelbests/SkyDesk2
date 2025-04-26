@@ -222,6 +222,7 @@ getCurrentWebviewWindow().listen("tauri://focus", () => {
 
 // 鼠标点击打开程序或文件或路径
 const openfile = async function (item: searchResult) {
+    getCurrentWebviewWindow().hide();
     let bool = await exists(item.path)
     if (bool) {
         openPath(item.path)
@@ -232,6 +233,7 @@ const openfile = async function (item: searchResult) {
 
 // 添加enter支持
 const searchenter = async function (e: any) {
+    getCurrentWebviewWindow().hide()
     if (focusindex.value >= 0) {
         let bool = await exists(searchresult.value[focusindex.value].path)
         if (bool) {
@@ -240,7 +242,6 @@ const searchenter = async function (e: any) {
             console.log("文件不存在")
         }
     } else {
-        getCurrentWebviewWindow().hide()
         openUrl("https://cn.bing.com/search?q=" + e.target.value.trim())
     }
 }
@@ -340,7 +341,8 @@ const createnote = async function () {
         <div id="search-result" class="search-result" v-if="inputvalue">
             <div class="search-shortcut" :style="{ height: searchshortcut.length == 0 ? '0px' : '80px' }">
                 <div v-for="item in searchshortcut" class="shortcut-container">
-                    <div tabindex="0" class="icon-div" @click="exec(item)" @keyup.enter="exec(item)">
+                    <div tabindex="0" class="icon-div" @click="exec(item)"
+                        @keyup.enter="() => { getCurrentWebviewWindow().hide(); exec(item); }">
                         <img class="icon"
                             :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                     </div>
@@ -356,7 +358,7 @@ const createnote = async function () {
                     :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
                     <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    }}</v-chip>
                     <div class="search-item-name">{{ item.name }}</div>
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
