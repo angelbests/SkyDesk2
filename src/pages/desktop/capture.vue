@@ -7,7 +7,6 @@ import {
 import { Canvas, Rect, Point } from "fabric"; // v6
 import { onMounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
-
 import {
   currentMonitor,
   LogicalPosition,

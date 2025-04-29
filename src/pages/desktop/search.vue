@@ -309,6 +309,11 @@ const screen = async function () {
     invoke('screen')
 }
 
+const openshortcut = function (item: any) {
+    getCurrentWebviewWindow().hide()
+    exec(item);
+}
+
 const createnote = async function () {
     let label = "note-" + uuid();
     let w = await createWindow(label, {
@@ -335,14 +340,13 @@ const createnote = async function () {
             <v-icon style="font-size: 26px;margin-left: 25px;color:rgba(123,123,123,0.8);">mdi-magnify</v-icon>
             <input id="input" autocomplete="off" @input="search" v-model="inputvalue" type="text"
                 @keyup.enter="searchenter" placeholder="请输入搜索内容" class="search-input" />
-
         </div>
 
         <div id="search-result" class="search-result" v-if="inputvalue">
             <div class="search-shortcut" :style="{ height: searchshortcut.length == 0 ? '0px' : '80px' }">
-                <div tabindex="0" @keyup.enter="() => { getCurrentWebviewWindow().hide(); exec(item); }"
-                    v-for="item in searchshortcut" class="shortcut-container">
-                    <div class="icon-div" @click="() => { getCurrentWebviewWindow().hide(); exec(item); }">
+                <div tabindex="0" @keyup.enter="openshortcut(item)" v-for="item in searchshortcut"
+                    class="shortcut-container">
+                    <div class="icon-div" @click="openshortcut(item)">
                         <img class="icon"
                             :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                     </div>
@@ -393,9 +397,9 @@ const createnote = async function () {
                         :group="{ name: 'shortcut', pull: 'clone' }"
                         style="box-sizing: border-box;padding-top: 10px;border-radius: 0px;">
                         <template v-slot="{ item }">
-                            <div tabindex="0" @keyup.enter="() => { getCurrentWebviewWindow().hide(); exec(item); }"
+                            <div tabindex="0" @keyup.enter="openshortcut(item)"
                                 :style="{ height: '80px', backgroundSize: 'cover', }" class="shortcut-container">
-                                <div class="icon-div" @click="() => { getCurrentWebviewWindow().hide(); exec(item); }">
+                                <div class="icon-div" @click="openshortcut(item)">
                                     <img class="icon"
                                         :src="item.icoPath == '' ? '/icons/program.png' : convertFileSrc(item.icoPath)" />
                                 </div>
@@ -409,19 +413,20 @@ const createnote = async function () {
                 </v-tabs-window-item>
             </v-tabs-window>
             <div class="settingbottom">
-                <div tabindex="0" v-for="item in settingbottom" class="settingbottom-item" @click="openPath(item.cmd)">
+                <div tabindex="0" v-for="item in settingbottom" class="settingbottom-item" @click="openPath(item.cmd)"
+                    @keyup.enter="openPath(item.cmd)">
                     <img :src="item.path" class="settingbottom-icon" />
                     <v-tooltip activator="parent" location="top">
                         {{ item.label }}
                     </v-tooltip>
                 </div>
-                <div tabindex="0" class="settingbottom-item" @click="screen">
+                <div tabindex="0" class="settingbottom-item" @click="screen" @keyup.enter="screen">
                     <img src="/icons/screenshot.png" class="settingbottom-icon" />
                     <v-tooltip activator="parent" location="top">
                         截图
                     </v-tooltip>
                 </div>
-                <div tabindex="0" class="settingbottom-item" @click="createnote">
+                <div tabindex="0" class="settingbottom-item" @click="createnote" @keyup.enter="createnote">
                     <img src="/icons/note.png" class="settingbottom-icon" />
                     <v-tooltip activator="parent" location="top">
                         便签
