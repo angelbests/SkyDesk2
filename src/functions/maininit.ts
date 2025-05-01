@@ -74,11 +74,11 @@ export const maininit = async function () {
   })
   // 恢复阴影
   getCurrentWebviewWindow().setShadow(true)
-  // const factor = await getCurrentWebviewWindow().scaleFactor()
+  const factor = await getCurrentWebviewWindow().scaleFactor()
   getCurrentWebviewWindow().listen("tauri://resize", (e: any) => {
     let size = {
-      width: Math.trunc(e.payload.width),
-      height: Math.trunc(e.payload.height),
+      width: Math.ceil(e.payload.width / factor),
+      height: Math.ceil(e.payload.height / factor),
     }
     localStorage.setItem("size", JSON.stringify(size))
   })
