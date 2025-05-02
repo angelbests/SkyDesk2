@@ -56,6 +56,7 @@ type WallpaperConfig = {
     memoryy: number
     memoryfontsize: number
     music: boolean
+    musictype: number
     musicx: number
     musicy: number
     musicfontsize: number

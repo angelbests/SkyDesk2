@@ -8,40 +8,7 @@ onMounted(() => {
   document
     .querySelector(".v-slide-group__content")
     ?.setAttribute("data-tauri-drag-region", "true");
-  // window.addEventListener("storage", (e) => {
-  //   if (e.key == "wallpaper") {
-  //     wallpaperstore.$hydrate();
-  //   }
-  // });
 });
-
-// const config = ref({
-//     audio:0,
-//     date:true,
-//     datex:0,
-//     datey:0,
-//     time:true,
-//     timex:0,
-//     timey:0,
-//     weather:true,
-//     weatherx:0,
-//     weathery:0,
-//     netspeed:true,
-//     netspeedx:0,
-//     netspeedy:0,
-//     cpu:true,
-//     cpux:0,
-//     cpuy:0,
-//     memory:true,
-//     memoryx:0,
-//     memoryy:0,
-//     disk:true,
-//     diskx:0,
-//     disky:0,
-//     battery:true,
-//     batteryx:0,
-//     batteryy:0,
-// })
 </script>
 
 <template>
@@ -169,14 +136,6 @@ onMounted(() => {
                 </div>
               </template>
             </v-list-item>
-            <!-- <v-list-item>
-                                <v-list-item-title>字体大小</v-list-item-title>
-                                <template v-slot:append>
-                                    <div style="width: 280px;">
-                                        <v-slider v-model.lazy="item.config.weatherfontsize" min="0" max="100" step="1" thumb-label hide-details></v-slider>
-                                    </div>
-                                </template>
-                            </v-list-item> -->
             <v-divider></v-divider>
             <v-list-subheader style="background: #d1c4e9">网速</v-list-subheader>
             <v-list-item>
@@ -311,6 +270,15 @@ onMounted(() => {
             <v-list-item>
               <v-list-item-title> APP </v-list-item-title>
               <template v-slot:append>
+                <v-radio-group v-model="item.config.musictype" inline density="compact" hide-details="auto">
+                  <v-radio style="width: 100px" label="胶片" value="1"></v-radio>
+                  <v-radio style="width: 100px" label="光盘" value="2"></v-radio>
+                </v-radio-group>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title> APP </v-list-item-title>
+              <template v-slot:append>
                 <v-radio-group v-model="item.config.musicapp" inline density="compact" hide-details="auto">
                   <v-radio style="width: 100px" label="网易云" value="cloudmusic.exe"></v-radio>
                   <v-radio style="width: 100px" label="QQ" value="QQMusic.exe"></v-radio>
@@ -318,21 +286,6 @@ onMounted(() => {
                 </v-radio-group>
               </template>
             </v-list-item>
-            <!-- <v-list-item>
-              <v-list-item-title>字体大小</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider
-                    v-model.lazy="item.config.musicfontsize"
-                    min="0"
-                    max="100"
-                    step="1"
-                    thumb-label
-                    hide-details
-                  ></v-slider>
-                </div>
-              </template>
-            </v-list-item> -->
           </v-list>
         </div>
       </v-tabs-window-item>

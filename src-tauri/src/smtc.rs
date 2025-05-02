@@ -173,7 +173,15 @@ fn session_control(session: GlobalSystemMediaTransportControlsSession, window: t
             let isession = session.TryGetMediaPropertiesAsync();
             match isession {
                 Ok(isession) => {
-                    let media = isession.get().unwrap();
+                    let mediares = isession.get();
+                    let media = match mediares {
+                        Ok(s) => s,
+                        Err(e) => {
+                            println!("mediares_error:{:?}", e);
+                            return Ok(());
+                        }
+                    };
+
                     let album_title = media.AlbumTitle().unwrap();
                     let artist = media.Artist().unwrap();
                     let title = media.Title().unwrap();

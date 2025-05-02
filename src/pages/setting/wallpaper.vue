@@ -67,6 +67,7 @@ onMounted(async () => {
                     memoryy: 0,
                     memoryfontsize: 0,
                     music: false,
+                    musictype: 1,
                     musicx: 0,
                     musicy: 0,
                     musicfontsize: 0,

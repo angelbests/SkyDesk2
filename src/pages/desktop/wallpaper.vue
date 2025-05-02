@@ -74,15 +74,15 @@ const player = new PCMPlayer({
   channels: 2,
   sampleRate: 32000,
   flushTime: 0,
-  fftSize: 512,
+  fftSize: 256,
 });
 player.volume(0);
 listen("audio_chunk", (e: { payload: number[] }) => {
   player.feed(new Uint8Array(e.payload));
 });
 
-const bufferLength = player.analyserNode.frequencyBinCount / 2;
-let getdataArray = new Uint8Array(bufferLength * 2);
+const bufferLength = player.analyserNode.frequencyBinCount;
+let getdataArray = new Uint8Array(bufferLength);
 let dataArray = new Uint8Array(bufferLength);
 function draw() {
   requestAnimationFrame(draw);
@@ -116,14 +116,14 @@ function draw() {
     canvasCtx.save();
     canvasCtx.rotate(angle * i + Math.PI);
     canvasCtx.beginPath();
-
-    const h = (dataArray[i] / 256) * 60;
+    const h = dataArray[i] / 255 * 60;
     canvasCtx.roundRect(0, 145, 4, h < 4 ? 4 : h, 4);
     canvasCtx.fill();
     canvasCtx.restore();
   }
   canvasCtx.restore();
 }
+
 
 //////////////////////////手势检测/////////////////////////////
 let mouseleftdown: {
@@ -163,6 +163,44 @@ listen("desktop", async (e: Event<MouseEvent>) => {
   }
 })
 
+let mouseleftdown2: {
+  x: number, y: number, in: boolean
+} | null = null
+listen("desktop", async (e: Event<MouseEvent>) => {
+  let dom = document.getElementById("music_vinyl");
+  if (!dom) return;
+  let monitor = await monitorFromPoint(e.payload.x, e.payload.y) as Monitor
+  let current = await currentMonitor()
+  if (monitor?.name != current?.name) {
+    mouseleftdown2 = null;
+    return
+  };
+
+  let x = (e.payload.x - monitor.position.x) / monitor.scaleFactor
+  let y = (e.payload.y - monitor.position.y) / monitor.scaleFactor
+  let { left, top, right, bottom } = dom.getBoundingClientRect()
+  if ((left < x) && (right > x) && (top < y) && (bottom > y) && e.payload.mouse == MouseAction.LeftDown) {
+    mouseleftdown2 = {
+      x: e.payload.x,
+      y: e.payload.y,
+      in: true,
+    }
+  }
+  if (e.payload.mouse == MouseAction.LeftUp && mouseleftdown2 && mouseleftdown2.in) {
+    info(`up ${mouseleftdown2.x}-${e.payload.x}-${e.payload.x - mouseleftdown2.x}`)
+    if ((e.payload.x - mouseleftdown2.x) > 40) {
+      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 1 })
+    } else if ((e.payload.x - mouseleftdown2.x) < 40 && (e.payload.x - mouseleftdown2.x) > -40) {
+      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 0 })
+    } else if ((e.payload.x - mouseleftdown2.x) < -40) {
+      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: -1 })
+    }
+  }
+  if (e.payload.mouse == MouseAction.LeftUp) {
+    mouseleftdown2 = null
+  }
+})
+
 //////////////////////////////smtc/////////////////////////////////////////
 import { Media, Smtc_Control, TimeLine } from "../../functions/smtc";
 let smtc = new Smtc_Control();
@@ -195,14 +233,34 @@ smtc.listen_timeline((e) => {
     timeline.value = e.payload
   }
 })
-
+const new_thumb = ref("");
+const history_thumb = ref("");
 smtc.listen_media((e) => {
   if (wallpaperstore.wallpaperConfig[index.value].config.musicapp == e.payload.app) {
-    media.value = {
-      ...e.payload,
-      thumb: convertFileSrc(e.payload.thumb)
+    let dom = document.getElementById("vinyl")
+    let dom2 = document.getElementById("vinyl2")
+    let dom3 = document.getElementById("vinyl_thumb");
+    if (!dom) return
+    if (!dom2) return
+    if (!dom3) return
+    history_thumb.value = media.value.thumb;
+    new_thumb.value = convertFileSrc(e.payload.thumb)
+    dom.style.animation = 'music_vinyl 0.5s linear 1'
+    dom2.style.animation = 'music_vinyl2 0.5s linear 1'
+    const preload = new Image();
+    preload.src = new_thumb.value;
+    preload.onload = () => {
+      media.value = {
+        ...e.payload,
+        thumb: convertFileSrc(e.payload.thumb)
+      }
     }
+    setTimeout(() => {
+      dom.style.animation = 'none'
+      dom2.style.animation = 'none'
+    }, 500)
   }
+  playstatus.value = 4
 })
 const playstatus = ref(5);
 smtc.listen_playstatus((e) => {
@@ -212,6 +270,7 @@ smtc.listen_playstatus((e) => {
   ) {
     playstatus.value = e.payload.status;
   }
+  info(JSON.stringify(e.payload))
 })
 
 //////////////////////////网速////////////////////////////////
@@ -333,12 +392,14 @@ const speed_s = computed(() => {
     }">
       内存：{{ memory }}%
     </div>
-    <!-- music -->
-    <div class="music" v-show="wallpaperstore.wallpaperConfig[index].config.music && media.thumb" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-      fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
-    }">
+    <!-- music1 -->
+    <div class="music"
+      v-show="wallpaperstore.wallpaperConfig[index].config.music && media.thumb && wallpaperstore.wallpaperConfig[index].config.musictype == 1"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
+      }">
       <div class="music_title">{{ media.title }} - {{ media.artist }}</div>
       <div class="music_pic" :style="{
         animationPlayState: playstatus == 4 ? 'running' : 'paused',
@@ -350,6 +411,71 @@ const speed_s = computed(() => {
           :model-value="(timeline.position / timeline.end) * 100" :width="20"></v-progress-circular>
       </div>
       <canvas id="music_canvas" class="music_canvas" width="400" height="400"></canvas>
+    </div>
+    <!-- music2-->
+    <div id="music_vinyl" class="music_vinyl_container"
+      v-show="media.thumb && wallpaperstore.wallpaperConfig[index].config.musictype == 2" :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+        fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
+      }">>
+      <svg width="0" height="0">
+        <!-- objectBoundingBox  userSpaceOnUs-->
+        <mask id="cutout-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="300">
+          <!-- 整张图为白色（可见） -->
+          <rect width="300" height="300" fill="white" />
+          <!-- 挖掉中间的下半圆（黑色区域） -->
+          <path d="
+          M 260 50 
+          A 1 1 0 0 0 260 250
+        " fill="black" opacity="0.7" />
+          <path d="
+          M 260 50
+          L 300 50
+          L 300 250
+          L 260 250
+          Z
+        " fill="black" opacity="0.7" />
+        </mask>
+      </svg>
+      <svg width="0" height="0">
+        <mask id="cutout-mask2" maskUnits="userSpaceOnUse" x="0" y="0" width="290" height="290">
+          <!-- 整张图为白色（可见） -->
+          <rect width="280" height="280" fill="white" />
+          <!-- 挖掉中间的下半圆（黑色区域） -->
+          <circle cx="140" cy="140" r="10" fill="black" />
+          <circle cx="140" cy="140" r="130" stroke="black" stroke-width="40" fill="none" />
+        </mask>
+      </svg>
+      <!-- vinyl -->
+      <div style="z-index: 301;left: 15px;top: 15px;" class="vinyl_shadow vinyl_div">
+        <img :src="history_thumb ? history_thumb : new_thumb" class="vinyl">
+      </div>
+      <div style="position: absolute;z-index: 301;" class="vinyl_shadow">
+        <img id="vinyl_thumb" :src="history_thumb" style="top: 15px;left: 15px;" class="vinyl_thumb" />
+      </div>
+      <!-- vinyl -->
+      <div style="z-index: 301;left: 10px;top: 10px;" class="vinyl_shadow vinyl_div">
+        <img :src="new_thumb" class="vinyl">
+      </div>
+      <div style="position: absolute;z-index: 301;" class="vinyl_shadow">
+        <img id="vinyl_thumb" :src="media.thumb" style="top: 10px;left: 10px;" class="vinyl_thumb" />
+      </div>
+      <!-- vinyl -->
+      <div id="vinyl" style="z-index: 302;left: 5px;top: 5px;" class="vinyl_shadow vinyl_div">
+        <img :src="history_thumb ? history_thumb : new_thumb" class="vinyl">
+      </div>
+      <div style="position: absolute;z-index: 302;" class="vinyl_shadow">
+        <img id="vinyl_thumb" :src="history_thumb" style="top: 5px;left: 5px;" class="vinyl_thumb" />
+      </div>
+      <!-- vinyl -->
+      <div id="vinyl2" style="z-index: 304;left: 0px;" class="vinyl_shadow vinyl_div">
+        <img :src="new_thumb" class="vinyl" :style="{ animationPlayState: playstatus == 4 ? 'running' : 'paused' }">
+      </div>
+      <!-- <div style="position: absolute;z-index: 310;background: rgba(223,232,223,0.9);width: 300px;height: 300px;"></div> -->
+      <div style="position: absolute;z-index: 310;" class="vinyl_shadow">
+        <img id="vinyl_thumb" :src="media.thumb" class="vinyl_thumb" />
+      </div>
     </div>
   </div>
 </template>
@@ -508,5 +634,93 @@ const speed_s = computed(() => {
 
 .rain {
   animation: rain 0.6s infinite linear;
+}
+</style>
+
+<style>
+.music_vinyl_container {
+  position: absolute;
+  left: 1400px;
+  top: 600px;
+  z-index: 300;
+  box-sizing: border-box;
+  width: 400px;
+  height: 360px;
+  /* background: white; */
+}
+
+.vinyl_shadow {
+  filter: drop-shadow(0px 0px 10px black);
+  background: transparent;
+}
+
+.vinyl_div {
+  position: relative;
+  left: 0px;
+  top: 0px;
+}
+
+.vinyl {
+  width: 280px;
+  height: 280px;
+  position: absolute;
+  border-radius: 50%;
+  left: 120px;
+  top: 10px;
+  animation: 10s normal 0s infinite linear music;
+  mask: url(#cutout-mask2);
+  mask-type: alpha;
+  border: 50px solid rgba(213, 213, 213, 1);
+
+}
+
+.vinyl_thumb {
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  mask: url(#cutout-mask);
+  mask-type: alpha;
+  border-radius: 10px;
+  border: 20px solid rgba(213, 213, 213, 1);
+}
+
+.path_rect {
+  background: rgba(123, 123, 123, 0.1);
+}
+
+@keyframes music_vinyl {
+  0% {
+    left: 0px;
+    z-index: 305;
+  }
+
+  50% {
+    left: -100px;
+    z-index: 302;
+  }
+
+  100% {
+    left: 0px;
+    z-index: 302;
+  }
+}
+
+@keyframes music_vinyl2 {
+  0% {
+    left: 0px;
+    z-index: 303;
+  }
+
+  50% {
+    left: 240px;
+    z-index: 302;
+  }
+
+  100% {
+    left: 0px;
+    z-index: 302;
+  }
 }
 </style>

@@ -5,6 +5,7 @@ import { createtray, traystart, wheelstart } from "./tray"
 import { initWindow } from "./window"
 import { exit } from "@tauri-apps/plugin-process"
 import { info } from "@tauri-apps/plugin-log"
+import { LogicalSize } from "@tauri-apps/api/dpi"
 export const maininit = async function () {
   ///#region  检查并创建文件夹
   await mkdir("lnk", { baseDir: BaseDirectory.AppData, recursive: true })
@@ -82,6 +83,11 @@ export const maininit = async function () {
     }
     localStorage.setItem("size", JSON.stringify(size))
   })
+  let datastr = localStorage.getItem("size")
+  if (datastr) {
+    let data = JSON.parse(datastr)
+    getCurrentWebviewWindow().setSize(new LogicalSize(data.width, data.height))
+  }
 }
 
 export const allinit = async function () {

@@ -13,16 +13,7 @@ import * as directives from "vuetify/directives"
 import { VNumberInput } from "vuetify/labs/VNumberInput"
 import { VDateInput } from "vuetify/labs/VDateInput"
 import { zhHans } from "vuetify/locale"
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow"
-import { LogicalSize } from "@tauri-apps/api/dpi"
 import i18n from "./i18n"
-if (getCurrentWebviewWindow().label == "main") {
-  let datastr = localStorage.getItem("size")
-  if (datastr) {
-    let data = JSON.parse(datastr)
-    getCurrentWebviewWindow().setSize(new LogicalSize(data.width, data.height))
-  }
-}
 
 const vuetify = createVuetify({
   components: {

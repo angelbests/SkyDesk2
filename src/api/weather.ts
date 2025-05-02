@@ -31,7 +31,7 @@ export const getWeather = async function (location: string): Promise<any> {
     if (respone.ok) {
       // 解压gzip数据
       for (const pair of respone.headers.entries()) {
-        info(`${pair[0]}: ${pair[1]}`)
+        // info(`${pair[0]}: ${pair[1]}`)
         if (pair[0] == "content-encoding" && pair[1] == "gzip") {
           isgzip = true
         }
@@ -49,6 +49,6 @@ export const getWeather = async function (location: string): Promise<any> {
       }
     }
   } catch (error) {
-    console.log(error)
+    info("weather_Error: " + error)
   }
 }
