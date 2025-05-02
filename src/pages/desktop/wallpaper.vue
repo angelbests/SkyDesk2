@@ -1,42 +1,39 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { convertFileSrc, invoke } from "@tauri-apps/api/core";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import { wallpaperStore } from "../../stores/wallpaper";
-import { listen, Event } from "@tauri-apps/api/event";
+import { listen } from "@tauri-apps/api/event";
 import "qweather-icons/font/qweather-icons.css";
-import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
-import PCMPlayer from "pcm-player";
-import { info } from "@tauri-apps/plugin-log";
-import { MouseAction, MouseEvent } from "../../types/desktopType";
+import { currentMonitor } from "@tauri-apps/api/window";
+import MusicDisk from "../../components/MusicDisk.vue";
+import MusicVinyl from "../../components/MusicVinyl.vue";
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
 const route = useRoute();
-const show = ref(false);
 const path = ref();
 const type = ref();
 onMounted(async () => {
   document.title = "skydesk2-wallpaper"
-  draw();
+  path.value = route.query.path;
+  type.value = route.query.type;
   const monitor = await currentMonitor();
   index.value = wallpaperstore.wallpaperConfig.findIndex(
     (item) => item.monitor == monitor?.name
   );
-  let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
-  dom.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+  if (type.value == 'video') {
+    let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
+    dom.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+  }
   window.addEventListener("storage", (e) => {
     if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
-      let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
-      dom.volume =
-        wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+      if (type.value == 'video') {
+        let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
+        dom.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+      }
     }
   });
-  path.value = route.query.path;
-  type.value = route.query.type;
-  setTimeout(() => {
-    show.value = true;
-  }, 500);
 });
 
 //////////////////////////日期/////////////////////////////////////
@@ -67,211 +64,6 @@ weather_wallpaper((e) => {
 }).then((e) => {
   w.value = e
 })
-//////////////////////音频频谱////////////////
-
-const player = new PCMPlayer({
-  inputCodec: "Int16",
-  channels: 2,
-  sampleRate: 32000,
-  flushTime: 0,
-  fftSize: 256,
-});
-player.volume(0);
-listen("audio_chunk", (e: { payload: number[] }) => {
-  player.feed(new Uint8Array(e.payload));
-});
-
-const bufferLength = player.analyserNode.frequencyBinCount;
-let getdataArray = new Uint8Array(bufferLength);
-let dataArray = new Uint8Array(bufferLength);
-function draw() {
-  requestAnimationFrame(draw);
-  // 时域数据
-  // player.analyserNode.getByteTimeDomainData(dataArray);
-  // 频率数据
-  player.analyserNode.getByteFrequencyData(getdataArray);
-  const canvas = document.getElementById("music_canvas") as HTMLCanvasElement;
-  if (canvas == null) {
-    return;
-  }
-  const canvasCtx = canvas.getContext("2d");
-  if (canvasCtx == null) {
-    return;
-  }
-
-  if (playstatus.value == 5) {
-    dataArray = new Uint8Array(bufferLength)
-  } else {
-    dataArray = getdataArray.slice(0, bufferLength)
-  }
-
-  const WIDTH = canvas.width,
-    HEIGHT = canvas.height;
-  canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-  canvasCtx.fillStyle = "rgba(220,220,220,1)";
-  const angle = (Math.PI * 2) / bufferLength;
-  canvasCtx.save();
-  canvasCtx.translate(canvas.width / 2, canvas.height / 2);
-  for (let i = 0; i < bufferLength; i++) {
-    canvasCtx.save();
-    canvasCtx.rotate(angle * i + Math.PI);
-    canvasCtx.beginPath();
-    const h = dataArray[i] / 255 * 60;
-    canvasCtx.roundRect(0, 145, 4, h < 4 ? 4 : h, 4);
-    canvasCtx.fill();
-    canvasCtx.restore();
-  }
-  canvasCtx.restore();
-}
-
-
-//////////////////////////手势检测/////////////////////////////
-let mouseleftdown: {
-  x: number, y: number, in: boolean
-} | null = null
-listen("desktop", async (e: Event<MouseEvent>) => {
-  let dom = document.getElementById("music_img");
-  if (!dom) return;
-  let monitor = await monitorFromPoint(e.payload.x, e.payload.y) as Monitor
-  let current = await currentMonitor()
-  if (monitor?.name != current?.name) {
-    mouseleftdown = null;
-    return
-  };
-  let x = (e.payload.x - monitor.position.x) / monitor.scaleFactor
-  let y = (e.payload.y - monitor.position.y) / monitor.scaleFactor
-  let { left, top, right, bottom } = dom.getBoundingClientRect()
-  if ((left < x) && (right > x) && (top < y) && (bottom > y) && e.payload.mouse == MouseAction.LeftDown) {
-    mouseleftdown = {
-      x: e.payload.x,
-      y: e.payload.y,
-      in: true,
-    }
-  }
-  if (e.payload.mouse == MouseAction.LeftUp && mouseleftdown && mouseleftdown.in) {
-    info(`up ${mouseleftdown.x}-${e.payload.x}-${e.payload.x - mouseleftdown.x}`)
-    if ((e.payload.x - mouseleftdown.x) > 40) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 1 })
-    } else if ((e.payload.x - mouseleftdown.x) < 40 && (e.payload.x - mouseleftdown.x) > -40) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 0 })
-    } else if ((e.payload.x - mouseleftdown.x) < -40) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: -1 })
-    }
-  }
-  if (e.payload.mouse == MouseAction.LeftUp) {
-    mouseleftdown = null
-  }
-})
-
-let mouseleftdown2: {
-  x: number, y: number, in: boolean
-} | null = null
-listen("desktop", async (e: Event<MouseEvent>) => {
-  let dom = document.getElementById("music_vinyl");
-  if (!dom) return;
-  let monitor = await monitorFromPoint(e.payload.x, e.payload.y) as Monitor
-  let current = await currentMonitor()
-  if (monitor?.name != current?.name) {
-    mouseleftdown2 = null;
-    return
-  };
-
-  let x = (e.payload.x - monitor.position.x) / monitor.scaleFactor
-  let y = (e.payload.y - monitor.position.y) / monitor.scaleFactor
-  let { left, top, right, bottom } = dom.getBoundingClientRect()
-  if ((left < x) && (right > x) && (top < y) && (bottom > y) && e.payload.mouse == MouseAction.LeftDown) {
-    mouseleftdown2 = {
-      x: e.payload.x,
-      y: e.payload.y,
-      in: true,
-    }
-  }
-  if (e.payload.mouse == MouseAction.LeftUp && mouseleftdown2 && mouseleftdown2.in) {
-    info(`up ${mouseleftdown2.x}-${e.payload.x}-${e.payload.x - mouseleftdown2.x}`)
-    if ((e.payload.x - mouseleftdown2.x) > 40) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 1 })
-    } else if ((e.payload.x - mouseleftdown2.x) < 40 && (e.payload.x - mouseleftdown2.x) > -40) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: 0 })
-    } else if ((e.payload.x - mouseleftdown2.x) < -40) {
-      invoke("play_control", { appname: wallpaperstore.wallpaperConfig[index.value].config.musicapp, control: -1 })
-    }
-  }
-  if (e.payload.mouse == MouseAction.LeftUp) {
-    mouseleftdown2 = null
-  }
-})
-
-//////////////////////////////smtc/////////////////////////////////////////
-import { Media, Smtc_Control, TimeLine } from "../../functions/smtc";
-let smtc = new Smtc_Control();
-const media = ref<Media>({ app: "", title: "", artist: "", album_title: "", media_type: 0, thumb: "", })
-const timeline = ref<TimeLine>({ app: "", position: 0, start: 0, end: 0 })
-smtc.listen_appstatus(async (e) => {
-  if (
-    !e.payload.cloudmusic &&
-    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-    "cloudmusic.exe"
-  ) {
-    media.value.thumb = "";
-  } else if (
-    !e.payload.qqmusic &&
-    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-    "QQMusic.exe"
-  ) {
-    media.value.thumb = "";
-  } else if (
-    !e.payload.spotify &&
-    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-    "Spotify.exe"
-  ) {
-    media.value.thumb = "";
-  }
-})
-
-smtc.listen_timeline((e) => {
-  if (wallpaperstore.wallpaperConfig[index.value].config.musicapp == e.payload.app) {
-    timeline.value = e.payload
-  }
-})
-const new_thumb = ref("");
-const history_thumb = ref("");
-smtc.listen_media((e) => {
-  if (wallpaperstore.wallpaperConfig[index.value].config.musicapp == e.payload.app) {
-    let dom = document.getElementById("vinyl")
-    let dom2 = document.getElementById("vinyl2")
-    let dom3 = document.getElementById("vinyl_thumb");
-    if (!dom) return
-    if (!dom2) return
-    if (!dom3) return
-    history_thumb.value = media.value.thumb;
-    new_thumb.value = convertFileSrc(e.payload.thumb)
-    dom.style.animation = 'music_vinyl 0.5s linear 1'
-    dom2.style.animation = 'music_vinyl2 0.5s linear 1'
-    const preload = new Image();
-    preload.src = new_thumb.value;
-    preload.onload = () => {
-      media.value = {
-        ...e.payload,
-        thumb: convertFileSrc(e.payload.thumb)
-      }
-    }
-    setTimeout(() => {
-      dom.style.animation = 'none'
-      dom2.style.animation = 'none'
-    }, 500)
-  }
-  playstatus.value = 4
-})
-const playstatus = ref(5);
-smtc.listen_playstatus((e) => {
-  if (
-    wallpaperstore.wallpaperConfig[index.value].config.musicapp ==
-    e.payload.app
-  ) {
-    playstatus.value = e.payload.status;
-  }
-  info(JSON.stringify(e.payload))
-})
 
 //////////////////////////网速////////////////////////////////
 import { Netspeed, NetSpeed } from "../../functions/sysinfo";
@@ -295,7 +87,8 @@ const speed_s = computed(() => {
   <div class="window">
     <!-- wallpaper -->
     <img v-if="type == 'image'" :src="convertFileSrc(path)" class="image" />
-    <video id="wallpapervideo" v-else class="video" :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
+    <video v-else-if="type == 'video'" id="wallpapervideo" class="video" :src="convertFileSrc(path)" autoplay="true"
+      loop="true"></video>
     <!-- 天气 -->
     <div class="weather" v-show="wallpaperstore.wallpaperConfig[index].config.weather" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
@@ -393,90 +186,15 @@ const speed_s = computed(() => {
       内存：{{ memory }}%
     </div>
     <!-- music1 -->
-    <div class="music"
-      v-show="wallpaperstore.wallpaperConfig[index].config.music && media.thumb && wallpaperstore.wallpaperConfig[index].config.musictype == 1"
-      :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
-      }">
-      <div class="music_title">{{ media.title }} - {{ media.artist }}</div>
-      <div class="music_pic" :style="{
-        animationPlayState: playstatus == 4 ? 'running' : 'paused',
-      }">
-        <img id="music_img" :src="media.thumb" class="music_pic_img" />
-      </div>
-      <div id="timeline">
-        <v-progress-circular class="music-progress" color="rgba(223,123,103,0.5)" bg-color="rgba(123,123,123,0.3)"
-          :model-value="(timeline.position / timeline.end) * 100" :width="20"></v-progress-circular>
-      </div>
-      <canvas id="music_canvas" class="music_canvas" width="400" height="400"></canvas>
-    </div>
+    <MusicVinyl v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 1" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+    }"></MusicVinyl>
     <!-- music2-->
-    <div id="music_vinyl" class="music_vinyl_container"
-      v-show="media.thumb && wallpaperstore.wallpaperConfig[index].config.musictype == 2" :style="{
-        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-        fontSize: `${wallpaperstore.wallpaperConfig[index].config.musicfontsize}px`,
-      }">>
-      <svg width="0" height="0">
-        <!-- objectBoundingBox  userSpaceOnUs-->
-        <mask id="cutout-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="300">
-          <!-- 整张图为白色（可见） -->
-          <rect width="300" height="300" fill="white" />
-          <!-- 挖掉中间的下半圆（黑色区域） -->
-          <path d="
-          M 260 50 
-          A 1 1 0 0 0 260 250
-        " fill="black" opacity="0.7" />
-          <path d="
-          M 260 50
-          L 300 50
-          L 300 250
-          L 260 250
-          Z
-        " fill="black" opacity="0.7" />
-        </mask>
-      </svg>
-      <svg width="0" height="0">
-        <mask id="cutout-mask2" maskUnits="userSpaceOnUse" x="0" y="0" width="290" height="290">
-          <!-- 整张图为白色（可见） -->
-          <rect width="280" height="280" fill="white" />
-          <!-- 挖掉中间的下半圆（黑色区域） -->
-          <circle cx="140" cy="140" r="10" fill="black" />
-          <circle cx="140" cy="140" r="130" stroke="black" stroke-width="40" fill="none" />
-        </mask>
-      </svg>
-      <!-- vinyl -->
-      <div style="z-index: 301;left: 15px;top: 15px;" class="vinyl_shadow vinyl_div">
-        <img :src="history_thumb ? history_thumb : new_thumb" class="vinyl">
-      </div>
-      <div style="position: absolute;z-index: 301;" class="vinyl_shadow">
-        <img id="vinyl_thumb" :src="history_thumb" style="top: 15px;left: 15px;" class="vinyl_thumb" />
-      </div>
-      <!-- vinyl -->
-      <div style="z-index: 301;left: 10px;top: 10px;" class="vinyl_shadow vinyl_div">
-        <img :src="new_thumb" class="vinyl">
-      </div>
-      <div style="position: absolute;z-index: 301;" class="vinyl_shadow">
-        <img id="vinyl_thumb" :src="media.thumb" style="top: 10px;left: 10px;" class="vinyl_thumb" />
-      </div>
-      <!-- vinyl -->
-      <div id="vinyl" style="z-index: 302;left: 5px;top: 5px;" class="vinyl_shadow vinyl_div">
-        <img :src="history_thumb ? history_thumb : new_thumb" class="vinyl">
-      </div>
-      <div style="position: absolute;z-index: 302;" class="vinyl_shadow">
-        <img id="vinyl_thumb" :src="history_thumb" style="top: 5px;left: 5px;" class="vinyl_thumb" />
-      </div>
-      <!-- vinyl -->
-      <div id="vinyl2" style="z-index: 304;left: 0px;" class="vinyl_shadow vinyl_div">
-        <img :src="new_thumb" class="vinyl" :style="{ animationPlayState: playstatus == 4 ? 'running' : 'paused' }">
-      </div>
-      <!-- <div style="position: absolute;z-index: 310;background: rgba(223,232,223,0.9);width: 300px;height: 300px;"></div> -->
-      <div style="position: absolute;z-index: 310;" class="vinyl_shadow">
-        <img id="vinyl_thumb" :src="media.thumb" class="vinyl_thumb" />
-      </div>
-    </div>
+    <MusicDisk v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 2" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+    }"></MusicDisk>
   </div>
 </template>
 
@@ -552,175 +270,5 @@ const speed_s = computed(() => {
   z-index: 100;
   width: 200px;
   height: 300px;
-}
-
-.music {
-  position: absolute;
-  z-index: 215;
-  left: 50vw;
-  top: 10vh;
-  width: 300px;
-}
-
-.music_title {
-  font-size: 16px;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-wrap: balance;
-  text-align: center;
-  text-overflow: clip;
-  overflow: hidden;
-}
-
-.music_pic {
-  z-index: 215;
-  position: relative;
-  transform-origin: 50% 50%;
-  animation: 15s normal 0s infinite linear music;
-  width: 100%;
-  height: 350px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.music_pic_img {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  border: 35px solid white;
-  transition: all 1s linear;
-}
-
-.music_canvas {
-  position: absolute;
-  z-index: 213;
-  left: -50px;
-  top: 55px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#timeline {
-  position: absolute;
-  z-index: 216;
-  left: -25px;
-  top: 80px;
-  width: 350px;
-  height: 350px;
-  /* background-color: blue; */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.music-progress {
-  width: 285px;
-  height: 285px;
-}
-
-@keyframes rain {
-  0% {
-    top: 0px;
-  }
-
-  100% {
-    top: 400px;
-  }
-}
-
-.rain {
-  animation: rain 0.6s infinite linear;
-}
-</style>
-
-<style>
-.music_vinyl_container {
-  position: absolute;
-  left: 1400px;
-  top: 600px;
-  z-index: 300;
-  box-sizing: border-box;
-  width: 400px;
-  height: 360px;
-  /* background: white; */
-}
-
-.vinyl_shadow {
-  filter: drop-shadow(0px 0px 10px black);
-  background: transparent;
-}
-
-.vinyl_div {
-  position: relative;
-  left: 0px;
-  top: 0px;
-}
-
-.vinyl {
-  width: 280px;
-  height: 280px;
-  position: absolute;
-  border-radius: 50%;
-  left: 120px;
-  top: 10px;
-  animation: 10s normal 0s infinite linear music;
-  mask: url(#cutout-mask2);
-  mask-type: alpha;
-  border: 50px solid rgba(213, 213, 213, 1);
-
-}
-
-.vinyl_thumb {
-  width: 300px;
-  height: 300px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  mask: url(#cutout-mask);
-  mask-type: alpha;
-  border-radius: 10px;
-  border: 20px solid rgba(213, 213, 213, 1);
-}
-
-.path_rect {
-  background: rgba(123, 123, 123, 0.1);
-}
-
-@keyframes music_vinyl {
-  0% {
-    left: 0px;
-    z-index: 305;
-  }
-
-  50% {
-    left: -100px;
-    z-index: 302;
-  }
-
-  100% {
-    left: 0px;
-    z-index: 302;
-  }
-}
-
-@keyframes music_vinyl2 {
-  0% {
-    left: 0px;
-    z-index: 303;
-  }
-
-  50% {
-    left: 240px;
-    z-index: 302;
-  }
-
-  100% {
-    left: 0px;
-    z-index: 302;
-  }
 }
 </style>

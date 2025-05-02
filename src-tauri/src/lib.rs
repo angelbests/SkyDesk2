@@ -1,4 +1,4 @@
-use tauri::{path::BaseDirectory, Manager};
+use tauri::{path::BaseDirectory, Error, Manager, Window};
 use tauri_plugin_autostart::MacosLauncher;
 mod capture;
 mod icotopng;
@@ -79,8 +79,18 @@ pub fn run() {
             search::search_query,
             shelllink::shelllink,
             wheel::screen,
-            taskbar::gettaskbarlist
+            taskbar::gettaskbarlist,
+            open_devtool
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn open_devtool(window: Window, label: String) -> Result<(), Error> {
+    let webview = window
+        .get_webview_window(&label)
+        .ok_or(Error::WebviewNotFound)?;
+    webview.open_devtools();
+    return Ok(());
 }

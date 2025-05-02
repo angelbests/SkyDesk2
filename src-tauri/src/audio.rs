@@ -160,7 +160,7 @@ pub fn default_audio_capture(window: tauri::AppHandle) {
             std::sync::mpsc::SyncSender<Vec<u8>>,
             std::sync::mpsc::Receiver<Vec<u8>>,
         ) = mpsc::sync_channel(2);
-        let chunksize = 1024;
+        let chunksize = 128;
 
         let _handle = thread::Builder::new()
             .name("Capture".to_string())
