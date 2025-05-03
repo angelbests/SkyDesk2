@@ -273,6 +273,7 @@ onMounted(() => {
                 <v-radio-group v-model="item.config.musictype" inline density="compact" hide-details="auto">
                   <v-radio style="width: 100px" label="胶片" value="1"></v-radio>
                   <v-radio style="width: 100px" label="光盘" value="2"></v-radio>
+                  <v-radio style="width: 100px" label="磁带" value="3"></v-radio>
                 </v-radio-group>
               </template>
             </v-list-item>

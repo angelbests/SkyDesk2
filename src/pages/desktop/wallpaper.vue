@@ -8,6 +8,7 @@ import "qweather-icons/font/qweather-icons.css";
 import { currentMonitor } from "@tauri-apps/api/window";
 import MusicDisk from "../../components/MusicDisk.vue";
 import MusicVinyl from "../../components/MusicVinyl.vue";
+import MusicTape from "../../components/MusicTape.vue";
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
 const route = useRoute();
@@ -34,6 +35,7 @@ onMounted(async () => {
       }
     }
   });
+  // invoke("open_devtool", { label: await getCurrentWebviewWindow().label })
 });
 
 //////////////////////////日期/////////////////////////////////////
@@ -195,6 +197,12 @@ const speed_s = computed(() => {
       left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
       top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
     }"></MusicDisk>
+    <!-- music3 -->
+    <MusicTape v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 3" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+    }">
+    </MusicTape>
   </div>
 </template>
 
