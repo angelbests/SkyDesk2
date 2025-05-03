@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { Media, Smtc_Control, TimeLine } from "../functions/smtc";
 import { wallpaperStore } from "../stores/wallpaper";
 import { convertFileSrc } from "@tauri-apps/api/core";
@@ -75,8 +75,8 @@ function draw() {
         canvasCtx.save();
         canvasCtx.rotate(angle * i + Math.PI);
         canvasCtx.beginPath();
-        const h = dataArray[i] / 255 * 60;
-        canvasCtx.roundRect(0, 143, 4, h < 4 ? 4 : h, 4);
+        const h = dataArray[i] / 255 * 35;
+        canvasCtx.roundRect(0, 95, 4, h < 4 ? 4 : h, 4);
         canvasCtx.fill();
         canvasCtx.restore();
     }
@@ -124,7 +124,7 @@ smtc.listen_media((e) => {
             thumb: convertFileSrc(e.payload.thumb)
         }
     }
-    playstatus.value = 4
+    // playstatus.value = 4
 })
 const playstatus = ref(5);
 smtc.listen_playstatus((e) => {
@@ -133,9 +133,48 @@ smtc.listen_playstatus((e) => {
         e.payload.app
     ) {
         playstatus.value = e.payload.status;
+
     }
     info(JSON.stringify(e.payload))
 })
+
+watch(playstatus, (newvalue, oldvalue) => {
+    if (newvalue != oldvalue && newvalue) {
+        tonearmControl(newvalue)
+    }
+
+})
+
+const tonearmControl = function (status: number) {
+    let tonearmanimate = document.getElementById('tonearmanimate') as SVGAnimateMotionElement | null
+    let svg = document.getElementById('tonearm') as SVGSVGElement | null
+    if (!svg) return
+    if (!tonearmanimate) return
+
+    if (status == 5) {
+        svg.pauseAnimations()
+        tonearmanimate.removeAttribute("values")
+        tonearmanimate.setAttribute("to", "-11,160,40")
+        tonearmanimate.setAttribute("repeatCount", "1")
+        tonearmanimate.setAttribute("dur", "0.1s")
+        tonearmanimate.beginElement()
+        svg.unpauseAnimations()
+    } else if (status == 4) {
+        tonearmanimate.removeAttribute("to")
+        tonearmanimate.setAttribute("values", "-11,160,40;0,160,40")
+        tonearmanimate.setAttribute("repeatCount", "1")
+        tonearmanimate.setAttribute("dur", "0.1s")
+        svg.unpauseAnimations()
+        tonearmanimate.beginElement()
+        setTimeout(() => {
+            tonearmanimate.setAttribute("values", "0,160,40;2,160,40;0,160,40")
+            tonearmanimate.setAttribute("repeatCount", "indefinite")
+            tonearmanimate.setAttribute("dur", "5s")
+            tonearmanimate.beginElement()
+        }, 300)
+    }
+    info(status.toString())
+}
 
 onUnmounted(() => {
     smtc.cancel_listen_media()
@@ -148,47 +187,87 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="music_vinyl vinyl_shadow" v-show="media.thumb">
+    <div class="music_vinyl" v-show="media.thumb"
+        :style="{ background: `url(${media.thumb})`, backgroundSize: 'cover' }">
+        <svg id="tonearm" style="position: absolute;z-index: 300;" width="400" height="400" viewBox="0 0 200 200">
+            <g id="tonearmg" transform="rotate(2,160,40)" style="filter: drop-shadow(0px 0px 2px black);">
+                <path d=" M 160 25 C 160 130, 170 120, 145 140" stroke="#304352" fill="none" stroke-width="4"
+                    stroke-linecap="round">
+                </path>
+                <g style="filter: drop-shadow(0px 0px 1px black);">
+                    <rect x="139" y="140" width="8" height="12" fill="gray" transform="rotate(50,146,143)" rx="2"
+                        ry="2" />
+                </g>
+                <circle cx="160" cy="40" r="6" fill="gray" />
+                <circle cx="160" cy="40" r="2" fill="#304352" />
+                <animateTransform id="tonearmanimate" attributeName="transform" attributeType="XML" type="rotate"
+                    values="0,160,40;2,160,40;0,160,40" dur="6s" repeatCount="indefinite" fill="freeze"
+                    begin="indefinite" />
+            </g>
+
+        </svg>
+        <!-- 封面 -->
         <img id="music_img" :style="{ animationPlayState: playstatus == 4 ? 'running' : 'paused' }" :src="media.thumb"
             class="music_pic_img" />
-        <v-progress-circular class="music-progress" color="rgba(223,123,103,0.5)" bg-color="rgba(123,123,123,0.3)"
-            :model-value="(timeline.position / timeline.end) * 100" :width="20"></v-progress-circular>
+        <!-- 环形柱状图 -->
         <canvas v-show="playstatus == 4 ? true : false" id="music_canvas" class="music_canvas" width="400"
             height="400"></canvas>
+        <!-- 时间线进度 -->
+        <v-progress-circular class="music-progress" bg-color="#00f2fe" color="#304352"
+            :model-value="(timeline.position / timeline.end) * 100" :width="10"></v-progress-circular>
+        <div class="circle_border"></div>
     </div>
+
 </template>
 
 <style>
-.vinyl_shadow {
-    filter: drop-shadow(0px 0px 10px black);
-}
-
 .music_vinyl {
     position: absolute;
     z-index: 215;
-    width: 300px;
-    height: 300px;
+    width: 320px;
+    height: 320px;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: rgba(203, 203, 223, 0.9);
+    border-radius: 50px;
+    filter: drop-shadow(0px 0px 10px black);
+    border: 5px solid white;
 }
 
 .music_pic_img {
     position: absolute;
+    z-index: 211;
     animation: 10s normal 0s infinite linear music;
-    width: 290px;
-    height: 290px;
+    width: 182px;
+    height: 182px;
     border-radius: 50%;
-    border: 30px solid rgba(223, 233, 223, 1);
-    transition: all 1s linear;
+    /* filter: drop-shadow(0px 0px 10px black); */
 }
 
 .music_canvas {
-    position: absolute
+    position: absolute;
+    z-index: 209;
+    /* animation: 10s normal 0s infinite linear music; */
 }
 
 .music-progress {
-    width: 285px;
-    height: 285px;
+    position: absolute;
+    z-index: 210;
+    width: 200px;
+    height: 200px;
+    filter: drop-shadow(0px 0px 10px black);
+}
+
+.circle_border {
+    position: absolute;
+    z-index: 208;
+    width: 270px;
+    height: 270px;
+    border-radius: 50%;
+    background-image: linear-gradient(60deg, #304352 0%, black 40%, #434322 60%, #304352 100%);
+    /* background-image: linear-gradient(to right, #434322 0%, #304352 100%); */
+    animation: 10s normal 0s infinite linear music;
+    filter: drop-shadow(0px 0px 10px black);
 }
 </style>
