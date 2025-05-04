@@ -19,7 +19,6 @@ import {
 import { emit } from "@tauri-apps/api/event";
 import { noteStore } from "../../stores/note";
 import { windowStore } from "../../stores/window"
-import { createWindow } from "../../functions/window";
 // 监听storage事件
 window.addEventListener("storage", (e) => {
   if (e.key === "note") {
@@ -437,7 +436,7 @@ const close = async function () {
   if (index >= 0) {
     notestore.note[index]['option'] = res[0].option;
   }
-  appWindow.close();
+  await getCurrentWebviewWindow().close()
 };
 
 // 右键菜单事件
@@ -449,23 +448,26 @@ const rightClick = function () {
 
 // 创建新窗口
 const createnote = async function () {
-  let label = "note-" + uuid();
-  let w = await createWindow(label, {
-    x: 200,
-    y: 200,
-    width: 330,
-    height: 330,
-    minWidth: 330,
-    minHeight: 100,
-    shadow: false,
-    decorations: false,
-    transparent: true,
-    skipTaskbar: true,
-    url: "/#/pages/desktop/note",
-    title: "note"
-  });
-  w?.center()
+  // let label = "note-" + uuid();
+  // let w = await createWindow(label, {
+  //   x: 200,
+  //   y: 200,
+  //   width: 330,
+  //   height: 330,
+  //   minWidth: 330,
+  //   minHeight: 100,
+  //   shadow: false,
+  //   decorations: false,
+  //   transparent: true,
+  //   skipTaskbar: true,
+  //   url: "/#/pages/desktop/note",
+  //   title: "note"
+  // });
+  // w?.center()
+  getCurrentWebviewWindow().emit("create-note")
 };
+
+
 </script>
 
 <template>

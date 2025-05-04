@@ -218,9 +218,6 @@ onUnmounted(() => {
             <!-- 封面 -->
             <img id="music_img" :style="{ animationPlayState: playstatus == 4 ? 'running' : 'paused' }"
                 :src="media.thumb" class="music_pic_img" />
-            <!-- 环形柱状图 -->
-            <canvas v-show="playstatus == 4 ? true : false" id="music_canvas" class="music_canvas" width="270"
-                height="270"></canvas>
             <!-- 时间线进度 -->
             <v-progress-circular class="music-progress" bg-color="#00f2fe" color="#304352"
                 :model-value="(timeline.position / timeline.end) * 100" :width="10" :size="190"></v-progress-circular>
