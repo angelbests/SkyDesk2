@@ -18,6 +18,7 @@ import {
 } from "@wangeditor/editor";
 import { noteStore } from "../../stores/note";
 import { windowStore } from "../../stores/window"
+let label = getCurrentWebviewWindow().label;
 // 监听storage事件
 window.addEventListener("storage", (e) => {
   if (e.key === "note") {
@@ -33,7 +34,7 @@ const editorData = reactive({
   date: gettime(),
   color: "235,235,235",
   opacity: 100,
-  label: getCurrentWebviewWindow().label,
+  label: label,
   always: "normal",
   wallpaper: false,
 });
@@ -41,7 +42,7 @@ const show = ref(true);
 onMounted(() => {
   // 初始化数据
   setTimeout(function () {
-    let dataStr = localStorage.getItem(getCurrentWebviewWindow().label);
+    let dataStr = localStorage.getItem(label);
     if (dataStr) {
       let data = JSON.parse(dataStr);
       editorData.date = data.date;
@@ -52,9 +53,8 @@ onMounted(() => {
       editorData.wallpaper = data.wallpaper;
       setconfig();
     } else {
-      localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
+      localStorage.setItem(label, JSON.stringify(editorData));
       setconfig();
-      getCurrentWebviewWindow().emit("note", editorData);
     }
   }, 1);
 
@@ -72,6 +72,7 @@ getCurrentWebviewWindow().listen("tauri://blur", function () {
 getCurrentWebviewWindow().listen("tauri://focus", function () {
   show.value = true;
 });
+let timer: any = undefined
 const setconfig = async function () {
   let doc = document.getElementsByTagName("body")[0];
   doc.style.background = `rgba(${editorData.color},${editorData.opacity / 100
@@ -86,20 +87,27 @@ const setconfig = async function () {
   con.style.background = "transparent";
   if (editorData.always == "top") {
     alwaysicon.value = "mdi-arrange-bring-forward";
-    await getCurrentWebviewWindow().setAlwaysOnBottom(false);
-    await getCurrentWebviewWindow().setAlwaysOnTop(true);
+    getCurrentWebviewWindow().setAlwaysOnBottom(false);
+    getCurrentWebviewWindow().setAlwaysOnTop(true);
   } else if (editorData.always == "bottom") {
     alwaysicon.value = "mdi-arrange-send-backward";
-    await getCurrentWebviewWindow().setAlwaysOnTop(false);
-    await getCurrentWebviewWindow().setAlwaysOnBottom(true);
+    getCurrentWebviewWindow().setAlwaysOnTop(false);
+    getCurrentWebviewWindow().setAlwaysOnBottom(true);
   } else if (editorData.always == "normal") {
     alwaysicon.value = "mdi-rectangle";
-    await getCurrentWebviewWindow().setAlwaysOnBottom(false);
-    await getCurrentWebviewWindow().setAlwaysOnTop(false);
+    getCurrentWebviewWindow().setAlwaysOnBottom(false);
+    getCurrentWebviewWindow().setAlwaysOnTop(false);
   }
   if (editorData.wallpaper) {
     show.value = false;
   }
+  localStorage.setItem(label, JSON.stringify({ ...editorData }));
+  if (timer != undefined) clearTimeout(timer);
+  timer = setTimeout(() => {
+    getCurrentWebviewWindow().emitTo("main", "note", { ...editorData });
+    console.log(1)
+  }, 50)
+
 };
 //#endregion
 
@@ -144,7 +152,7 @@ const onChangeTime = ref<any>();
 const onChange = function () {
   clearTimeout(onChangeTime.value);
   onChangeTime.value = setTimeout(function () {
-    localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
+    localStorage.setItem(label, JSON.stringify(editorData));
     getCurrentWebviewWindow().emit("note", editorData);
   }, 100);
 };
@@ -366,8 +374,6 @@ const colorChange = function () {
 const colorInput = function (e: any) {
   const { red, green, blue } = hexToRgba(e.srcElement.value, 1);
   editorData.color = red + "," + green + "," + blue;
-  localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
-  getCurrentWebviewWindow().emit("note", editorData);
   setconfig();
 };
 // 16进制color转10进制
@@ -394,8 +400,6 @@ function hexToRgba(hex: string, opacity: number | string) {
 const transparentbool = ref(false);
 const rangeChange = function (e: any) {
   editorData.opacity = e.srcElement.value;
-  localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
-  getCurrentWebviewWindow().emit("note", editorData);
   setconfig();
 };
 
@@ -412,15 +416,12 @@ const setalways = function () {
     editorData.always = "top";
     alwaysicon.value = "mdi-arrange-bring-forward";
   }
-  localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
   setconfig();
 };
 
 // 关闭
-
 const close = function () {
   const windowstore = windowStore();
-  let label = getCurrentWebviewWindow().label;
   console.log(windowstore.windows);
   let res = windowstore.windows.filter((item) => {
     return item.label == label
@@ -440,12 +441,11 @@ const close = function () {
 const rightClick = function () {
   transparentbool.value = false;
 };
-
 //#endregion
 
 // 创建新窗口
 const createnote = async function () {
-  getCurrentWebviewWindow().emit("create-note")
+  getCurrentWebviewWindow().emitTo("main", "create-note")
 };
 
 

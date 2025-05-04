@@ -27,11 +27,11 @@ struct MouseInfo {
     y: i32,
     mouse: MouseAction,
 }
-
+use std::sync::mpsc::{sync_channel, SyncSender};
 use std::sync::{LazyLock, Mutex};
-
 static mut H: HWND = HWND(std::ptr::null_mut());
-static APP_HANDLE: LazyLock<Mutex<Option<AppHandle>>> = LazyLock::new(|| Mutex::new(None));
+static TX: LazyLock<Mutex<Option<SyncSender<Option<MouseInfo>>>>> =
+    LazyLock::new(|| Mutex::new(None));
 static mut HOOK: Option<HHOOK> = None;
 extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     unsafe {
@@ -87,6 +87,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::LeftDown,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_RBUTTONDOWN => {
                     // println!("鼠标右键点击了桌面");
@@ -95,6 +98,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::RightDown,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_MBUTTONDOWN => {
                     // println!("鼠标中键点击了桌面");
@@ -103,6 +109,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::MiddleDown,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_LBUTTONUP => {
                     // println!("鼠标左键释放了桌面");
@@ -111,6 +120,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::LeftUp,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_RBUTTONUP => {
                     // println!("鼠标右键释放了桌面");
@@ -119,6 +131,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::RightUp,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_MBUTTONUP => {
                     // println!("鼠标中键释放了桌面");
@@ -127,6 +142,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::MiddleUp,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_MOUSEMOVE => {
                     // println!("鼠标移动了桌面");
@@ -135,6 +153,9 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::Move,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
                 WM_MOUSEWHEEL => {
                     // println!("鼠标滚轮滚动了桌面");
@@ -143,11 +164,16 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                         y: mouse_info.pt.y,
                         mouse: MouseAction::Wheel,
                     });
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
                 }
-                _ => mouse = None,
-            }
-            if let Some(app_handle) = APP_HANDLE.lock().unwrap().as_ref() {
-                let _ = app_handle.emit("desktop", mouse);
+                _ => {
+                    mouse = None;
+                    if let Some(sender) = &*TX.lock().unwrap() {
+                        let _ = sender.send(mouse);
+                    }
+                }
             }
         }
     }
@@ -163,7 +189,15 @@ pub fn desktop_mouse_listen(app: AppHandle) {
         h = FindWindowExA(Some(h), None, s!("Chrome_WidgetWin_1"), None).unwrap();
         h = FindWindowExA(Some(h), None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
         H = h;
-        *APP_HANDLE.lock().unwrap() = Some(app);
+
+        let (tx, rx) = sync_channel::<Option<MouseInfo>>(100);
+        *TX.lock().unwrap() = Some(tx);
+        std::thread::spawn(move || {
+            while let Ok(mouse) = rx.recv() {
+                let _ = app.emit("desktop", mouse);
+            }
+        });
+        // *APP_HANDLE.lock().unwrap() = Some(app);
         let h_instance = GetModuleHandleA(None).unwrap();
         let _hook = SetWindowsHookExA(
             WH_MOUSE_LL,

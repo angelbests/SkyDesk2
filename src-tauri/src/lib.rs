@@ -25,7 +25,6 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(move |app| {
             let apphandle = app.handle();
-
             wheel::wheelclick(apphandle.clone());
             sysinfo::netspeed(apphandle.clone());
             sysinfo::system(apphandle.clone());
