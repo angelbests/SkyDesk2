@@ -3,7 +3,7 @@ import App from "./App.vue"
 import { createPinia } from "pinia"
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate"
 import router from "./router/index"
-
+// npm install @tauri-apps/cli@latest @tauri-apps/api@latest @tauri-apps/plugin-clipboard-manager @tauri-apps/plugin-dialog @tauri-apps/plugin-fs @tauri-apps/plugin-global-shortcut @tauri-apps/plugin-http @tauri-apps/plugin-log @tauri-apps/plugin-opener @tauri-apps/plugin-process @tauri-apps/plugin-shell @tauri-apps/plugin-updater @tauri-apps/plugin-upload
 // Vuetify
 import "@mdi/font/css/materialdesignicons.css"
 import "vuetify/styles"

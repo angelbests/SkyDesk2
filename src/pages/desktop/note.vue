@@ -16,7 +16,6 @@ import {
   IDomEditor,
   IEditorConfig,
 } from "@wangeditor/editor";
-import { emit } from "@tauri-apps/api/event";
 import { noteStore } from "../../stores/note";
 import { windowStore } from "../../stores/window"
 // 监听storage事件
@@ -29,13 +28,12 @@ window.addEventListener("storage", (e) => {
   }
 });
 //#region vue
-const appWindow = getCurrentWebviewWindow();
 const editorData = reactive({
   value: "",
   date: gettime(),
   color: "235,235,235",
   opacity: 100,
-  label: appWindow.label,
+  label: getCurrentWebviewWindow().label,
   always: "normal",
   wallpaper: false,
 });
@@ -43,7 +41,7 @@ const show = ref(true);
 onMounted(() => {
   // 初始化数据
   setTimeout(function () {
-    let dataStr = localStorage.getItem(appWindow.label);
+    let dataStr = localStorage.getItem(getCurrentWebviewWindow().label);
     if (dataStr) {
       let data = JSON.parse(dataStr);
       editorData.date = data.date;
@@ -54,24 +52,26 @@ onMounted(() => {
       editorData.wallpaper = data.wallpaper;
       setconfig();
     } else {
-      localStorage.setItem(appWindow.label, JSON.stringify(editorData));
+      localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
       setconfig();
-      emit("note", editorData);
+      getCurrentWebviewWindow().emit("note", editorData);
     }
   }, 1);
 
   //文件拖拽监听
   filedrop();
 
-  appWindow.listen("tauri://blur", function () {
-    show.value = false;
-  });
 
-  appWindow.listen("tauri://focus", function () {
-    show.value = true;
-  });
 });
 
+
+getCurrentWebviewWindow().listen("tauri://blur", function () {
+  show.value = false;
+});
+
+getCurrentWebviewWindow().listen("tauri://focus", function () {
+  show.value = true;
+});
 const setconfig = async function () {
   let doc = document.getElementsByTagName("body")[0];
   doc.style.background = `rgba(${editorData.color},${editorData.opacity / 100
@@ -97,9 +97,6 @@ const setconfig = async function () {
     await getCurrentWebviewWindow().setAlwaysOnBottom(false);
     await getCurrentWebviewWindow().setAlwaysOnTop(false);
   }
-
-
-
   if (editorData.wallpaper) {
     show.value = false;
   }
@@ -108,7 +105,7 @@ const setconfig = async function () {
 
 //#region 监听图片文件的拖拽
 const filedrop = async function () {
-  await appWindow.listen("tauri://drag-drop", async (e: any) => {
+  await getCurrentWebviewWindow().listen("tauri://drag-drop", async (e: any) => {
     for (let i = 0; i < e.payload.paths.length; i++) {
       // 判断是否是合法的图片格式，若不是则跳出此次循环
       let name = await basename(e.payload.paths[i]);
@@ -147,8 +144,8 @@ const onChangeTime = ref<any>();
 const onChange = function () {
   clearTimeout(onChangeTime.value);
   onChangeTime.value = setTimeout(function () {
-    localStorage.setItem(appWindow.label, JSON.stringify(editorData));
-    emit("note", editorData);
+    localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
+    getCurrentWebviewWindow().emit("note", editorData);
   }, 100);
 };
 
@@ -369,8 +366,8 @@ const colorChange = function () {
 const colorInput = function (e: any) {
   const { red, green, blue } = hexToRgba(e.srcElement.value, 1);
   editorData.color = red + "," + green + "," + blue;
-  localStorage.setItem(appWindow.label, JSON.stringify(editorData));
-  emit("note", editorData);
+  localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
+  getCurrentWebviewWindow().emit("note", editorData);
   setconfig();
 };
 // 16进制color转10进制
@@ -397,8 +394,8 @@ function hexToRgba(hex: string, opacity: number | string) {
 const transparentbool = ref(false);
 const rangeChange = function (e: any) {
   editorData.opacity = e.srcElement.value;
-  localStorage.setItem(appWindow.label, JSON.stringify(editorData));
-  emit("note", editorData);
+  localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
+  getCurrentWebviewWindow().emit("note", editorData);
   setconfig();
 };
 
@@ -415,13 +412,13 @@ const setalways = function () {
     editorData.always = "top";
     alwaysicon.value = "mdi-arrange-bring-forward";
   }
-  localStorage.setItem(appWindow.label, JSON.stringify(editorData));
+  localStorage.setItem(getCurrentWebviewWindow().label, JSON.stringify(editorData));
   setconfig();
 };
 
 // 关闭
 
-const close = async function () {
+const close = function () {
   const windowstore = windowStore();
   let label = getCurrentWebviewWindow().label;
   console.log(windowstore.windows);
@@ -436,7 +433,7 @@ const close = async function () {
   if (index >= 0) {
     notestore.note[index]['option'] = res[0].option;
   }
-  await getCurrentWebviewWindow().close()
+  getCurrentWebviewWindow().close()
 };
 
 // 右键菜单事件
@@ -448,22 +445,6 @@ const rightClick = function () {
 
 // 创建新窗口
 const createnote = async function () {
-  // let label = "note-" + uuid();
-  // let w = await createWindow(label, {
-  //   x: 200,
-  //   y: 200,
-  //   width: 330,
-  //   height: 330,
-  //   minWidth: 330,
-  //   minHeight: 100,
-  //   shadow: false,
-  //   decorations: false,
-  //   transparent: true,
-  //   skipTaskbar: true,
-  //   url: "/#/pages/desktop/note",
-  //   title: "note"
-  // });
-  // w?.center()
   getCurrentWebviewWindow().emit("create-note")
 };
 
