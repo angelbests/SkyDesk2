@@ -134,6 +134,7 @@ smtc.listen_media((e) => {
                 thumb: convertFileSrc(e.payload.thumb)
             }
         }, 500)
+        playstatus.value = 4
         // tonearmControl(5)
         // setTimeout(() => {
         //     tonearmControl(4)
