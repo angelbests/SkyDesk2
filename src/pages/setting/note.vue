@@ -65,6 +65,22 @@ const opennote = async function (item: { label: string }) {
       if (note && note[0].option) {
         let w = await createWindow(note[0].label, note[0].option);
         w?.setFocus();
+      } else {
+        let w = await createWindow(note[0].label, {
+          x: 200,
+          y: 200,
+          width: 330,
+          height: 330,
+          minWidth: 330,
+          minHeight: 100,
+          shadow: false,
+          decorations: false,
+          transparent: true,
+          skipTaskbar: true,
+          url: "/#/pages/desktop/note",
+          title: "note"
+        });
+        w?.setFocus();
       }
     }
   });
