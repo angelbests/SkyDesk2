@@ -34,6 +34,7 @@ type WallpaperConfig = {
     date: boolean
     datex: number
     datey: number
+    color: string
     datefontsize: number
     time: boolean
     timex: number

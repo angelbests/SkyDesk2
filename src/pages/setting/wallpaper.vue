@@ -46,6 +46,7 @@ onMounted(async () => {
                     datex: 0,
                     datey: 0,
                     datefontsize: 0,
+                    color: "white",
                     time: false,
                     timex: 0,
                     timey: 0,

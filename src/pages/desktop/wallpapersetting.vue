@@ -34,7 +34,7 @@ onMounted(() => {
               <v-list-item-title>静音</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.audio" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="(e) => { item.config.audio = e }" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -52,7 +52,7 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.datex" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.datex = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -61,53 +61,19 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.datey" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.datey = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title>字体大小</v-list-item-title>
+              <v-list-item-title> 字体颜色 </v-list-item-title>
               <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.datefontsize" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-subheader style="background: #d1c4e9">时间</v-list-subheader>
-            <v-list-item>
-              <v-list-item-title>显示</v-list-item-title>
-              <template v-slot:append>
-                <v-switch color="info" hide-details v-model.lazy="item.config.time"></v-switch>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>X坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.timex" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Y坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.timey" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>字体大小</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.timefontsize" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
+                <v-radio-group v-model="item.config.color" inline density="compact" hide-details="auto">
+                  <v-radio style="width: 100px" label="白色" value="white"></v-radio>
+                  <v-radio style="width: 100px" label="黑色" value="black"></v-radio>
+                  <!-- <v-radio style="width: 100px" label="磁带" value="3"></v-radio> -->
+                </v-radio-group>
               </template>
             </v-list-item>
             <v-divider></v-divider>
@@ -122,7 +88,7 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.weatherx" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.weatherx = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -131,7 +97,7 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.weathery" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.weathery = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -148,7 +114,7 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.netspeedx" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.netspeedx = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -157,7 +123,7 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.netspeedy" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.netspeedy = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -166,82 +132,13 @@ onMounted(() => {
               <v-list-item-title>字体大小</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.netspeedfontsize" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.netspeedfontsize = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
             <v-divider></v-divider>
-            <v-list-subheader style="background: #d1c4e9">CPU</v-list-subheader>
-            <v-list-item>
-              <v-list-item-title>显示</v-list-item-title>
-              <template v-slot:append>
-                <v-switch color="info" hide-details v-model.lazy="item.config.cpu"></v-switch>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>X坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.cpux" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Y坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.cpuy" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>字体大小</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.cpufontsize" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-subheader style="background: #d1c4e9">内存</v-list-subheader>
-            <v-list-item>
-              <v-list-item-title>显示</v-list-item-title>
-              <template v-slot:append>
-                <v-switch color="info" hide-details v-model.lazy="item.config.memory"></v-switch>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>X坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.memoryx" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Y坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.memoryy" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>字体大小</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.memoryfontsize" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-divider></v-divider>
+
             <v-list-subheader style="background: #d1c4e9">音乐</v-list-subheader>
             <v-list-item>
               <v-list-item-title>显示</v-list-item-title>
@@ -253,7 +150,7 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.musicx" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.musicx = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>
@@ -262,7 +159,7 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider v-model.lazy="item.config.musicy" min="0" max="100" step="1" thumb-label
+                  <v-slider @end="e => item.config.musicy = e" min="0" max="100" step="1" thumb-label
                     hide-details></v-slider>
                 </div>
               </template>

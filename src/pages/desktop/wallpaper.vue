@@ -36,6 +36,7 @@ onMounted(async () => {
     }
   });
   // invoke("open_devtool", { label: await getCurrentWebviewWindow().label })
+
 });
 
 //////////////////////////日期/////////////////////////////////////
@@ -59,14 +60,51 @@ listen("memory", (e) => {
 });
 
 ///////////////////weather/////////////////////////
-import { weather_wallpaper, WeatherType } from "../../functions/weather";
+import { weatherNowWallpaper, weatherD7Wallpaper, WeatherType, WeatherD7Type } from "../../functions/weather";
+import { weatherIcon, windIcon } from "../../functions/weatnerIcon";
 const w = ref<WeatherType>({ temp: "", feelsLike: "", icon: "", text: "", windDir: "", windScale: "", windSpeed: "", humidity: "", precip: "", pressure: "", vis: "", cloud: "", dew: "", city: "", });
-weather_wallpaper((e) => {
+weatherNowWallpaper((e) => {
   w.value = e
+  icon1.value = getWeatherIcon(Number(e.icon))
+  wind.value = getWindIcon(Number(e.windScale))
+  console.log(e)
 }).then((e) => {
   w.value = e
+  icon1.value = getWeatherIcon(Number(e.icon))
+  wind.value = getWindIcon(Number(e.windScale))
+  console.log(e)
 })
-
+const ws = ref<{
+  city: string,
+  daily: WeatherD7Type[]
+}>({
+  city: "",
+  daily: []
+})
+weatherD7Wallpaper((e) => {
+  ws.value = e
+  icon2.value = getWeatherIcon(Number(e.daily[0].iconDay))
+  console.log(e)
+}).then((e) => {
+  ws.value = e
+  icon2.value = getWeatherIcon(Number(e.daily[0].iconDay))
+  console.log(e)
+})
+const icon1 = ref("");
+const icon2 = ref("");
+const getWeatherIcon = function (id: number) {
+  let res = weatherIcon.filter(e => {
+    return e.code == id
+  })
+  return `/svg/${res[0].icon}.svg`
+}
+const wind = ref("")
+const getWindIcon = function (id: number) {
+  let res = windIcon.filter(e => {
+    return e.code == id
+  })
+  return `/svg/${res[0].icon}.svg`
+}
 //////////////////////////网速////////////////////////////////
 import { Netspeed, NetSpeed } from "../../functions/sysinfo";
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0 })
@@ -83,47 +121,77 @@ const speed_s = computed(() => {
   return Math.trunc(net.value.speed_s / 1024) < 1024 ? Math.trunc(net.value.speed_s / 1024) + "KB/s" : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
 })
 
+// import { download } from "@tauri-apps/plugin-upload"
+// import { pictureDir } from "@tauri-apps/api/path";
+// let str = "https://a.hecdn.net/img/common/icon/202106d/";
+
+// let i = 1;
+
+// let timer = setInterval(async () => {
+//   i = i + 1
+//   console.log(str + i + ".png")
+//   let path = await pictureDir() + "\\icon\\" + i + ".png"
+//   download(str + i + ".png", path)
+//   if (i >= 3000) {
+//     clearInterval(timer)
+//   }
+// }, 1000)
+
+
 </script>
 
 <template>
   <div class="window">
+    <!-- date -->
+    <div v-show="wallpaperstore.wallpaperConfig[index].config.date" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
+      color: `${wallpaperstore.wallpaperConfig[index].config.color}`
+    }" class="date">
+      <div class="date_time">
+        {{ time.hour }} <span class="date_dot">:</span> {{ time.minute }}
+      </div>
+      <div class="date_date">
+        {{ time.year }} - {{ time.month }} - {{ time.day }}
+      </div>
+      <div class="date_week">{{ time.week }}</div>
+    </div>
     <!-- wallpaper -->
     <img v-if="type == 'image'" :src="convertFileSrc(path)" class="image" />
     <video v-else-if="type == 'video'" id="wallpapervideo" class="video" :src="convertFileSrc(path)" autoplay="true"
       loop="true"></video>
-    <!-- 天气 -->
-    <div class="weather" v-show="wallpaperstore.wallpaperConfig[index].config.weather" :style="{
+    <!-- weather -->
+    <div v-if="wallpaperstore.wallpaperConfig[index].config.weather && ws.daily.length > 0" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
       top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
-    }">
-      <div style="width: 200px; height: 30px; text-align: center">
+    }" class="weather">
+      <div class="weather_city ">
         {{ w.city }}
       </div>
-      <div style="width: 200px; display: flex; height: 60px">
-        <div style="
-            width: 100px;
-            height: 50px;
-            line-height: 50px;
-            text-align: center;
-          ">
-          {{ w.text }} {{ w.temp }}°
-        </div>
-        <div style="
-            width: 100px;
-            height: 50px;
-            text-align: center;
-            line-height: 50px;
-          ">
-          <i style="font-size: 30px" :class="['qi-' + (w.icon ? w.icon : 100), 'weather-icon']"></i>
+      <img class="weather_w" :src="icon1">
+      <img class="weather_wind" :src="wind">
+      <div class="weather_temp">
+        {{ w.temp }}
+        <div class="weather_temp_c">°C
         </div>
       </div>
-      <div style="width: 200px; height: 60px; display: flex">
-        <div style="width: 100px; height: 50px; text-align: center">
-          {{ w.windDir }}
+      <div class="weather_temp_rang">
+        {{ ws.daily[0].tempMin }}
+        <div class="weather_temp_rang_c">°C</div>
+        <div style="margin: 0px 8px;">
+          -
         </div>
-        <div style="width: 100px; height: 50px; text-align: center">
-          {{ w.windScale }}级
-        </div>
+        {{ ws.daily[0].tempMax }}
+        <div class="weather_temp_rang_c">°C</div>
+      </div>
+      <div class="weather_text">
+        {{ w.text }}
+      </div>
+      <div class="weather_winddir">
+        {{ w.windDir }}
+      </div>
+      <div class="weather_rh">
+        {{ w.humidity }}% RH
       </div>
     </div>
     <!-- 网速 -->
@@ -139,38 +207,7 @@ const speed_s = computed(() => {
         <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{ speed_s }}
       </div>
     </div>
-    <!-- time -->
-    <div class="time" v-show="wallpaperstore.wallpaperConfig[index].config.time" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.timex}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.timey}%`,
-      fontSize: `${wallpaperstore.wallpaperConfig[index].config.timefontsize}px`,
-    }">
-      <div class="hour">
-        {{ time.hour }}
-        <div style="height: 1.65em;width: 23px;text-align: center;">
-          :
-        </div>
-        {{ time.minute }}
-        <div style="height: 1.65em;width: 23px;text-align: center;">
-          :
-        </div>
-        {{ time.second }}
-      </div>
-    </div>
-    <div class="date" v-show="wallpaperstore.wallpaperConfig[index].config.date" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
-      fontSize: `${wallpaperstore.wallpaperConfig[index].config.datefontsize}px`,
-    }">
-      <div style="margin-right: 10px">
-        {{ time.year }}
-        {{ time.month }}
-        {{ time.day }}
-      </div>
-      <div>
-        {{ time.week }}
-      </div>
-    </div>
+
     <!-- cpu -->
     <div class="cpu" v-show="wallpaperstore.wallpaperConfig[index].config.cpu" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.cpux}%`,
@@ -207,11 +244,18 @@ const speed_s = computed(() => {
 </template>
 
 <style scoped>
+@font-face {
+  font-family: "Quicksand";
+  src: url("/font/Quicksand-Light.ttf") format(woff);
+  font-weight: normal;
+  font-style: normal;
+}
+
 .window {
   width: 100vw;
   height: 100vh;
   position: relative;
-  font-family: 'Microsoft YaHei UI LIGHT';
+  font-family: 'Quicksand';
 }
 
 .image {
@@ -238,24 +282,6 @@ const speed_s = computed(() => {
   color: rgba(223, 223, 223, 0.5);
 }
 
-.time {
-  position: absolute;
-  z-index: 201;
-  color: rgba(223, 223, 223, 0.5);
-}
-
-.hour {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-.date {
-  position: absolute;
-  z-index: 202;
-  display: flex;
-  color: rgba(223, 223, 223, 0.5);
-}
 
 .cpu {
   position: absolute;
@@ -269,14 +295,195 @@ const speed_s = computed(() => {
   color: rgba(223, 223, 223, 0.5);
 }
 
-.weather {
-  display: flex;
-  flex-direction: column;
+/* date 日期 */
+.date {
   position: absolute;
-  right: 40px;
-  top: 40px;
-  z-index: 100;
+  z-index: 500;
+  width: 400px;
+  height: 200px;
+  /* background: rgb(223, 223, 233, 0.1); */
+  border-radius: 50px;
+  /* box-shadow: 0px 0px 10px black; */
+  text-align: center;
+}
+
+.date_time {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  text-align: center;
+  font-size: 90px;
+  font-weight: bolder;
+  text-align: center;
+}
+
+.date_date {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  font-size: 20px;
+  left: 0px;
+  top: 170px;
+  position: absolute;
+  text-align: center;
+}
+
+.date_week {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  font-size: 18px;
+  left: 0px;
+  top: 130px;
+  position: absolute;
+  text-align: center;
+}
+
+.date_dot {
+  animation: 1s normal 0s infinite ease dot;
+}
+
+@keyframes dot {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+</style>
+<style>
+.weather {
   width: 200px;
-  height: 300px;
+  height: 200px;
+  background: rgba(253, 253, 253, 0.1);
+  border-radius: 50px;
+  position: absolute;
+  z-index: 400;
+  color: rgba(250, 250, 250, 1);
+  box-shadow: 0px 0px 10px black;
+}
+
+.weather_city {
+  width: 200px;
+  height: 30px;
+  position: absolute;
+  left: 0px;
+  top: 7px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_w {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 0px;
+  top: 20px;
+  filter: drop-shadow(0px 0px 5px black);
+}
+
+.weather_wind {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 0px;
+  top: 100px;
+  filter: drop-shadow(0px 0px 10px gray);
+}
+
+.weather_temp {
+  width: 100px;
+  height: 70px;
+  position: absolute;
+  left: 100px;
+  top: 30px;
+  font-size: 30px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_temp_c {
+  margin-left: 5px;
+  height: 30px;
+  font-size: 15px;
+  display: flex;
+  align-items: start;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_temp_rang {
+  width: 100px;
+  height: 30px;
+  position: absolute;
+  left: 100px;
+  top: 85px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_temp_rang_c {
+  margin-left: 1px;
+  height: 20px;
+  font-size: 8px;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_text {
+  width: 100px;
+  height: 30px;
+  position: absolute;
+  left: 100px;
+  top: 110px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_winddir {
+  width: 100px;
+  height: 30px;
+  position: absolute;
+  left: 100px;
+  top: 135px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 0px 10px black;
+}
+
+.weather_rh {
+  width: 100px;
+  height: 30px;
+  position: absolute;
+  left: 100px;
+  top: 160px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 0px 10px black;
 }
 </style>
