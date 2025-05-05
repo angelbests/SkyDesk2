@@ -34,8 +34,8 @@ onMounted(() => {
               <v-list-item-title>静音</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="(e) => { item.config.audio = e }" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.audio" @end="(e) => { item.config.audio = e }" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -52,8 +52,8 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.datex = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.datex" @end="e => item.config.datex = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -61,8 +61,8 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.datey = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.datey" @end="e => item.config.datey = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -88,8 +88,8 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.weatherx = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.weatherx" @end="e => item.config.weatherx = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -97,8 +97,8 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.weathery = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.weathery" @end="e => item.config.weathery = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -114,8 +114,8 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.netspeedx = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.netspeedx" @end="e => item.config.netspeedx = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -123,8 +123,8 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.netspeedy = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.netspeedy" @end="e => item.config.netspeedy = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -132,8 +132,8 @@ onMounted(() => {
               <v-list-item-title>字体大小</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.netspeedfontsize = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.netspeedfontsize" @end="e => item.config.netspeedfontsize = e"
+                    min="0" max="100" step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -150,8 +150,8 @@ onMounted(() => {
               <v-list-item-title>X坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.musicx = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.musicx" @end="e => item.config.musicx = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
@@ -159,8 +159,8 @@ onMounted(() => {
               <v-list-item-title>Y坐标</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
-                  <v-slider @end="e => item.config.musicy = e" min="0" max="100" step="1" thumb-label
-                    hide-details></v-slider>
+                  <v-slider :model-value="item.config.musicy" @end="e => item.config.musicy = e" min="0" max="100"
+                    step="1" thumb-label hide-details></v-slider>
                 </div>
               </template>
             </v-list-item>
