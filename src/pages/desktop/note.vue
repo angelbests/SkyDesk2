@@ -73,6 +73,7 @@ getCurrentWebviewWindow().listen("tauri://focus", function () {
   show.value = true;
 });
 let timer: any = undefined
+let timer2: any = undefined;
 const setconfig = async function () {
   let doc = document.getElementsByTagName("body")[0];
   doc.style.background = `rgba(${editorData.color},${editorData.opacity / 100
@@ -89,11 +90,16 @@ const setconfig = async function () {
     alwaysicon.value = "mdi-arrange-bring-forward";
     getCurrentWebviewWindow().setAlwaysOnBottom(false);
     getCurrentWebviewWindow().setAlwaysOnTop(true);
+    timer2 = setInterval(() => {
+      getCurrentWebviewWindow().setAlwaysOnTop(true);
+    }, 1000);
   } else if (editorData.always == "bottom") {
+    if (timer2) clearInterval(timer2)
     alwaysicon.value = "mdi-arrange-send-backward";
     getCurrentWebviewWindow().setAlwaysOnTop(false);
     getCurrentWebviewWindow().setAlwaysOnBottom(true);
   } else if (editorData.always == "normal") {
+    if (timer2) clearInterval(timer2)
     alwaysicon.value = "mdi-rectangle";
     getCurrentWebviewWindow().setAlwaysOnBottom(false);
     getCurrentWebviewWindow().setAlwaysOnTop(false);
