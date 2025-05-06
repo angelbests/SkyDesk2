@@ -79,10 +79,10 @@ const speed_s = computed(() => {
 
 // 鼠标跟随 //////////////////////////////////////////
 let rx: number = 0;
-let ry: number = 0
+let ry: number = 0;
 let tx: number = 0;
-let ty: number = 0
-listen("desktop", async (e: Event<MouseEvent>) => {
+let ty: number = 0;
+listen("desktop2", async (e: Event<MouseEvent>) => {
   let dom: any
   if (type.value == 'image') {
     dom = document.getElementById("wallpaperimg")
@@ -103,7 +103,7 @@ listen("desktop", async (e: Event<MouseEvent>) => {
     y = (y - monitor.position.y) / monitor.scaleFactor
     let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
     let poiy = y / window.innerHeight - 0.5;
-    rx = (poiy * 5); // 可调节旋转幅度
+    rx = (poiy * 5); // 
     ry = (-poix * 5);
     // dom.style.transform = ``;
     tx = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
@@ -123,45 +123,6 @@ function animate() {
   dom.style.transform = `translate(${tx}px, ${ty}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
   requestAnimationFrame(animate);
 }
-
-
-// let timer: any = undefined
-// listen("mouse-move", async (e: Event<{ message: string }>) => {
-//   if (timer) {
-//     clearTimeout(timer)
-//   } else {
-//     timer = undefined
-//   }
-//   timer = setTimeout(async () => {
-//     let dom: any
-//     if (type.value == 'image') {
-//       dom = document.getElementById("wallpaperimg")
-
-//     } else if (type.value == 'video') {
-//       dom = document.getElementById("wallpapervideo")
-//     }
-//     if (!dom) return
-//     // if (e.payload.mouse == MouseAction.Move) {
-//     let { x, y } = JSON.parse(e.payload.message) as { x: number, y: number }
-//     console.log(x, y)
-//     let monitor = (await monitorFromPoint(x, y))
-//     let current = await currentMonitor()
-//     if (!monitor) return
-//     if (!current) return
-//     if (current.name != monitor.name) return
-//     x = (x - monitor.position.x) / monitor.scaleFactor
-//     y = (y - monitor.position.y) / monitor.scaleFactor
-//     let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
-//     let poiy = y / window.innerHeight - 0.5;
-//     let rotateX = (poiy * 5).toFixed(4); // 可调节旋转幅度
-//     let rotateY = (-poix * 5).toFixed(4);
-//     // dom.style.transform = ``;
-//     poix = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
-//     poiy = (y / window.innerHeight - 0.5) * 100;
-//     dom.style.transform = `translate(${poix}px, ${poiy}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-//     // }
-//   }, 0)
-// })
 </script>
 
 <template>
@@ -247,6 +208,7 @@ function animate() {
   overflow: hidden;
   perspective: 1000px;
   font-family: 'Quicksand';
+  transform-style: preserve-3d;
 }
 
 .image {
@@ -259,7 +221,7 @@ function animate() {
   left: -10%;
   transform-origin: center;
   will-change: transform;
-  transition: transform 0.3s ease-out;
+  transition: transform 0.1s ease-out;
 }
 
 .video {
@@ -273,7 +235,7 @@ function animate() {
   left: -10%;
   transform-origin: center;
   will-change: transform;
-  transition: transform 0.3s ease-out;
+  transition: transform 0.1s ease-out;
 }
 
 .netspeed {

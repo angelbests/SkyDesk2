@@ -32,6 +32,8 @@ use std::sync::{LazyLock, Mutex};
 static mut H: HWND = HWND(std::ptr::null_mut());
 static TX: LazyLock<Mutex<Option<SyncSender<Option<MouseInfo>>>>> =
     LazyLock::new(|| Mutex::new(None));
+static TX2: LazyLock<Mutex<Option<SyncSender<Option<MouseInfo>>>>> =
+    LazyLock::new(|| Mutex::new(None));
 static mut HOOK: Option<HHOOK> = None;
 extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
     unsafe {
@@ -74,7 +76,6 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
                 println!("{:?}", e);
             }
         }
-        let mouse: Option<MouseInfo>;
         if hwnd_clicked == sys_list_view32_hwnd
             || hwnd_clicked == shell_dll_def_view
             || hwnd_clicked == H
@@ -82,97 +83,176 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             match w_param.0 as u32 {
                 WM_LBUTTONDOWN => {
                     println!("鼠标左键点击了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::LeftDown,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::LeftDown,
+                        }));
                     }
                 }
                 WM_RBUTTONDOWN => {
                     // println!("鼠标右键点击了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::RightDown,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::RightDown,
+                        }));
                     }
                 }
                 WM_MBUTTONDOWN => {
                     // println!("鼠标中键点击了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::MiddleDown,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::MiddleDown,
+                        }));
                     }
                 }
                 WM_LBUTTONUP => {
                     // println!("鼠标左键释放了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::LeftUp,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::LeftUp,
+                        }));
                     }
                 }
                 WM_RBUTTONUP => {
                     // println!("鼠标右键释放了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::RightUp,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::RightUp,
+                        }));
                     }
                 }
                 WM_MBUTTONUP => {
                     // println!("鼠标中键释放了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::MiddleUp,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::MiddleUp,
+                        }));
                     }
                 }
                 WM_MOUSEMOVE => {
                     // println!("鼠标移动了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::Move,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::Move,
+                        }));
                     }
                 }
                 WM_MOUSEWHEEL => {
                     // println!("鼠标滚轮滚动了桌面");
-                    mouse = Some(MouseInfo {
-                        x: mouse_info.pt.x,
-                        y: mouse_info.pt.y,
-                        mouse: MouseAction::Wheel,
-                    });
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(Some(MouseInfo {
+                            x: mouse_info.pt.x,
+                            y: mouse_info.pt.y,
+                            mouse: MouseAction::Wheel,
+                        }));
                     }
                 }
                 _ => {
-                    mouse = None;
                     if let Some(sender) = &*TX.lock().unwrap() {
-                        let _ = sender.send(mouse);
+                        let _ = sender.send(None);
                     }
+                }
+            }
+        }
+
+        match w_param.0 as u32 {
+            WM_LBUTTONDOWN => {
+                println!("鼠标左键点击了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::LeftDown,
+                    }));
+                }
+            }
+            WM_RBUTTONDOWN => {
+                // println!("鼠标右键点击了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::RightDown,
+                    }));
+                }
+            }
+            WM_MBUTTONDOWN => {
+                // println!("鼠标中键点击了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::MiddleDown,
+                    }));
+                }
+            }
+            WM_LBUTTONUP => {
+                // println!("鼠标左键释放了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::LeftUp,
+                    }));
+                }
+            }
+            WM_RBUTTONUP => {
+                // println!("鼠标右键释放了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::RightUp,
+                    }));
+                }
+            }
+            WM_MBUTTONUP => {
+                // println!("鼠标中键释放了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::MiddleUp,
+                    }));
+                }
+            }
+            WM_MOUSEMOVE => {
+                // println!("鼠标移动了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::Move,
+                    }));
+                }
+            }
+            WM_MOUSEWHEEL => {
+                // println!("鼠标滚轮滚动了桌面");
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(Some(MouseInfo {
+                        x: mouse_info.pt.x,
+                        y: mouse_info.pt.y,
+                        mouse: MouseAction::Wheel,
+                    }));
+                }
+            }
+            _ => {
+                if let Some(sender) = &*TX2.lock().unwrap() {
+                    let _ = sender.send(None);
                 }
             }
         }
@@ -190,11 +270,20 @@ pub fn desktop_mouse_listen(app: AppHandle) {
         h = FindWindowExA(Some(h), None, s!("Chrome_RenderWidgetHostHWND"), None).unwrap();
         H = h;
 
+        let app2 = app.clone();
         let (tx, rx) = sync_channel::<Option<MouseInfo>>(100);
         *TX.lock().unwrap() = Some(tx);
         std::thread::spawn(move || {
             while let Ok(mouse) = rx.recv() {
                 let _ = app.emit("desktop", mouse);
+            }
+        });
+
+        let (tx2, rx2) = sync_channel::<Option<MouseInfo>>(100);
+        *TX2.lock().unwrap() = Some(tx2);
+        std::thread::spawn(move || {
+            while let Ok(mouse) = rx2.recv() {
+                let _ = app2.emit("desktop2", mouse);
             }
         });
         // *APP_HANDLE.lock().unwrap() = Some(app);
