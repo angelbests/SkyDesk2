@@ -120,7 +120,7 @@ function animate() {
     dom = document.getElementById("wallpapervideo")
   }
   if (!dom) return
-  dom.style.transform = `translate(${tx}px, ${ty}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
+  dom.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
   requestAnimationFrame(animate);
 }
 </script>

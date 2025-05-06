@@ -115,6 +115,13 @@ smtc.listen_appstatus(async (e) => {
   }
 })
 
+smtc.listen_media((e) => {
+  if (!Boolean(e.payload.thumb)) return
+  if (wallpaperstore.wallpaperConfig[0].config.musicapp == e.payload.app) {
+    playstatus.value = 4
+  }
+})
+
 smtc.listen_playstatus((e) => {
   if (
     wallpaperstore.wallpaperConfig[0].config.musicapp ==
