@@ -12,7 +12,7 @@ import Weather from "../../components/wallpaper/Weather.vue";
 import Date from "../../components/wallpaper/Date.vue";
 
 import { Netspeed, NetSpeed } from "../../functions/sysinfo";
-// import { MouseAction, MouseEvent } from "../../types/desktopType"
+import { MouseAction, MouseEvent } from "../../types/desktopType"
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { invoke } from "@tauri-apps/api/core";
 const wallpaperstore = wallpaperStore();
@@ -41,6 +41,7 @@ onMounted(async () => {
       }
     }
   });
+  animate()
   // invoke("open_devtool", { label: await getCurrentWebviewWindow().label })
 
 });
@@ -77,24 +78,21 @@ const speed_s = computed(() => {
 })
 
 // 鼠标跟随 //////////////////////////////////////////
-let timer: any = undefined
-listen("mouse-move", async (e: Event<{ message: string }>) => {
-  if (timer) {
-    clearTimeout(timer)
-  } else {
-    timer = undefined
-  }
-  timer = setTimeout(async () => {
-    let dom: any
-    if (type.value == 'image') {
-      dom = document.getElementById("wallpaperimg")
+let rx: number = 0;
+let ry: number = 0
+let tx: number = 0;
+let ty: number = 0
+listen("desktop", async (e: Event<MouseEvent>) => {
+  let dom: any
+  if (type.value == 'image') {
+    dom = document.getElementById("wallpaperimg")
 
-    } else if (type.value == 'video') {
-      dom = document.getElementById("wallpapervideo")
-    }
-    if (!dom) return
-    // if (e.payload.mouse == MouseAction.Move) {
-    let { x, y } = JSON.parse(e.payload.message) as { x: number, y: number }
+  } else if (type.value == 'video') {
+    dom = document.getElementById("wallpapervideo")
+  }
+  if (!dom) return
+  if (e.payload.mouse == MouseAction.Move) {
+    let { x, y } = e.payload
     console.log(x, y)
     let monitor = (await monitorFromPoint(x, y))
     let current = await currentMonitor()
@@ -105,15 +103,65 @@ listen("mouse-move", async (e: Event<{ message: string }>) => {
     y = (y - monitor.position.y) / monitor.scaleFactor
     let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
     let poiy = y / window.innerHeight - 0.5;
-    let rotateX = (poiy * 5).toFixed(4); // 可调节旋转幅度
-    let rotateY = (-poix * 5).toFixed(4);
+    rx = (poiy * 5); // 可调节旋转幅度
+    ry = (-poix * 5);
     // dom.style.transform = ``;
-    poix = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
-    poiy = (y / window.innerHeight - 0.5) * 100;
-    dom.style.transform = `translate(${poix}px, ${poiy}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    // }
-  }, 0)
+    tx = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
+    ty = (y / window.innerHeight - 0.5) * 100;
+  }
 })
+
+function animate() {
+  let dom: any
+  if (type.value == 'image') {
+    dom = document.getElementById("wallpaperimg")
+
+  } else if (type.value == 'video') {
+    dom = document.getElementById("wallpapervideo")
+  }
+  if (!dom) return
+  dom.style.transform = `translate(${tx}px, ${ty}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
+  requestAnimationFrame(animate);
+}
+
+
+// let timer: any = undefined
+// listen("mouse-move", async (e: Event<{ message: string }>) => {
+//   if (timer) {
+//     clearTimeout(timer)
+//   } else {
+//     timer = undefined
+//   }
+//   timer = setTimeout(async () => {
+//     let dom: any
+//     if (type.value == 'image') {
+//       dom = document.getElementById("wallpaperimg")
+
+//     } else if (type.value == 'video') {
+//       dom = document.getElementById("wallpapervideo")
+//     }
+//     if (!dom) return
+//     // if (e.payload.mouse == MouseAction.Move) {
+//     let { x, y } = JSON.parse(e.payload.message) as { x: number, y: number }
+//     console.log(x, y)
+//     let monitor = (await monitorFromPoint(x, y))
+//     let current = await currentMonitor()
+//     if (!monitor) return
+//     if (!current) return
+//     if (current.name != monitor.name) return
+//     x = (x - monitor.position.x) / monitor.scaleFactor
+//     y = (y - monitor.position.y) / monitor.scaleFactor
+//     let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
+//     let poiy = y / window.innerHeight - 0.5;
+//     let rotateX = (poiy * 5).toFixed(4); // 可调节旋转幅度
+//     let rotateY = (-poix * 5).toFixed(4);
+//     // dom.style.transform = ``;
+//     poix = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
+//     poiy = (y / window.innerHeight - 0.5) * 100;
+//     dom.style.transform = `translate(${poix}px, ${poiy}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+//     // }
+//   }, 0)
+// })
 </script>
 
 <template>
@@ -210,6 +258,7 @@ listen("mouse-move", async (e: Event<{ message: string }>) => {
   top: -10%;
   left: -10%;
   transform-origin: center;
+  will-change: transform;
   transition: transform 0.3s ease-out;
 }
 
@@ -223,6 +272,7 @@ listen("mouse-move", async (e: Event<{ message: string }>) => {
   top: -10%;
   left: -10%;
   transform-origin: center;
+  will-change: transform;
   transition: transform 0.3s ease-out;
 }
 
