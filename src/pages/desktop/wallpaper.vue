@@ -82,7 +82,7 @@ let rx: number = 0;
 let ry: number = 0;
 let tx: number = 0;
 let ty: number = 0;
-listen("desktop2", async (e: Event<MouseEvent>) => {
+listen("desktop", async (e: Event<MouseEvent>) => {
   let dom: any
   if (type.value == 'image') {
     dom = document.getElementById("wallpaperimg")
