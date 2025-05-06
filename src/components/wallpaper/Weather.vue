@@ -46,6 +46,16 @@ const getWindIcon = function (id: number) {
     })
     return `/svg/${res[0].icon}.svg`
 }
+
+// import { readDir } from "@tauri-apps/plugin-fs";
+// const readfile = async function () {
+//     let res = await readDir("D:\\SkyDesk2\\public\\svg")
+//     let arr = []
+//     res.filter(e => {
+//         arr.push(e.name)
+//     })
+// }
+// readfile()
 </script>
 
 <template>

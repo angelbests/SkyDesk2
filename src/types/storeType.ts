@@ -30,6 +30,7 @@ type WallpaperConfig = {
   monitor: string
   label: string
   config: {
+    action: true
     audio: number
     date: boolean
     datex: number

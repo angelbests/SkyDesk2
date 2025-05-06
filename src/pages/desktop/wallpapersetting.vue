@@ -28,6 +28,15 @@ onMounted(() => {
             height: 100%;
           ">
           <v-list lines="one" select-strategy="classic">
+            <!-- 动效 -->
+            <v-list-subheader style="background: #d1c4e9">动效</v-list-subheader>
+            <v-list-item>
+              <v-list-item-title>启用</v-list-item-title>
+              <template v-slot:append>
+                <v-switch color="info" hide-details v-model.lazy="item.config.action"></v-switch>
+              </template>
+            </v-list-item>
+
             <!-- 声音 -->
             <v-list-subheader style="background: #d1c4e9">声音</v-list-subheader>
             <v-list-item>

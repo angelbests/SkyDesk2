@@ -10,11 +10,11 @@ import MusicVinyl from "../../components/wallpaper/MusicVinyl.vue";
 import MusicTape from "../../components/wallpaper/MusicTape.vue";
 import Weather from "../../components/wallpaper/Weather.vue";
 import Date from "../../components/wallpaper/Date.vue";
-
 import { Netspeed, NetSpeed } from "../../functions/sysinfo";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { invoke } from "@tauri-apps/api/core";
+// invoke("open_devtool", { label: getCurrentWebviewWindow().label })
 const wallpaperstore = wallpaperStore();
 const index = ref(0);
 const route = useRoute();
@@ -42,8 +42,6 @@ onMounted(async () => {
     }
   });
   animate()
-  // invoke("open_devtool", { label: await getCurrentWebviewWindow().label })
-
 });
 
 ////////////////////cpu/////////////////////
@@ -59,10 +57,7 @@ listen("memory", (e) => {
   let str = e.payload;
   memory.value = Math.trunc(Number(str) * 100);
 });
-
 //////////////////////////网速////////////////////////////////
-
-
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0 })
 const netspeed = new Netspeed();
 netspeed.listen_netspeed((e) => {
@@ -83,17 +78,8 @@ let ry: number = 0;
 let tx: number = 0;
 let ty: number = 0;
 listen("desktop", async (e: Event<MouseEvent>) => {
-  let dom: any
-  if (type.value == 'image') {
-    dom = document.getElementById("wallpaperimg")
-
-  } else if (type.value == 'video') {
-    dom = document.getElementById("wallpapervideo")
-  }
-  if (!dom) return
   if (e.payload.mouse == MouseAction.Move) {
     let { x, y } = e.payload
-    console.log(x, y)
     let monitor = (await monitorFromPoint(x, y))
     let current = await currentMonitor()
     if (!monitor) return
@@ -120,17 +106,27 @@ function animate() {
     dom = document.getElementById("wallpapervideo")
   }
   if (!dom) return
-  dom.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
+  if (wallpaperstore.wallpaperConfig[index.value].config.action) {
+    dom.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
+  } else {
+    dom.style.transform = `translate3d(0px, 0px,0) rotateX(0deg) rotateY(0deg) scale(1)`;
+  }
   requestAnimationFrame(animate);
 }
 </script>
 
 <template>
   <div class="window">
+    <!-- snow -->
+    <div style="width: 100%;height: 100%;background: transparent;position: absolute;z-index: 500;">
+    </div>
     <!-- wallpaper -->
-    <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" class="image" />
-    <video id="wallpapervideo" v-else-if="type == 'video'" class="video" :src="convertFileSrc(path)" autoplay="true"
-      loop="true"></video>
+    <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" :class="{
+      image: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action
+    }" />
+    <video id="wallpapervideo" v-else-if="type == 'video'"
+      :class="{ video: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action }"
+      :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
 
     <!-- 网速 -->
     <div class="netspeed" v-show="wallpaperstore.wallpaperConfig[index].config.netspeed" :style="{
@@ -212,30 +208,40 @@ function animate() {
 }
 
 .image {
-  width: 120%;
-  height: 120%;
-  background-size: cover;
-  background-position: center;
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  transform-origin: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   will-change: transform;
-  transition: transform 0.1s ease-out;
+  transition: all 0.1s ease-out;
 }
 
 .video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  transition: all 0.1s ease-out;
+}
+
+.unaction {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
+}
+
+.action {
   width: 120%;
   height: 120%;
-  object-fit: cover;
   background-size: cover;
   background-position: center;
   position: absolute;
   top: -10%;
   left: -10%;
   transform-origin: center;
-  will-change: transform;
-  transition: transform 0.1s ease-out;
+
 }
 
 .netspeed {

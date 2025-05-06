@@ -62,6 +62,8 @@ const delvideo = function (path: string) {
   capturestore.video.splice(index, 1);
   remove(path);
 };
+
+// import { svgs } from "../../functions/weatnerIcon";
 </script>
 
 <template>
@@ -102,6 +104,14 @@ const delvideo = function (path: string) {
         </GridContainer>
       </div>
     </div>
+    <!-- <div style="width: 100%;display: flex;justify-content: center;align-items: start;flex-wrap: wrap;background:red;">
+      <div v-for="item in svgs" style="width: 100px;height: 150px;">
+        <img style="width: 100px;" :src="`/svg/${item}`">
+        <div style="font-size: 12px;">
+          {{ item }}
+        </div>
+      </div>
+    </div> -->
   </div>
 </template>
 

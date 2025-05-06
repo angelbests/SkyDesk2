@@ -41,6 +41,7 @@ onMounted(async () => {
                 label: "",
                 monitor: monitors.value[i].name as string,
                 config: {
+                    action: true,
                     audio: 0,
                     date: false,
                     datex: 0,
