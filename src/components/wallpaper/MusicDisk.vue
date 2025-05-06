@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { Media, Smtc_Control } from "../functions/smtc";
+import { Media, Smtc_Control } from "../../functions/smtc";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { wallpaperStore } from "../stores/wallpaper";
+import { wallpaperStore } from "../../stores/wallpaper";
 import { info } from "@tauri-apps/plugin-log";
 import { currentMonitor } from "@tauri-apps/api/window";
-import { desktopMouseControl } from "../functions/wallpaper";
+import { desktopMouseControl } from "../../functions/wallpaper";
 const wallpaperstore = wallpaperStore()
 const index = ref(0);
 const media = ref<Media>({ app: "", title: "", artist: "", album_title: "", media_type: 0, thumb: "", })

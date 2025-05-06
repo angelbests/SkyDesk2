@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { Media, Smtc_Control, TimeLine } from "../functions/smtc";
-import { wallpaperStore } from "../stores/wallpaper";
+import { Media, Smtc_Control, TimeLine } from "../../functions/smtc";
+import { wallpaperStore } from "../../stores/wallpaper";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { info } from "@tauri-apps/plugin-log";
 import { currentMonitor } from "@tauri-apps/api/window"
-import { desktopMouseControl } from "../functions/wallpaper";
+import { desktopMouseControl } from "../../functions/wallpaper";
 import { listen } from "@tauri-apps/api/event";
 import PCMPlayer from "pcm-player";
 const wallpaperstore = wallpaperStore()
