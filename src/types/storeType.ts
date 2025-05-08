@@ -31,6 +31,7 @@ type WallpaperConfig = {
   label: string
   config: {
     action: true
+    sakura: true
     audio: number
     date: boolean
     datex: number

@@ -29,10 +29,6 @@ onMounted(async () => {
   index.value = wallpaperstore.wallpaperConfig.findIndex(
     (item) => item.monitor == monitor.value?.name
   );
-  if (type.value == 'video') {
-    let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
-    dom.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
-  }
   window.addEventListener("storage", (e) => {
     if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
@@ -47,13 +43,14 @@ onMounted(async () => {
       dom.value = document.getElementById("wallpaperimg")
     } else if (type.value == 'video') {
       dom.value = document.getElementById("wallpapervideo")
+      dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+
     }
     listen_desktop()
-  }, 100)
+  }, 10)
 });
 
 // 鼠标跟随 //////////////////////////////////////////
-
 const listen_desktop = function () {
   let rx: number = 0;
   let ry: number = 0;
@@ -89,7 +86,6 @@ startSakura()
 
 <template>
   <div class="window">
-
     <!-- snow -->
     <div style="width: 100%;height: 100%;position: absolute;z-index: 500;">
 
@@ -184,7 +180,6 @@ startSakura()
   top: -10%;
   left: -10%;
   transform-origin: center;
-
 }
 
 .netspeed {

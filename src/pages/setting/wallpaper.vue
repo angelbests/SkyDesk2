@@ -42,6 +42,7 @@ onMounted(async () => {
                 monitor: monitors.value[i].name as string,
                 config: {
                     action: true,
+                    sakura: true,
                     audio: 0,
                     date: false,
                     datex: 0,
