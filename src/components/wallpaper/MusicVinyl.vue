@@ -135,10 +135,6 @@ smtc.listen_media((e) => {
             }
         }, 500)
         playstatus.value = 4
-        // tonearmControl(5)
-        // setTimeout(() => {
-        //     tonearmControl(4)
-        // }, 100)
     }
 })
 const playstatus = ref(5);

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { wallpaperStore } from "../../stores/wallpaper";
 import { listen, Event } from "@tauri-apps/api/event";
-import { currentMonitor, monitorFromPoint } from "@tauri-apps/api/window";
+import { currentMonitor, Monitor } from "@tauri-apps/api/window";
 import MusicDisk from "../../components/wallpaper/MusicDisk.vue";
 import MusicVinyl from "../../components/wallpaper/MusicVinyl.vue";
 import MusicTape from "../../components/wallpaper/MusicTape.vue";
 import Weather from "../../components/wallpaper/Weather.vue";
 import Date from "../../components/wallpaper/Date.vue";
-import { Netspeed, NetSpeed } from "../../functions/sysinfo";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { invoke } from "@tauri-apps/api/core";
@@ -20,13 +19,15 @@ const index = ref(0);
 const route = useRoute();
 const path = ref();
 const type = ref();
+const dom = ref<any>()
+const monitor = ref<Monitor>()
 onMounted(async () => {
+  monitor.value = await currentMonitor() as Monitor
   document.title = "skydesk2-wallpaper"
   path.value = route.query.path;
   type.value = route.query.type;
-  const monitor = await currentMonitor();
   index.value = wallpaperstore.wallpaperConfig.findIndex(
-    (item) => item.monitor == monitor?.name
+    (item) => item.monitor == monitor.value?.name
   );
   if (type.value == 'video') {
     let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
@@ -41,84 +42,57 @@ onMounted(async () => {
       }
     }
   });
-  animate()
+  setTimeout(() => {
+    if (type.value == 'image') {
+      dom.value = document.getElementById("wallpaperimg")
+    } else if (type.value == 'video') {
+      dom.value = document.getElementById("wallpapervideo")
+    }
+    listen_desktop()
+  }, 100)
 });
-
-////////////////////cpu/////////////////////
-const cpu = ref(0);
-listen("cpu", (e) => {
-  let str = e.payload;
-  cpu.value = Math.trunc(Math.round(Number(str)));
-});
-
-///////////////////////////memeory///////////////////////
-const memory = ref(0);
-listen("memory", (e) => {
-  let str = e.payload;
-  memory.value = Math.trunc(Number(str) * 100);
-});
-//////////////////////////网速////////////////////////////////
-const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0 })
-const netspeed = new Netspeed();
-netspeed.listen_netspeed((e) => {
-  net.value = e.payload
-})
-
-const speed_r = computed(() => {
-  return Math.trunc(net.value.speed_r / 1024) < 1024 ? Math.trunc(net.value.speed_r / 1024) + "KB/s" : Math.trunc((net.value.speed_r / 1024 / 1024) * 10) / 10 + "MB/s"
-})
-
-const speed_s = computed(() => {
-  return Math.trunc(net.value.speed_s / 1024) < 1024 ? Math.trunc(net.value.speed_s / 1024) + "KB/s" : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
-})
 
 // 鼠标跟随 //////////////////////////////////////////
-let rx: number = 0;
-let ry: number = 0;
-let tx: number = 0;
-let ty: number = 0;
-listen("desktop", async (e: Event<MouseEvent>) => {
-  if (e.payload.mouse == MouseAction.Move) {
-    let { x, y } = e.payload
-    let monitor = (await monitorFromPoint(x, y))
-    let current = await currentMonitor()
-    if (!monitor) return
-    if (!current) return
-    if (current.name != monitor.name) return
-    x = (x - monitor.position.x) / monitor.scaleFactor
-    y = (y - monitor.position.y) / monitor.scaleFactor
-    let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
-    let poiy = y / window.innerHeight - 0.5;
-    rx = (poiy * 5); // 
-    ry = (-poix * 5);
-    // dom.style.transform = ``;
-    tx = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
-    ty = (y / window.innerHeight - 0.5) * 100;
-  }
-})
 
-function animate() {
-  let dom: any
-  if (type.value == 'image') {
-    dom = document.getElementById("wallpaperimg")
-
-  } else if (type.value == 'video') {
-    dom = document.getElementById("wallpapervideo")
+const listen_desktop = function () {
+  let rx: number = 0;
+  let ry: number = 0;
+  let tx: number = 0;
+  let ty: number = 0;
+  listen("desktop", async (e: Event<MouseEvent>) => {
+    if (monitor.value?.name !== e.payload.monitor.name) return
+    if (e.payload.mouse == MouseAction.Move) {
+      let { x, y } = e.payload
+      x = (x - monitor.value.position.x) / monitor.value.scaleFactor
+      y = (y - monitor.value.position.y) / monitor.value.scaleFactor
+      let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
+      let poiy = y / window.innerHeight - 0.5;
+      rx = (poiy * 5);
+      ry = (-poix * 5);
+      tx = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
+      ty = (y / window.innerHeight - 0.5) * 100;
+    }
+  })
+  function animate() {
+    if (wallpaperstore.wallpaperConfig[index.value].config.action) {
+      dom.value.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    } else {
+      dom.value.style.transform = `translate3d(0px, 0px,0) rotateX(0deg) rotateY(0deg)`;
+    }
+    requestAnimationFrame(animate);
   }
-  if (!dom) return
-  if (wallpaperstore.wallpaperConfig[index.value].config.action) {
-    dom.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg) scale(1)`;
-  } else {
-    dom.style.transform = `translate3d(0px, 0px,0) rotateX(0deg) rotateY(0deg) scale(1)`;
-  }
-  requestAnimationFrame(animate);
+  animate()
 }
+import { startSakura } from "../../functions/sakura";
+startSakura()
 </script>
 
 <template>
   <div class="window">
+
     <!-- snow -->
-    <div style="width: 100%;height: 100%;background: transparent;position: absolute;z-index: 500;">
+    <div style="width: 100%;height: 100%;position: absolute;z-index: 500;">
+
     </div>
     <!-- wallpaper -->
     <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" :class="{
@@ -127,37 +101,6 @@ function animate() {
     <video id="wallpapervideo" v-else-if="type == 'video'"
       :class="{ video: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action }"
       :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
-
-    <!-- 网速 -->
-    <div class="netspeed" v-show="wallpaperstore.wallpaperConfig[index].config.netspeed" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.netspeedx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.netspeedy}%`,
-      fontSize: `${wallpaperstore.wallpaperConfig[index].config.netspeedfontsize}px`,
-    }">
-      <div data-tauri-drag-region style="display: flex; align-items: center">
-        <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>{{ speed_r }}
-      </div>
-      <div style="display: flex; align-items: center">
-        <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>{{ speed_s }}
-      </div>
-    </div>
-
-    <!-- cpu -->
-    <div class="cpu" v-show="wallpaperstore.wallpaperConfig[index].config.cpu" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.cpux}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.cpuy}%`,
-      fontSize: `${wallpaperstore.wallpaperConfig[index].config.cpufontsize}px`,
-    }">
-      CPU：{{ cpu }}%
-    </div>
-    <!-- memory -->
-    <div class="memory" v-show="wallpaperstore.wallpaperConfig[index].config.memory" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.memoryx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.memoryy}%`,
-      fontSize: `${wallpaperstore.wallpaperConfig[index].config.memoryfontsize}px`,
-    }">
-      内存：{{ memory }}%
-    </div>
     <!-- music1 -->
     <MusicVinyl v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 1" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,

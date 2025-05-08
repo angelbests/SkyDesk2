@@ -2,7 +2,7 @@ import { MouseAction, MouseEvent } from "../types/desktopType"
 import { listen, Event } from "@tauri-apps/api/event"
 import { invoke } from "@tauri-apps/api/core"
 import { wallpaperStore } from "../stores/wallpaper"
-import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window"
+import { currentMonitor } from "@tauri-apps/api/window"
 import { info } from "@tauri-apps/plugin-log"
 
 //////////////////////////手势检测/////////////////////////////
@@ -12,19 +12,17 @@ export const desktopMouseControl = async function (id: string, index: number) {
     y: number
     in: boolean
   } | null = null
+  let dom = document.getElementById(id)
+  if (!dom) return
   const wallpaperstore = wallpaperStore()
+  let current = await currentMonitor()
   let cancel_listen_desktop = await listen("desktop", async (e: Event<MouseEvent>) => {
-    let dom = document.getElementById(id)
-    if (!dom) return
-    let monitor = (await monitorFromPoint(e.payload.x, e.payload.y)) as Monitor
-    let current = await currentMonitor()
-    if (monitor?.name != current?.name) {
+    if (e.payload.monitor.name != current?.name) {
       mouseleftdown = null
       return
     }
-
-    let x = (e.payload.x - monitor.position.x) / monitor.scaleFactor
-    let y = (e.payload.y - monitor.position.y) / monitor.scaleFactor
+    let x = (e.payload.x - e.payload.monitor.position.x) / e.payload.monitor.scaleFactor
+    let y = (e.payload.y - e.payload.monitor.position.y) / e.payload.monitor.scaleFactor
     let { left, top, right, bottom } = dom.getBoundingClientRect()
     if (left < x && right > x && top < y && bottom > y && e.payload.mouse == MouseAction.LeftDown) {
       mouseleftdown = {
