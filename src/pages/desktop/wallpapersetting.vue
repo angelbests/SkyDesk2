@@ -33,13 +33,13 @@ onMounted(() => {
             <v-list-item>
               <v-list-item-title>视差</v-list-item-title>
               <template v-slot:append>
-                <v-switch color="info" hide-details v-model.lazy="item.config.action"></v-switch>
+                <v-switch color="info" hide-details v-model="item.config.action"></v-switch>
               </template>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>樱花</v-list-item-title>
               <template v-slot:append>
-                <v-switch color="info" hide-details v-model.lazy="item.config.sakura"></v-switch>
+                <v-switch color="info" hide-details v-model="item.config.sakura"></v-switch>
               </template>
             </v-list-item>
             <!-- 声音 -->
@@ -117,42 +117,6 @@ onMounted(() => {
               </template>
             </v-list-item>
             <v-divider></v-divider>
-            <v-list-subheader style="background: #d1c4e9">网速</v-list-subheader>
-            <v-list-item>
-              <v-list-item-title>显示</v-list-item-title>
-              <template v-slot:append>
-                <v-switch color="info" hide-details v-model.lazy="item.config.netspeed"></v-switch>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>X坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider :model-value="item.config.netspeedx" @end="e => item.config.netspeedx = e" min="0" max="100"
-                    step="1" thumb-label hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>Y坐标</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider :model-value="item.config.netspeedy" @end="e => item.config.netspeedy = e" min="0" max="100"
-                    step="1" thumb-label hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-title>字体大小</v-list-item-title>
-              <template v-slot:append>
-                <div style="width: 280px">
-                  <v-slider :model-value="item.config.netspeedfontsize" @end="e => item.config.netspeedfontsize = e"
-                    min="0" max="100" step="1" thumb-label hide-details></v-slider>
-                </div>
-              </template>
-            </v-list-item>
-            <v-divider></v-divider>
-
             <v-list-subheader style="background: #d1c4e9">音乐</v-list-subheader>
             <v-list-item>
               <v-list-item-title>显示</v-list-item-title>

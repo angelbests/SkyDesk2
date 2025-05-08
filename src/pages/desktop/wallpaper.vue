@@ -11,6 +11,7 @@ import MusicTape from "../../components/wallpaper/MusicTape.vue";
 import Weather from "../../components/wallpaper/Weather.vue";
 import Date from "../../components/wallpaper/Date.vue";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
+import { startSakura, stopp } from "../../functions/sakura";
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { invoke } from "@tauri-apps/api/core";
 // invoke("open_devtool", { label: getCurrentWebviewWindow().label })
@@ -33,21 +34,31 @@ onMounted(async () => {
     if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
       if (type.value == 'video') {
-        let dom = document.getElementById("wallpapervideo") as HTMLVideoElement;
-        dom.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+        dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+      }
+      if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
+        startSakura()
+      } else {
+        stopp()
       }
     }
   });
+
   setTimeout(() => {
     if (type.value == 'image') {
       dom.value = document.getElementById("wallpaperimg")
     } else if (type.value == 'video') {
       dom.value = document.getElementById("wallpapervideo")
       dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
-
     }
     listen_desktop()
-  }, 10)
+  }, 10);
+  if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
+    startSakura()
+  } else {
+    stopp()
+  }
+
 });
 
 // 鼠标跟随 //////////////////////////////////////////
@@ -80,8 +91,7 @@ const listen_desktop = function () {
   }
   animate()
 }
-import { startSakura } from "../../functions/sakura";
-startSakura()
+
 </script>
 
 <template>

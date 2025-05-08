@@ -180,6 +180,8 @@ window.onresize = function () {
 export function stopp() {
   let child = document.getElementById("canvas_sakura")
   if (child) {
+    console.log(child)
+    // document.body.removeChild(child)
     child.parentNode?.removeChild(child)
     window.cancelAnimationFrame(stop)
   }

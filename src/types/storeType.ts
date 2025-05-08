@@ -30,39 +30,20 @@ type WallpaperConfig = {
   monitor: string
   label: string
   config: {
-    action: true
-    sakura: true
+    action: boolean
+    sakura: boolean
     audio: number
     date: boolean
     datex: number
     datey: number
     color: string
-    datefontsize: number
-    time: boolean
-    timex: number
-    timey: number
-    timefontsize: number
     weather: boolean
     weatherx: number
     weathery: number
-    weatherfontsize: number
-    netspeed: boolean
-    netspeedx: number
-    netspeedy: number
-    netspeedfontsize: number
-    cpu: boolean
-    cpux: number
-    cpuy: number
-    cpufontsize: number
-    memory: boolean
-    memoryx: number
-    memoryy: number
-    memoryfontsize: number
     music: boolean
-    musictype: number
     musicx: number
     musicy: number
-    musicfontsize: number
+    musictype: number
     musicapp: string
   }
 }
