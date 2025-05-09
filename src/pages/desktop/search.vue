@@ -155,6 +155,12 @@ const search = async function (e: any) {
         let value = e.target.value.trim().replace("'", "");
         let show = await getCurrentWebviewWindow().isVisible();
         if (show) {
+            let shortcutres = shortcutstore.shortcutsTemp.filter(item => {
+                let path = item.name.toLocaleLowerCase();
+                let str = value.toLocaleLowerCase()
+                return path.indexOf(str) >= 0
+            });
+            searchshortcut.value = [...shortcutres]
             let searchinvoke: {
                 str: string,
                 result: searchResult[]
@@ -188,12 +194,6 @@ const search = async function (e: any) {
                 return e.kind == "音乐"
             })
             searchresult.value = [...program, ...url, ...document, ...image, ...video, ...music, ...dir,]
-            let shortcutres = shortcutstore.shortcutsTemp.filter(item => {
-                let path = item.name.toLocaleLowerCase();
-                let str = value.toLocaleLowerCase()
-                return path.indexOf(str) >= 0
-            });
-            searchshortcut.value = [...shortcutres]
             searchstatus.value = false
         }
     }, 500);

@@ -58,7 +58,6 @@ onMounted(async () => {
   } else {
     stopp()
   }
-
 });
 
 // 鼠标跟随 //////////////////////////////////////////
@@ -98,7 +97,6 @@ const listen_desktop = function () {
   <div class="window">
     <!-- snow -->
     <div style="width: 100%;height: 100%;position: absolute;z-index: 500;">
-
     </div>
     <!-- wallpaper -->
     <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" :class="{

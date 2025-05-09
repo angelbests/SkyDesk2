@@ -10,8 +10,8 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { appDataDir, basename, resolve, pictureDir, resourceDir } from '@tauri-apps/api/path'
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { copyFile, mkdir, exists, remove } from "@tauri-apps/plugin-fs";
-import { availableMonitors, LogicalSize, Monitor } from "@tauri-apps/api/window";
-import { getAllWebviewWindows, WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { availableMonitors, LogicalSize, Monitor, ProgressBarStatus } from "@tauri-apps/api/window";
+import { getAllWebviewWindows, getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import wallpaperfall from "../../components/WallpaperFall.vue";
 import GridContainer from "../../components/GridContainer.vue";
 import { getpoi } from "./../../api/weather"
@@ -285,16 +285,25 @@ import { download } from "@tauri-apps/plugin-upload"
 const downloadwallpaper = async function (src: string) {
     let name = await basename(src);
     let path = await pictureDir() + "\\skydesk2\\" + name;
-
     if (!await exists(path)) {
-        await download(src, path, ({ total, progressTotal, transferSpeed }) => {
+        await download(src, path, async ({ progress, total, progressTotal, transferSpeed }) => {
+
+            await getCurrentWebviewWindow().setProgressBar({
+                "progress": total == progressTotal ? 0 : Math.trunc(progressTotal / total * 100),
+                "status": total == progressTotal ? ProgressBarStatus.Normal : ProgressBarStatus.None
+            })
+
+            console.log(progress, total, progressTotal, transferSpeed)
             console.log(`name:${name},percentage :${Math.trunc(progressTotal / total * 100)}%,speed:${transferSpeed / 1024}KB/s`)
         }
         )
     }
     return path;
 }
-
+getCurrentWebviewWindow().setProgressBar({
+    "progress": 0,
+    "status": ProgressBarStatus.None
+})
 // 天气
 const weatherstore = weatherStore()
 const weathershow = ref(false)
@@ -355,6 +364,8 @@ const wallpapersetting = function () {
         url: '/#/pages/desktop/wallpapersetting'
     })
 }
+
+
 </script>
 
 <template>
