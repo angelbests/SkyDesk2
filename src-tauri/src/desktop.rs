@@ -64,7 +64,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_LBUTTONDOWN => {
                 println!("鼠标左键点击了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::LeftDown,
@@ -76,7 +76,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_RBUTTONDOWN => {
                 // println!("鼠标右键点击了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::RightDown,
@@ -88,7 +88,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_MBUTTONDOWN => {
                 // println!("鼠标中键点击了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::MiddleDown,
@@ -100,7 +100,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_LBUTTONUP => {
                 // println!("鼠标左键释放了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::LeftUp,
@@ -112,7 +112,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_RBUTTONUP => {
                 // println!("鼠标右键释放了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::RightUp,
@@ -124,7 +124,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_MBUTTONUP => {
                 // println!("鼠标中键释放了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::MiddleUp,
@@ -136,7 +136,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_MOUSEMOVE => {
                 // println!("鼠标移动了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::Move,
@@ -148,7 +148,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             WM_MOUSEWHEEL => {
                 // println!("鼠标滚轮滚动了桌面");
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(Some(MouseInfo {
+                    let _ = sender.try_send(Some(MouseInfo {
                         x: mouse_info.pt.x,
                         y: mouse_info.pt.y,
                         mouse: MouseAction::Wheel,
@@ -159,7 +159,7 @@ unsafe extern "system" fn mouse_proc(n_code: i32, w_param: WPARAM, l_param: LPAR
             }
             _ => {
                 if let Some(sender) = &*TX.lock().unwrap() {
-                    let _ = sender.send(None);
+                    let _ = sender.try_send(None);
                 }
             }
         }
@@ -192,7 +192,7 @@ pub fn desktop_mouse_listen(app: AppHandle) {
                 println!("{:?}", e);
             }
         }
-        let (tx, rx) = sync_channel::<Option<MouseInfo>>(1);
+        let (tx, rx) = sync_channel::<Option<MouseInfo>>(200);
         let h_instance = GetModuleHandleA(None).unwrap();
         let _hook = SetWindowsHookExA(
             WH_MOUSE_LL,
