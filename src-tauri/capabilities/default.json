@@ -27,7 +27,10 @@
     "core:window:allow-destroy",
     "core:window:allow-center",
     "core:window:allow-set-focus",
-    "core:window:allow-start-dragging",
+    {
+      "identifier": "core:window:allow-start-dragging",
+      "allow": []
+    },
     "core:window:allow-toggle-maximize",
     "core:window:allow-start-resize-dragging",
     "core:window:allow-minimize",
@@ -156,16 +159,6 @@
               "validator": "\\S+"
             }
           ]
-        },
-        {
-          "name": "bin/ResourcesExtract",
-          "args": true,
-          "sidecar": true
-        },
-        {
-          "name": "bin/shman",
-          "args": true,
-          "sidecar": true
         }
       ]
     },

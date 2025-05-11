@@ -7,11 +7,12 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { systemStore } from "../../stores/system";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { MouseAction, MouseEvent } from "../../types/desktopType";
-import { currentMonitor, Monitor, monitorFromPoint } from "@tauri-apps/api/window";
+import { currentMonitor } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { Smtc_Control } from "../../functions/smtc";
 import { wallpaperStore } from "../../stores/wallpaper";
 import { shortcutStore } from "../../stores/shortcut";
+import { openPath } from "@tauri-apps/plugin-opener";
 const wallpaperstore = wallpaperStore()
 const shortcutstore = shortcutStore()
 const app = ref("")
@@ -77,6 +78,7 @@ onMounted(() => {
       shortcutstore.$hydrate()
     }
   });
+  listen_music_btn()
 })
 
 watch(systemstore, () => {
@@ -92,6 +94,7 @@ watch(systemstore, () => {
 
 
 smtc.listen_appstatus(async (e) => {
+  if (!wallpaperstore.wallpaperConfig[0]) return
   if (
     !e.payload.cloudmusic &&
     wallpaperstore.wallpaperConfig[0].config.musicapp ==
@@ -131,62 +134,59 @@ smtc.listen_playstatus((e) => {
   }
 })
 
-import { Command } from "@tauri-apps/plugin-shell";
-listen("desktop", async (e: Event<MouseEvent>) => {
+
+const listen_music_btn = async function () {
   let dom = document.getElementById("previous")
   if (!dom) return;
-  let monitor = await monitorFromPoint(e.payload.x, e.payload.y) as Monitor
   let current = await currentMonitor()
-  if (monitor?.name != current?.name) {
-    return
-  };
-  let x = e.payload.x
-  let y = e.payload.y
-  let width = dom.clientWidth * monitor.scaleFactor;
-  let height = dom.clientHeight * monitor.scaleFactor;
-  if (e.payload.mouse == MouseAction.LeftUp) {
-    if (rect.value.x < x && (rect.value.x + width) > x && rect.value.y < y && (rect.value.y + height) > y) {
-      if (app.value) {
-        shortcutstore.shortcutsTemp.filter((e) => {
-          if (e.targetPath.indexOf(app.value) > 0) {
-            Command.create("powershell", `& "${e.targetPath}"`, {
-              encoding: "GBK",
-            }).execute();
-          }
-        })
-      } else {
+  if (!current) return;
+  let width = dom.clientWidth * current.scaleFactor;
+  let height = dom.clientHeight * current.scaleFactor;
+  await listen("desktop", async (e: Event<MouseEvent>) => {
+    let { monitor, x, y, mouse } = e.payload
+    if (monitor.name != current.name) {
+      return
+    };
+    if (mouse == MouseAction.LeftUp) {
+      if (!wallpaperstore.wallpaperConfig[0]) return
+      if (rect.value.x < x && (rect.value.x + width) > x && rect.value.y < y && (rect.value.y + height) > y) {
+        if (app.value) {
+          shortcutstore.shortcutsTemp.filter((e) => {
+            if (e.targetPath.indexOf(app.value) > 0) {
+              console.log(e)
+              openPath(e.targetPath)
+            }
+          })
+          return
+        }
         invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: -1 })
-      }
-    } else if ((rect.value.x + width) < x && (rect.value.x + width * 2) > x && rect.value.y < y && (rect.value.y + height) > y) {
-      if (app.value) {
-        shortcutstore.shortcutsTemp.filter((e) => {
-          if (e.targetPath.indexOf(app.value) > 0) {
-            Command.create("powershell", `& "${e.targetPath}"`, {
-              encoding: "GBK",
-            }).execute();
-          }
-        })
-      } else {
+      } else if ((rect.value.x + width) < x && (rect.value.x + width * 2) > x && rect.value.y < y && (rect.value.y + height) > y) {
+        if (app.value) {
+          shortcutstore.shortcutsTemp.filter((e) => {
+            if (e.targetPath.indexOf(app.value) > 0) {
+              console.log(e)
+              openPath(e.targetPath)
+            }
+          })
+          return
+        }
         invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 0 })
-      }
-    } else if ((rect.value.x + width * 2) < x && (rect.value.x + width * 3) > x && rect.value.y < y && (rect.value.y + height) > y) {
-      if (app.value) {
-        shortcutstore.shortcutsTemp.filter((e) => {
-          if (e.targetPath.indexOf(app.value) > 0) {
-            Command.create("powershell", `& "${e.targetPath}"`, {
-              encoding: "GBK",
-            }).execute();
-          }
-        })
-      } else {
+      } else if ((rect.value.x + width * 2) < x && (rect.value.x + width * 3) > x && rect.value.y < y && (rect.value.y + height) > y) {
+        if (app.value) {
+          shortcutstore.shortcutsTemp.filter((e) => {
+            if (e.targetPath.indexOf(app.value) > 0) {
+              console.log(e)
+              openPath(e.targetPath)
+            }
+          })
+          return
+        }
         invoke("play_control", { appname: wallpaperstore.wallpaperConfig[0].config.musicapp, control: 1 })
       }
     }
-  }
-})
-
+  })
+}
 </script>
-
 <template>
   <div class="window">
     <div class="music">

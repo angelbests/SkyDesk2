@@ -22,6 +22,8 @@ onMounted(() => {
     }
   });
 });
+
+
 const selectcapture = function () {
   let wins = [];
   monitors.value.forEach((item) => {
@@ -46,9 +48,6 @@ const selectcapture = function () {
 import { Command } from "@tauri-apps/plugin-shell";
 import { videoDir } from "@tauri-apps/api/path";
 import { remove } from "@tauri-apps/plugin-fs";
-// const openvideo = function(path:string){
-//     open(path)
-// }
 
 const opendir = async function () {
   let path = (await videoDir()) + "\\skydesk2";
@@ -63,7 +62,7 @@ const delvideo = function (path: string) {
   remove(path);
 };
 
-// import { svgs } from "../../functions/weatnerIcon";
+
 </script>
 
 <template>
@@ -104,14 +103,6 @@ const delvideo = function (path: string) {
         </GridContainer>
       </div>
     </div>
-    <!-- <div style="width: 100%;display: flex;justify-content: center;align-items: start;flex-wrap: wrap;background:red;">
-      <div v-for="item in svgs" style="width: 100px;height: 150px;">
-        <img style="width: 100px;" :src="`/svg/${item}`">
-        <div style="font-size: 12px;">
-          {{ item }}
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 

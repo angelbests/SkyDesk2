@@ -14,6 +14,10 @@ import { maininit } from "../functions/maininit"
 import { convertFileSrc, invoke } from "@tauri-apps/api/core"
 import { open } from "@tauri-apps/plugin-dialog"
 import { copyFile } from "@tauri-apps/plugin-fs"
+import { Netspeed, NetSpeed } from "../functions/sysinfo"
+import { uuid } from "../functions"
+import { appDataDir, resolve } from "@tauri-apps/api/path"
+import { createWindow } from "../functions/window"
 const systemstore = systemStore()
 const drawer = ref(true)
 const colorshow = ref(false)
@@ -23,6 +27,14 @@ onMounted(async () => {
   await maininit()
   appbardraging()
   get_version()
+})
+
+window.addEventListener("drop", e => {
+  e.preventDefault()
+})
+
+window.addEventListener("dragover", e => {
+  e.preventDefault()
 })
 
 getCurrentWebviewWindow().listen("create-note", async () => {
@@ -289,10 +301,7 @@ const updateprogram = async function () {
 //#endregion
 
 //#region  网速监听
-import { Netspeed, NetSpeed } from "../functions/sysinfo"
-import { uuid } from "../functions"
-import { appDataDir, resolve } from "@tauri-apps/api/path"
-import { createWindow } from "../functions/window"
+
 // import { LogicalPosition } from "@tauri-apps/api/dpi";
 const net = ref<NetSpeed>({ speed_r: 0, speed_s: 0 })
 new Netspeed().listen_netspeed((e) => {

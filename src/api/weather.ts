@@ -8,10 +8,25 @@ export const getpoi = async function (city: string): Promise<any> {
     let respone = await fetch(`https://geoapi.qweather.com/v2/city/lookup?location=${city}&key=${w.apikey}&gzip=n`, {
       method: "GET",
     })
+    console.log(respone)
     if (respone.ok) {
-      let json = await respone.json()
-      console.log(json)
-      return json.location
+      let isgzip = false
+      for (const pair of respone.headers.entries()) {
+        info(`${pair[0]}: ${pair[1]}`)
+        if (pair[0] == "content-encoding" && pair[1] == "gzip") {
+          isgzip = true
+        }
+      }
+      if (isgzip) {
+        let blob = await respone.blob()
+        let ds = new DecompressionStream("gzip")
+        const de = blob.stream().pipeThrough(ds)
+        let json = await new Response(de).json()
+        return json.location
+      } else {
+        let json = await respone.json()
+        return json.location
+      }
     }
   }
   return []

@@ -1,9 +1,11 @@
-import { Command } from "@tauri-apps/plugin-shell"
 import { readDir } from "@tauri-apps/plugin-fs"
-import { basename, extname, homeDir, resolve } from "@tauri-apps/api/path"
+import { extname, homeDir, resolve } from "@tauri-apps/api/path"
 import { info, error } from "@tauri-apps/plugin-log"
+import { Command } from "@tauri-apps/plugin-shell"
+import { ShortCut } from "../types/storeType"
+
 export const getlnks = async function () {
-  let lnks = []
+  let lnks: ShortCut[] = []
   let lnkFiles = await getLnkFile()
   // 拼接shell脚本
   let lnkFilesstr = "$lnkFiles = @("
@@ -43,11 +45,9 @@ export const getlnks = async function () {
   for (let i = 0; i < res.length; i++) {
     lnks.push({
       targetPath: res[i].TargetPath,
-      iconLocationPeFile: res[i].IconLocation == null ? "" : res[i].IconLocation.split(",")[0],
-      iconLocation: res[i].IconLocation == null ? "" : res[i].IconLocation.split(",")[1],
       lnkPath: lnkFiles[i],
       icoPath: "",
-      name: (await basename(lnkFiles[i])).replace("." + (await extname(lnkFiles[i])), ""),
+      name: "",
     })
   }
   info("完成快捷方式信息提取！")

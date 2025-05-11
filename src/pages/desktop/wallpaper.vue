@@ -16,20 +16,41 @@ import { startSakura, stopp } from "../../functions/sakura";
 // import { invoke } from "@tauri-apps/api/core";
 // invoke("open_devtool", { label: getCurrentWebviewWindow().label })
 const wallpaperstore = wallpaperStore();
-const index = ref(0);
+const index = ref<number>(0);
 const route = useRoute();
 const path = ref();
 const type = ref();
 const dom = ref<any>()
 const monitor = ref<Monitor>()
-onMounted(async () => {
-  monitor.value = await currentMonitor() as Monitor
+const unlisten = ref<any>()
+onMounted(() => {
   document.title = "skydesk2-wallpaper"
   path.value = route.query.path;
   type.value = route.query.type;
+  setTimeout(async () => {
+    await init()
+    if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
+      startSakura()
+    }
+
+    if (wallpaperstore.wallpaperConfig[index.value].config.action) {
+      listen_desktop()
+    }
+  }, 50)
+});
+
+const init = async function () {
+  monitor.value = await currentMonitor() as Monitor
   index.value = wallpaperstore.wallpaperConfig.findIndex(
     (item) => item.monitor == monitor.value?.name
   );
+  console.log(index.value)
+  if (type.value == 'image') {
+    dom.value = document.getElementById("wallpaperimg")
+  } else if (type.value == 'video') {
+    dom.value = document.getElementById("wallpapervideo")
+    dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+  }
   window.addEventListener("storage", (e) => {
     if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
@@ -41,24 +62,17 @@ onMounted(async () => {
       } else {
         stopp()
       }
+
+      if (wallpaperstore.wallpaperConfig[index.value].config.action) {
+        listen_desktop()
+      } else {
+        unlisten.value()
+      }
     }
   });
 
-  setTimeout(() => {
-    if (type.value == 'image') {
-      dom.value = document.getElementById("wallpaperimg")
-    } else if (type.value == 'video') {
-      dom.value = document.getElementById("wallpapervideo")
-      dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
-    }
-    listen_desktop()
-  }, 10);
-  if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
-    startSakura()
-  } else {
-    stopp()
-  }
-});
+
+}
 
 // 鼠标跟随 //////////////////////////////////////////
 const listen_desktop = function () {
@@ -66,7 +80,7 @@ const listen_desktop = function () {
   let ry: number = 0;
   let tx: number = 0;
   let ty: number = 0;
-  listen("desktop", async (e: Event<MouseEvent>) => {
+  unlisten.value = listen("desktop", async (e: Event<MouseEvent>) => {
     if (monitor.value?.name !== e.payload.monitor.name) return
     if (e.payload.mouse == MouseAction.Move) {
       let { x, y } = e.payload
@@ -97,29 +111,36 @@ const listen_desktop = function () {
   <div class="window">
     <!-- snow -->
     <div style="width: 100%;height: 100%;position: absolute;z-index: 500;">
+
     </div>
     <!-- wallpaper -->
-    <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" :class="{
+    <img id="wallpaperimg" v-show="type == 'image'" :src="convertFileSrc(path)" :class="{
       image: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action
     }" />
-    <video id="wallpapervideo" v-else-if="type == 'video'"
+    <video id="wallpapervideo" v-show="type == 'video'"
       :class="{ video: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action }"
       :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
     <!-- music1 -->
-    <MusicVinyl v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 1" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-    }"></MusicVinyl>
+    <MusicVinyl
+      v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 1 && wallpaperstore.wallpaperConfig[index].config.music"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+      }"></MusicVinyl>
     <!-- music2-->
-    <MusicDisk v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 2" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-    }"></MusicDisk>
+    <MusicDisk
+      v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 2 && wallpaperstore.wallpaperConfig[index].config.music"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+      }"></MusicDisk>
     <!-- music3 -->
-    <MusicTape v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 3" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-    }">
+    <MusicTape
+      v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 3 && wallpaperstore.wallpaperConfig[index].config.music"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+      }">
     </MusicTape>
     <!-- weather -->
     <Weather v-if="wallpaperstore.wallpaperConfig[index].config.weather" :style="{
@@ -128,7 +149,7 @@ const listen_desktop = function () {
     }">
     </Weather>
     <!-- date -->
-    <Date v-show="wallpaperstore.wallpaperConfig[index].config.date" :style="{
+    <Date v-if="wallpaperstore.wallpaperConfig[index].config.date" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
       top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
       color: `${wallpaperstore.wallpaperConfig[index].config.color}`

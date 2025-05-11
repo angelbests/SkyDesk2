@@ -18,6 +18,7 @@ import {
 } from "@wangeditor/editor";
 import { noteStore } from "../../stores/note";
 import { windowStore } from "../../stores/window"
+import { listen } from "@tauri-apps/api/event";
 let label = getCurrentWebviewWindow().label;
 // 监听storage事件
 window.addEventListener("storage", (e) => {
@@ -60,7 +61,9 @@ onMounted(() => {
 
   //文件拖拽监听
   filedrop();
-
+  listen("tauri://drag-drop", e => {
+    console.log(e)
+  })
 
 });
 

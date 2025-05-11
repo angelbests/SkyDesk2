@@ -61,7 +61,7 @@ pub async fn search_query(str: String) -> SearchResult {
         // 调用 .Execute() 执行查询
         let execute_dispid = get_dispid(&conn, w!("Execute"));
         let sql = format!(
-            r#"SELECT TOP 100 System.ItemNameDisplay,
+            r#"SELECT TOP 20 System.ItemNameDisplay,
             System.ItemPathDisplay,
             System.ItemTypeText,
             System.MIMEType,

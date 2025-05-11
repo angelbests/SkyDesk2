@@ -13,12 +13,14 @@ import { ShortCut } from '../../types/storeType';
 import { homeDir } from '@tauri-apps/api/path';
 import { createWindow } from '../../functions/window';
 import { uuid } from '../../functions';
+import { get_pe_ico } from '../../functions/peIcon';
 type searchResult = {
     name: string,
     path: string,
     kind: string,
     ext: string,
-    dir?: string
+    dir?: string,
+    icon: string
 }
 const shortcutstore = shortcutStore()
 const { shortcuts } = toRefs(shortcutstore)
@@ -168,7 +170,11 @@ const search = async function (e: any) {
             if (searchinvoke.str != (inputvalue.value.trim().replace("'", ""))) return
             let res = searchinvoke.result;
             console.log(searchinvoke)
-
+            for (let i = 0; i < res.length; i++) {
+                let path = await get_pe_ico(res[i].path, 'ico')
+                console.log(path)
+                res[i].icon = convertFileSrc(path)
+            }
             res.forEach(e => {
                 e.dir = e.path.replace(e.name, "");
             });
@@ -361,9 +367,12 @@ const createnote = async function () {
                 <div v-if="searchresult.length > 0" tabindex="0" v-for="(item, index) in searchresult"
                     :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
                     :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
-                    <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                        }}</v-chip>
+                    <!-- <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
+                    }}</v-chip> -->
+
+                    <img style="width: 25px;margin-right: 10px;" :src="item.icon">
                     <div class="search-item-name">{{ item.name }}</div>
+                    <!-- <v-btn style="margin-left: 10px;" size="x-small">文件夹</v-btn> -->
                 </div>
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
                     <div v-if="searchstatus"

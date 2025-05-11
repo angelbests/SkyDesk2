@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, toRefs } from "vue";
-import { setIcon } from "../../functions/peIcon";
+import { get_pe_ico, setIcon2 } from "../../functions/peIcon";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { systemStore } from "../../stores/system";
 import { shortcutStore } from "../../stores/shortcut";
@@ -9,11 +9,10 @@ import { createWindow } from "../../functions/window";
 import { uuid } from "../../functions";
 import { open } from "@tauri-apps/plugin-dialog";
 import { exec } from "../../functions/open";
-import { appDataDir, extname, resourceDir } from "@tauri-apps/api/path";
+import { basename, resourceDir } from "@tauri-apps/api/path";
 import GridContainer from "../../components/GridContainer.vue";
 import { emit } from "@tauri-apps/api/event";
-import { readFile, writeFile } from "@tauri-apps/plugin-fs";
-const systemprogram = ref<any[]>([]);
+import { ShortCut } from "../../types/storeType";
 const systemstore = systemStore();
 const tab = ref();
 const tabshow = ref(false);
@@ -23,11 +22,11 @@ const dialog2 = ref(false);
 const dialog = ref(false);
 const index = ref(0);
 const setting = ref(false);
-const shortcut = ref({
-  targetPath: "",
+const shortcut = ref<ShortCut>({
   lnkPath: "",
   icoPath: "",
   name: "",
+  targetPath: "",
 });
 const shortcutstore = shortcutStore();
 const { shortcuts, shortcutsTemp, wheels } = toRefs(shortcutstore);
@@ -45,68 +44,53 @@ onMounted(async () => {
       shortcutstore.$hydrate();
     }
   });
+
+
+});
+
+const scanProgram = async function () {
   let respath = await resourceDir();
-  systemprogram.value = [
+  let systemprogram: ShortCut[] = [
     {
       icoPath: respath + "/resources/notepad.png",
-      iconLocation: "0",
-      iconLocationPeFile: "",
       lnkPath: "",
       name: "记事本",
       targetPath: "C:/Windows/notepad.exe",
     },
     {
-      icoPath: respath + "/resources/resource-manager.png",
-      iconLocation: "0",
-      iconLocationPeFile: "",
-      lnkPath: "",
-      name: "文件资源管理器",
-      targetPath: "C:/Windows/explorer.exe",
-    },
-    {
       icoPath: respath + "/resources/calc.png",
-      iconLocation: "0",
-      iconLocationPeFile: "",
       lnkPath: "",
       name: "计算器",
       targetPath: "C:/Windows/system32/calc.exe",
     },
     {
       icoPath: respath + "/resources/disk.png",
-      iconLocation: "0",
-      iconLocationPeFile: "",
       targetPath: "C:/Windows/system32/diskmgmt.msc",
       name: "磁盘管理",
       lnkPath: "",
     },
     {
       icoPath: respath + "/resources/keyboard.png",
-      iconLocation: "0",
-      iconLocationPeFile: "",
       targetPath: "C:/Windows/system32/osk.exe",
       name: "屏幕键盘",
       lnkPath: "",
     },
     {
       icoPath: respath + "/resources/Volume.png",
-      iconLocation: "0",
-      iconLocationPeFile: "",
       targetPath: "C:/Windows/system32/SndVol.exe",
       name: "音量合成器",
       lnkPath: "",
     },
   ];
-});
-
-const scanProgram = async function () {
   if (scanbtn.value) {
     scanbtn.value = false;
     if (!scanbar.value) {
       scanbar.value = true;
-      let res = await setIcon();
-      const map = new Map();
-      const res2 = res.filter((v) => !map.has(v.name) && map.set(v.name, v));
-      shortcutsTemp.value = [...res2, ...systemprogram.value];
+      let res = await setIcon2();
+      res.push(...systemprogram)
+      shortcutsTemp.value = res
+      // const map = new Map();
+      // res.filter((v) => !map.has(v.name) && map.set(v.name, v));
       scanbar.value = false;
     }
   } else {
@@ -124,6 +108,7 @@ const delSshorcut = function (item: any) {
   shortcuts.value[tab.value].shortcut.splice(index, 1);
 };
 
+//#region  创建桌面docker
 const createDocker = async function () {
   let label = "shortcut-" + uuid();
   let data = {
@@ -159,42 +144,32 @@ const createDocker = async function () {
     title: "shorcut"
   });
 };
+//#endregion
 
-const setdata = function (d: DataTransfer, h: HTMLElement) {
-  console.log(h.dataset.lnk);
-  if (h.dataset.lnk) {
-    d.setData("lnk", h.dataset.lnk);
-  }
-};
-
+// 获取快捷文件并自动生成名称和图标
 const getlnk = async function () {
   let res = await open({
+    "directory": addselect.value == "file" ? false : true,
     filters: [
       {
-        extensions: ["lnk"],
-        name: "lnk",
+        extensions: ["lnk", "exe", "url"],
+        name: "程序文件",
       },
+      {
+        extensions: ["*"],
+        name: "任何文件"
+      }
     ],
   });
   if (res) {
+    let name = await basename(res)
+    shortcut.value.name = name.split(".")[0]
+    shortcut.value.icoPath = await get_pe_ico(res)
     shortcut.value.lnkPath = res;
   }
 };
 
-const getexe = async function () {
-  let res = await open({
-    filters: [
-      {
-        extensions: ["exe"],
-        name: "exe",
-      },
-    ],
-  });
-  if (res) {
-    shortcut.value.targetPath = res;
-  }
-};
-
+// 用户选择图标
 const getico = async function () {
   let res = await open({
     filters: [
@@ -209,7 +184,7 @@ const getico = async function () {
   }
 };
 
-// 修改shortcut
+// 修改shortcut 显示dialog
 const editshortcut = function (i: any) {
   dialog.value = true;
   index.value = i;
@@ -218,60 +193,60 @@ const editshortcut = function (i: any) {
   };
 };
 
+// 提交修改
 const submitshortcut = async function () {
   if (
-    shortcut.value.targetPath &&
     shortcut.value.lnkPath &&
     shortcut.value.icoPath &&
     shortcut.value.name
   ) {
-    let read = await readFile(shortcut.value.icoPath);
-    let icoext = await extname(shortcut.value.icoPath);
-    let path = (await appDataDir()) + "\\ico\\other\\" + uuid() + "." + icoext;
-    await writeFile(path, read);
-    shortcuts.value[tab.value].shortcut[index.value].icoPath = path;
     shortcuts.value[tab.value].shortcut[index.value].lnkPath =
       shortcut.value.lnkPath;
-    shortcuts.value[tab.value].shortcut[index.value].targetPath =
-      shortcut.value.targetPath;
     shortcuts.value[tab.value].shortcut[index.value].name = shortcut.value.name;
+    shortcuts.value[tab.value].shortcut[index.value].icoPath = shortcut.value.icoPath;
   }
   cancelsubmit();
 };
 
+// 新增shorcut 提交
 const submitshortcut2 = async function () {
   if (
-    shortcut.value.targetPath &&
+    shortcut.value.lnkPath &&
     shortcut.value.name &&
     shortcut.value.icoPath
   ) {
-    let read = await readFile(shortcut.value.icoPath);
-    let icoext = await extname(shortcut.value.icoPath);
-    let path = (await appDataDir()) + "\\ico\\other\\" + uuid() + "." + icoext;
-    await writeFile(path, read);
     shortcuts.value[tab.value].shortcut.push({
-      targetPath: shortcut.value.targetPath,
-      iconLocationPeFile: "",
-      iconLocation: "",
       lnkPath: shortcut.value.lnkPath,
-      icoPath: path,
+      icoPath: shortcut.value.icoPath,
       name: shortcut.value.name,
+      targetPath: shortcut.value.targetPath
     });
   }
   cancelsubmit();
 };
 
+// 清除输入
 const cancelsubmit = function () {
   shortcut.value = {
-    targetPath: "",
     lnkPath: "",
     icoPath: "",
     name: "",
+    targetPath: ""
   };
+  addselect.value = "file"
   dialog2.value = false;
   dialog.value = false;
 };
 
+//#region ///////////////拖拽//////////////////////////////////////////
+// 设置拖拽附带的数据
+const setdata = function (d: DataTransfer, h: HTMLElement) {
+  console.log(h.dataset.lnk);
+  if (h.dataset.lnk) {
+    d.setData("lnk", h.dataset.lnk);
+  }
+};
+//克隆
 const clone = function (element: any) {
   if (wheels.value.length < 8) {
     return {
@@ -280,11 +255,13 @@ const clone = function (element: any) {
   }
 };
 
+// 左边拖拽到右键
 const clonelefttoright = function (element: any): any {
   return {
     ...element,
   };
 };
+//拖拽到下方wheel
 const adddown = function () {
   let map = new Map();
   wheels.value = wheels.value.filter(
@@ -292,6 +269,7 @@ const adddown = function () {
   );
 };
 
+// 拖拽到右边
 const addright = function () {
   let map = new Map();
   shortcuts.value[tab.value].shortcut = shortcuts.value[
@@ -299,6 +277,7 @@ const addright = function () {
   ].shortcut.filter((v) => !map.has(v.name) && map.set(v.name, v));
 };
 
+// 拖拽回左边
 const addleft = function () {
   let map = new Map();
   shortcutsTemp.value = shortcutsTemp.value.filter(
@@ -306,6 +285,22 @@ const addleft = function () {
   );
 };
 
+const dragover = function (e: DragEvent) {
+  e.preventDefault();
+};
+
+// 拖拽放下
+const drop = function (e: DragEvent) {
+  if (e.dataTransfer?.getData("dellnk")) {
+    let lnk = JSON.parse(e.dataTransfer.getData("dellnk"));
+    emit("dellnk", lnk);
+  }
+};
+
+//#endregion
+
+//#region 选项卡
+// 添加选项卡
 const addtab = function () {
   if (tabtitle.value) {
     shortcuts.value.push({
@@ -318,6 +313,7 @@ const addtab = function () {
   }
 };
 
+// 删除选项卡
 const deltab = function () {
   shortcuts.value.splice(tab.value, 1);
   tab.value = shortcuts.value.length - 1;
@@ -326,18 +322,8 @@ const deltab = function () {
   }
   deltabshow.value = false;
 };
-
-// 删除对应的桌面合集图标
-const dragover = function (e: DragEvent) {
-  e.preventDefault();
-};
-
-const drop = function (e: DragEvent) {
-  if (e.dataTransfer?.getData("dellnk")) {
-    let lnk = JSON.parse(e.dataTransfer.getData("dellnk"));
-    emit("dellnk", lnk);
-  }
-};
+//#endregion
+const addselect = ref<string>("file")
 </script>
 
 <template>
@@ -370,12 +356,14 @@ const drop = function (e: DragEvent) {
     <v-dialog max-width="500" v-model="dialog">
       <v-list>
         <v-list-item>
-          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getlnk" label="快捷路径"></v-text-field>
+          <v-radio-group v-model="addselect" inline density="compact" hide-details="auto">
+            <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
+            <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
+          </v-radio-group>
         </v-list-item>
         <v-list-item>
-          <v-text-field v-model="shortcut.targetPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getexe" label="程序路径"></v-text-field>
+          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getlnk" :label="addselect == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
         </v-list-item>
         <v-list-item>
           <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
@@ -399,12 +387,14 @@ const drop = function (e: DragEvent) {
     <v-dialog max-width="500" v-model="dialog2">
       <v-list>
         <v-list-item>
-          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getlnk" label="快捷路径"></v-text-field>
+          <v-radio-group v-model="addselect" inline density="compact" hide-details="auto">
+            <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
+            <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
+          </v-radio-group>
         </v-list-item>
         <v-list-item>
-          <v-text-field v-model="shortcut.targetPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getexe" label="程序路径"></v-text-field>
+          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getlnk" :label="addselect == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
         </v-list-item>
         <v-list-item>
           <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"

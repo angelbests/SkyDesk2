@@ -57,12 +57,10 @@ type WallpaperList = {
 }
 
 type ShortCut = {
-  targetPath: string
-  iconLocationPeFile: string
-  iconLocation: string
   lnkPath: string
   icoPath: string
   name: string
+  targetPath: string
 }
 
 export type { Windows, Note, WallpaperConfig, WallpaperList, ShortCut, Monitor }

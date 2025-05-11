@@ -119,7 +119,7 @@ async function weatherD7Wallpaper(fn: (e: { city: string; daily: WeatherD7Type[]
         clearInterval(unlisten)
       }
     },
-    1000 * 60 * 60,
+    1000 * 60 * 30,
   )
 
   // 第一次请求

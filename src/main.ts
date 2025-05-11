@@ -14,7 +14,6 @@ import { VNumberInput } from "vuetify/labs/VNumberInput"
 import { VDateInput } from "vuetify/labs/VDateInput"
 import { zhHans } from "vuetify/locale"
 import i18n from "./i18n"
-
 const vuetify = createVuetify({
   components: {
     VNumberInput,

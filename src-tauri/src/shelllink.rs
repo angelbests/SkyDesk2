@@ -1,222 +1,117 @@
-use std::path::Path;
-use tauri::{AppHandle, Manager};
-use windows::core::BOOL;
-use windows::core::{Interface, PCWSTR};
-use windows::Win32::Foundation::{FreeLibrary, HMODULE, MAX_PATH};
-use windows::Win32::Storage::FileSystem::WIN32_FIND_DATAW;
-use windows::Win32::System::Com::{CoUninitialize, STGM_READ};
-use windows::Win32::System::LibraryLoader::{
-    EnumResourceNamesW, FindResourceW, LoadLibraryExW, LoadResource, LockResource, SizeofResource,
-    LOAD_LIBRARY_AS_DATAFILE,
-};
-use windows::Win32::UI::WindowsAndMessaging::{RT_GROUP_ICON, RT_ICON};
-use windows::Win32::{
-    System::Com::{
-        CoCreateInstance, CoInitializeEx, IPersistFile, CLSCTX_INPROC_SERVER,
-        COINIT_APARTMENTTHREADED,
+use std::{ffi::OsStr, os::windows::ffi::OsStrExt, ptr::null_mut};
+use windows::{
+    core::{Interface, HSTRING, PCWSTR},
+    Win32::{
+        Foundation::SIZE,
+        Graphics::{
+            Gdi::{HBITMAP, HPALETTE},
+            Imaging::{
+                CLSID_WICImagingFactory, GUID_ContainerFormatPng, GUID_VendorMicrosoftBuiltIn,
+                GUID_WICPixelFormat32bppBGRA, IWICBitmapFrameEncode, IWICImagingFactory,
+                WICBitmapEncoderNoCache, WICBitmapUseAlpha,
+            },
+        },
+        Storage::FileSystem::FILE_FLAGS_AND_ATTRIBUTES,
+        System::Com::{
+            CoCreateInstance, CoInitializeEx, IStream, StructuredStorage::IPropertyBag2,
+            CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED, STGM_CREATE, STGM_SHARE_EXCLUSIVE,
+            STGM_WRITE,
+        },
+        UI::Shell::{
+            IShellItem, IShellItemImageFactory, SHCreateItemFromParsingName,
+            SHCreateStreamOnFileEx, SHGetFileInfoW, SHFILEINFOW, SHGFI_DISPLAYNAME,
+            SIIGBF_ICONONLY,
+        },
     },
-    UI::Shell::{IShellLinkW, ShellLink},
 };
-
-#[repr(C)]
-#[derive(Debug, Clone)]
-struct IconDir {
-    reserved: u16,
-    r#type: u16,
-    count: u16,
+#[tauri::command]
+pub fn get_lnk_png(path: &str, savepath: &str, width: i32, height: i32) {
+    println!("path:{:?}", path);
+    let path = path.to_string();
+    let savepath = savepath.to_string();
+    tauri::async_runtime::spawn(async move {
+        let h = get_file_thumbnail(&path, width, height);
+        save_bitmap_as_png(h, &savepath);
+    });
 }
 
-#[repr(C)]
-#[derive(Debug, Clone)]
-struct IconDirEntry {
-    width: u8,
-    height: u8,
-    color_count: u8,
-    reserved: u8,
-    planes: u16,
-    bit_count: u16,
-    bytes_in_res: u32,
-    id: u16, // RT_ICON resource ID
+fn get_file_thumbnail(path: &str, width: i32, height: i32) -> HBITMAP {
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
+        let item: IShellItem = SHCreateItemFromParsingName(&HSTRING::from(path), None).unwrap();
+
+        let image_factory: IShellItemImageFactory = item.cast().unwrap();
+        let size = SIZE {
+            cx: width,
+            cy: height,
+        };
+
+        let hbitmap = image_factory.GetImage(size, SIIGBF_ICONONLY).unwrap();
+        hbitmap
+    }
+}
+
+fn save_bitmap_as_png(hbitmap: HBITMAP, savepath: &str) {
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
+        let imaging_factory: IWICImagingFactory =
+            CoCreateInstance(&CLSID_WICImagingFactory, None, CLSCTX_INPROC_SERVER).unwrap();
+        let wic_bitmap = imaging_factory
+            .CreateBitmapFromHBITMAP(hbitmap, HPALETTE::default(), WICBitmapUseAlpha)
+            .unwrap();
+        let stream: IStream = SHCreateStreamOnFileEx(
+            &HSTRING::from(savepath),
+            STGM_CREATE.0 | STGM_WRITE.0 | STGM_SHARE_EXCLUSIVE.0,
+            0,
+            true,
+            None,
+        )
+        .unwrap();
+        let encoder: windows::Win32::Graphics::Imaging::IWICBitmapEncoder = imaging_factory
+            .CreateEncoder(&GUID_ContainerFormatPng, &GUID_VendorMicrosoftBuiltIn)
+            .unwrap();
+        let _ = encoder.Initialize(&stream, WICBitmapEncoderNoCache);
+        let mut frame: Option<IWICBitmapFrameEncode> = None;
+        let mut props: Option<IPropertyBag2> = None;
+        encoder.CreateNewFrame(&mut frame, &mut props).unwrap();
+        let frame = frame.unwrap();
+        let _ = frame.Initialize(None);
+        let mut width: u32 = 0;
+        let mut height: u32 = 0;
+        wic_bitmap.GetSize(&mut width, &mut height).unwrap();
+        let _ = frame.SetSize(width, height);
+        let mut pixel_format = GUID_WICPixelFormat32bppBGRA;
+        let _ = frame.SetPixelFormat(&mut pixel_format as *mut _);
+        let _ = frame.WriteSource(&wic_bitmap, null_mut());
+        let _ = frame.Commit();
+        let _ = encoder.Commit();
+    }
 }
 
 #[tauri::command]
-pub fn shelllink(app: AppHandle, path: String) {
+pub async fn get_localized_display_name(path: String) -> Option<String> {
+    let wide_path: Vec<u16> = OsStr::new(&path).encode_wide().chain(Some(0)).collect();
+    let mut file_info = SHFILEINFOW::default();
+
     unsafe {
-        let filename = app.path().file_name(&path).unwrap();
-        let c: Vec<&str> = filename.split(".").collect();
-        let name = c[0];
-        print!("name:{}", name);
-        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
-        let shell_link: IShellLinkW =
-            CoCreateInstance(&ShellLink, None, CLSCTX_INPROC_SERVER).unwrap();
-        let persist_file: IPersistFile = shell_link.cast().unwrap();
-
-        let wide_path: Vec<u16> = path.encode_utf16().chain(std::iter::once(0)).collect();
-        let _ = persist_file.Load(PCWSTR(wide_path.as_ptr()), STGM_READ);
-
-        let mut icon_path: [u16; MAX_PATH as usize] = [0; MAX_PATH as usize];
-        let mut icon_index: i32 = 0;
-        shell_link
-            .GetIconLocation(&mut icon_path, &mut icon_index)
-            .unwrap();
-        let mut icon_path_str = String::from_utf16_lossy(&icon_path);
-        let str = icon_path_str.trim_end_matches('\0');
-        println!("{}", str.is_empty());
-        if str.is_empty() {
-            let mut find_data = WIN32_FIND_DATAW::default();
-            let mut path: [u16; MAX_PATH as usize] = [0; MAX_PATH as usize];
-            shell_link.GetPath(&mut path, &mut find_data, 0).unwrap();
-            icon_path_str = String::from_utf16_lossy(&path);
-            let str = icon_path_str.trim_end_matches('\0');
-            if str.is_empty() {
-                return;
-            }
-            icon_path = path;
-        }
-        println!(
-            "path:{},index:{}",
-            icon_path_str.trim_end_matches('\0'),
-            icon_index
+        let result = SHGetFileInfoW(
+            PCWSTR(wide_path.as_ptr()),
+            FILE_FLAGS_AND_ATTRIBUTES(0),
+            Some(&mut file_info),
+            std::mem::size_of::<SHFILEINFOW>() as u32,
+            SHGFI_DISPLAYNAME,
         );
-        let icopath = icon_path_str.trim_end_matches('\0');
-        let filename = app.path().file_name(icopath).unwrap();
-        let c: Vec<&str> = filename.split(".").collect();
-
-        let ext = c[1];
-        println!("{:?}", ext);
-        println!("{:?}", icopath);
-        let path = Path::new(&icopath);
-        let bool = path.exists();
-        if !bool {
-            return;
+        if result == 0 {
+            return None;
         }
-        if ext == "ico" {
-            return;
-        } else if ext == "exe" || ext == "dll" {
-            let hmodule =
-                LoadLibraryExW(PCWSTR(icon_path.as_ptr()), None, LOAD_LIBRARY_AS_DATAFILE).unwrap();
-
-            // https://learn.microsoft.com/zh-cn/windows/win32/api/libloaderapi/nf-libloaderapi-findresourcew
-
-            let mut group_id: Vec<PCWSTR> = vec![];
-            let _bool = EnumResourceNamesW(
-                Some(hmodule),
-                RT_GROUP_ICON,
-                Some(enum_group_icon_callback),
-                &mut group_id as *mut _ as isize,
-            );
-            println!("group_id:{:?}", group_id);
-            for id in group_id.iter() {
-                let bool = is_int_resource(*id);
-                if !bool {
-                    println!("group_id:{:?}", *id);
-                    return;
-                }
-                let group_data = load_resource_data(hmodule, *id, RT_GROUP_ICON).unwrap();
-                let header = IconDir {
-                    reserved: u16::from_le_bytes([group_data[0], group_data[1]]),
-                    r#type: u16::from_le_bytes([group_data[2], group_data[3]]),
-                    count: u16::from_le_bytes([group_data[4], group_data[5]]),
-                };
-                println!("header:{:?}", header);
-
-                let mut entries: Vec<IconDirEntry> = vec![];
-                for i in 0..header.count {
-                    let offset = 6 + i as usize * 14;
-                    let entry = IconDirEntry {
-                        width: group_data[offset],
-                        height: group_data[offset + 1],
-                        color_count: group_data[offset + 2],
-                        reserved: group_data[offset + 3],
-                        planes: u16::from_le_bytes([
-                            group_data[offset + 4],
-                            group_data[offset + 5],
-                        ]),
-                        bit_count: u16::from_le_bytes([
-                            group_data[offset + 6],
-                            group_data[offset + 7],
-                        ]),
-                        bytes_in_res: u32::from_le_bytes([
-                            group_data[offset + 8],
-                            group_data[offset + 9],
-                            group_data[offset + 10],
-                            group_data[offset + 11],
-                        ]),
-                        id: u16::from_le_bytes([group_data[offset + 12], group_data[offset + 13]]),
-                    };
-                    entries.push(entry);
-                }
-
-                // 读取所有 RT_ICON 并构建 ICO 文件
-                let mut ico_data = vec![];
-                ico_data.extend_from_slice(&group_data[0..6]); // ICONDIR
-                for entry in entries.iter() {
-                    let icon_bin =
-                        load_resource_data(hmodule, makeintresource(entry.id), RT_ICON).unwrap();
-                    let mut new_entry = entry.clone();
-                    new_entry.id = 0; // 替换为 offset
-                    new_entry.bytes_in_res = icon_bin.len() as u32;
-                    let offset = 6 + (14 * entries.len()) + ico_data.len() as usize;
-                    let mut entry_buf = vec![
-                        new_entry.width,
-                        new_entry.height,
-                        new_entry.color_count,
-                        new_entry.reserved,
-                    ];
-                    entry_buf.extend_from_slice(&new_entry.planes.to_le_bytes());
-                    entry_buf.extend_from_slice(&new_entry.bit_count.to_le_bytes());
-                    entry_buf.extend_from_slice(&new_entry.bytes_in_res.to_le_bytes());
-                    entry_buf.extend_from_slice(&(offset as u32).to_le_bytes());
-                    let mut ico: Vec<u8> = vec![0, 0, 1, 0, 1, 0];
-                    ico.extend(entry_buf);
-                    ico[18] = 22; // 修改偏移
-                    ico.extend(icon_bin);
-                    let p = format!("target\\{}-{}.ico", name, entry.id);
-                    let _ = std::fs::write(p, &ico);
-                }
-            }
-            let _ = FreeLibrary(hmodule);
-        }
-
-        CoUninitialize();
-    };
-}
-
-fn load_resource_data(hmodule: HMODULE, res_id: PCWSTR, res_type: PCWSTR) -> Option<Vec<u8>> {
-    unsafe {
-        let hres_info = FindResourceW(Some(hmodule), res_id, res_type);
-        let hres_data = LoadResource(Some(hmodule), hres_info);
-        match hres_data {
-            Ok(hres_data) => {
-                let size = SizeofResource(Some(hmodule), hres_info) as usize;
-                let ptr = LockResource(hres_data) as *const u8;
-                Some(std::slice::from_raw_parts(ptr, size).to_vec())
-            }
-            Err(e) => {
-                println!("{:?},res_id:{:?},res_type:{:?}", e, res_id, res_type);
-                None
-            }
-        }
+        // Convert display name (null-terminated UTF-16)
+        let display_name = {
+            let len = (0..)
+                .take_while(|&i| file_info.szDisplayName[i] != 0)
+                .count();
+            String::from_utf16_lossy(&file_info.szDisplayName[..len])
+        };
+        println!("{:?}", display_name);
+        Some(display_name)
     }
-}
-
-fn makeintresource(id: u16) -> PCWSTR {
-    PCWSTR(id as usize as *const u16)
-}
-
-fn is_int_resource(res: PCWSTR) -> bool {
-    (res.0 as usize) >> 16 == 0
-}
-
-unsafe extern "system" fn enum_group_icon_callback(
-    _hmodule: HMODULE,
-    itype: PCWSTR,
-    name: PCWSTR,
-    lparam: isize,
-) -> BOOL {
-    if itype.0 as u16 == 14 {
-        let id_ptr = lparam as *mut Vec<PCWSTR>;
-        (*id_ptr).push(name);
-    }
-    return true.into();
 }

@@ -132,7 +132,6 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
         );
         let _ = SetLayeredWindowAttributes(hwnd, COLORREF(0), 255, LWA_ALPHA);
         let _ = WindowsAndMessaging::SetParent(hwnd, Some(worker_w));
-        // thread::sleep(Duration::from_millis(100));
         if z == 1 {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,

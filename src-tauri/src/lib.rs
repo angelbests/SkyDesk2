@@ -76,9 +76,10 @@ pub fn run() {
             smtc::play_control,
             hovertop::hovertop,
             search::search_query,
-            shelllink::shelllink,
             wheel::screen,
             taskbar::gettaskbarlist,
+            shelllink::get_lnk_png,
+            shelllink::get_localized_display_name,
             open_devtool
         ])
         .run(tauri::generate_context!())

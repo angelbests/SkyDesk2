@@ -39,10 +39,6 @@ export const maininit = async function () {
   await mkdir("skydesk2", { baseDir: BaseDirectory.Picture, recursive: true })
   await mkdir("skydesk2", { baseDir: BaseDirectory.Video, recursive: true })
   await mkdir("ico", { baseDir: BaseDirectory.AppData, recursive: true })
-  await mkdir("ico\\other", {
-    baseDir: BaseDirectory.AppData,
-    recursive: true,
-  })
   info("文件夹初始化完成")
   //#endregion
 
