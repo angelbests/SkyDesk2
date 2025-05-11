@@ -65,6 +65,14 @@
     "clipboard-manager:allow-write-text",
     "log:default",
     {
+      "identifier": "fs:allow-remove",
+      "allow": [
+        {
+          "path": "$APPDATA/**"
+        }
+      ]
+    },
+    {
       "identifier": "fs:write-files",
       "allow": [
         {

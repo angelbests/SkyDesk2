@@ -169,7 +169,6 @@ const search = async function (e: any) {
             } = await invoke('search_query', { str: value });
             if (searchinvoke.str != (inputvalue.value.trim().replace("'", ""))) return
             let res = searchinvoke.result;
-            console.log(searchinvoke)
             for (let i = 0; i < res.length; i++) {
                 let path = await get_pe_ico(res[i].path, 'ico')
                 console.log(path)
@@ -199,7 +198,9 @@ const search = async function (e: any) {
             let music = res.filter(e => {
                 return e.kind == "音乐"
             })
-            searchresult.value = [...program, ...url, ...document, ...image, ...video, ...music, ...dir,]
+            setTimeout(() => {
+                searchresult.value = [...program, ...url, ...document, ...image, ...video, ...music, ...dir,]
+            }, 20)
             searchstatus.value = false
         }
     }, 500);
