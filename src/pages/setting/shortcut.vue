@@ -23,6 +23,7 @@ const dialog = ref(false);
 const index = ref(0);
 const setting = ref(false);
 const shortcut = ref<ShortCut>({
+  type: "openPath",
   lnkPath: "",
   icoPath: "",
   name: "",
@@ -52,30 +53,35 @@ const scanProgram = async function () {
   let respath = await resourceDir();
   let systemprogram: ShortCut[] = [
     {
+      type: "openPath",
       icoPath: respath + "/resources/notepad.png",
       lnkPath: "",
       name: "记事本",
       targetPath: "C:/Windows/notepad.exe",
     },
     {
+      type: "openPath",
       icoPath: respath + "/resources/calc.png",
       lnkPath: "",
       name: "计算器",
       targetPath: "C:/Windows/system32/calc.exe",
     },
     {
+      type: "openPath",
       icoPath: respath + "/resources/disk.png",
       targetPath: "C:/Windows/system32/diskmgmt.msc",
       name: "磁盘管理",
       lnkPath: "",
     },
     {
+      type: "openPath",
       icoPath: respath + "/resources/keyboard.png",
       targetPath: "C:/Windows/system32/osk.exe",
       name: "屏幕键盘",
       lnkPath: "",
     },
     {
+      type: "openPath",
       icoPath: respath + "/resources/Volume.png",
       targetPath: "C:/Windows/system32/SndVol.exe",
       name: "音量合成器",
@@ -86,6 +92,8 @@ const scanProgram = async function () {
     scanbtn.value = false;
     if (!scanbar.value) {
       scanbar.value = true;
+      // let arr = await get_uwp();
+      // console.log(arr)
       let res = await setIcon2();
       res.push(...systemprogram)
       shortcutsTemp.value = res
@@ -200,7 +208,8 @@ const submitshortcut = async function () {
     shortcut.value.icoPath &&
     shortcut.value.name
   ) {
-    shortcuts.value[tab.value].shortcut[index.value].lnkPath =
+    shortcuts.value[tab.value].shortcut[index.value].type = "openPath",
+      shortcuts.value[tab.value].shortcut[index.value].lnkPath =
       shortcut.value.lnkPath;
     shortcuts.value[tab.value].shortcut[index.value].name = shortcut.value.name;
     shortcuts.value[tab.value].shortcut[index.value].icoPath = shortcut.value.icoPath;
@@ -216,6 +225,7 @@ const submitshortcut2 = async function () {
     shortcut.value.icoPath
   ) {
     shortcuts.value[tab.value].shortcut.push({
+      type: "openPath",
       lnkPath: shortcut.value.lnkPath,
       icoPath: shortcut.value.icoPath,
       name: shortcut.value.name,
@@ -228,6 +238,7 @@ const submitshortcut2 = async function () {
 // 清除输入
 const cancelsubmit = function () {
   shortcut.value = {
+    type: "openPath",
     lnkPath: "",
     icoPath: "",
     name: "",

@@ -3,7 +3,6 @@ import { invoke } from "@tauri-apps/api/core"
 import { ShortCut } from "../types/storeType"
 import { getlnks } from "./lnks"
 import { uuid } from "."
-
 export const setIcon2 = async function () {
   let arr: ShortCut[] = []
   let lnks = await getlnks()
@@ -21,12 +20,19 @@ export const setIcon2 = async function () {
 
     let displayName: string = await invoke("get_localized_display_name", { path: lnks[i].lnkPath })
     arr.push({
+      type: "openPath",
       name: displayName,
       lnkPath: lnks[i].lnkPath,
       icoPath: savepath,
       targetPath: lnks[i].targetPath,
     })
   }
+  return arr
+}
+
+export const get_uwp = async function () {
+  let path = await resolve(await appDataDir(), "lnk")
+  let arr: ShortCut[] = await invoke("get_uwp", { path })
   return arr
 }
 

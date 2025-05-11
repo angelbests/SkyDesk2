@@ -13,7 +13,7 @@ mod desktop;
 mod hovertop;
 mod lockscreen;
 mod search;
-mod shelllink;
+mod shell;
 mod smtc;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -78,8 +78,10 @@ pub fn run() {
             search::search_query,
             wheel::screen,
             taskbar::gettaskbarlist,
-            shelllink::get_lnk_png,
-            shelllink::get_localized_display_name,
+            shell::get_lnk_png,
+            shell::get_localized_display_name,
+            shell::get_uwp,
+            shell::launch_shell_item,
             open_devtool
         ])
         .run(tauri::generate_context!())

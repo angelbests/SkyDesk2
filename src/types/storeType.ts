@@ -57,6 +57,7 @@ type WallpaperList = {
 }
 
 type ShortCut = {
+  type: "cmd" | "openPath"
   lnkPath: string
   icoPath: string
   name: string

@@ -1,6 +1,10 @@
-import { exists } from "@tauri-apps/plugin-fs"
-// import { Command } from "@tauri-apps/plugin-shell"
 import { openPath } from "@tauri-apps/plugin-opener"
-export const exec = async function (item: any) {
-  if (await exists(item.lnkPath)) openPath(item.lnkPath)
+import { ShortCut } from "../types/storeType"
+import { invoke } from "@tauri-apps/api/core"
+export const exec = async function (item: ShortCut) {
+  if (item.type == "openPath") {
+    openPath(item.lnkPath)
+  } else {
+    await invoke("launch_shell_item", { path: item.lnkPath })
+  }
 }

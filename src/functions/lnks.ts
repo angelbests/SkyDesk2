@@ -44,6 +44,7 @@ export const getlnks = async function () {
   }[] = JSON.parse(outputtarget.stdout)
   for (let i = 0; i < res.length; i++) {
     lnks.push({
+      type: "openPath",
       targetPath: res[i].TargetPath,
       lnkPath: lnkFiles[i],
       icoPath: "",

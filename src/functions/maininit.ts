@@ -1,4 +1,4 @@
-import { BaseDirectory, mkdir, remove } from "@tauri-apps/plugin-fs"
+import { BaseDirectory, exists, mkdir, remove } from "@tauri-apps/plugin-fs"
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow"
 import { register, isRegistered } from "@tauri-apps/plugin-global-shortcut"
 import { createtray, traystart, wheelstart } from "./tray"
@@ -7,7 +7,10 @@ import { exit } from "@tauri-apps/plugin-process"
 import { info } from "@tauri-apps/plugin-log"
 import { LogicalSize } from "@tauri-apps/api/dpi"
 export const maininit = async function () {
-  await remove("ico", { baseDir: BaseDirectory.AppData, recursive: true })
+  if (await exists("ico", { baseDir: BaseDirectory.AppData })) {
+    await remove("ico", { baseDir: BaseDirectory.AppData, recursive: true })
+  }
+
   ///#region  检查并创建文件夹
   await mkdir("lnk", { baseDir: BaseDirectory.AppData, recursive: true })
   await mkdir("ico", { baseDir: BaseDirectory.AppData, recursive: true })

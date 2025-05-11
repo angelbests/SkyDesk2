@@ -41,6 +41,8 @@ version = "0.61.1"
 features = [
     "Win32_UI_WindowsAndMessaging",
     "Win32_UI_Shell",
+    "Win32_UI_Shell_Common",
+    "Win32_UI_Shell_PropertiesSystem",
     "Win32_Foundation",
     "Win32_Graphics_Dwm",
     "Win32_Graphics_Gdi",
@@ -60,6 +62,7 @@ features = [
     "Storage",
     "Foundation_Collections",
     "Win32_System_LibraryLoader",
+    "Win32_Storage_EnhancedStorage",
     "Win32_Storage_FileSystem"
 ]
 
