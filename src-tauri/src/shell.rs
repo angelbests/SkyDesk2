@@ -17,21 +17,17 @@ use windows::{
             CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED, STGM_CREATE, STGM_SHARE_EXCLUSIVE,
             STGM_WRITE,
         },
-        UI::{
-            Shell::{
-                Common::{ITEMIDLIST, STRRET},
-                IShellItem, IShellItemImageFactory, SHCreateItemFromParsingName,
-                SHCreateStreamOnFileEx, SHGetFileInfoW, SHParseDisplayName, SHFILEINFOW,
-                SHGFI_DISPLAYNAME, SIIGBF_ICONONLY,
-            },
-            WindowsAndMessaging::SW_SHOWNORMAL,
+        UI::Shell::{
+            Common::{ITEMIDLIST, STRRET},
+            IShellItem, IShellItemImageFactory, SHCreateItemFromParsingName,
+            SHCreateStreamOnFileEx, SHGetFileInfoW, SHParseDisplayName, SHFILEINFOW,
+            SHGFI_DISPLAYNAME, SIIGBF_ICONONLY,
         },
     },
 };
 use windows::{Win32::Foundation::*, Win32::System::Com::*, Win32::UI::Shell::*};
 #[tauri::command]
 pub fn get_lnk_png(path: &str, savepath: &str, width: i32, height: i32) {
-    println!("path:{:?}", path);
     let path = path.to_string();
     let savepath = savepath.to_string();
     tauri::async_runtime::spawn(async move {
@@ -116,7 +112,6 @@ pub async fn get_localized_display_name(path: String) -> Option<String> {
                 .count();
             String::from_utf16_lossy(&file_info.szDisplayName[..len])
         };
-        println!("{:?}", display_name);
         Some(display_name)
     }
 }
@@ -205,7 +200,10 @@ pub async fn get_uwp(path: &str) -> Result<Vec<ProgramInfo>, String> {
             match start_path {
                 Ok(start_path) => {
                     let start_path = start_path.to_string().unwrap();
-                    if !start_path.contains("://") && !start_path.starts_with("shell:") {
+                    if !start_path.contains("://")
+                        && !start_path.starts_with("shell:")
+                        && start_path.contains("!")
+                    {
                         // 保存图标
                         let image_factory: IShellItemImageFactory = item.cast().unwrap();
                         let hbitmap = image_factory
@@ -213,12 +211,13 @@ pub async fn get_uwp(path: &str) -> Result<Vec<ProgramInfo>, String> {
                             .unwrap();
                         let path = format!("{:}\\{:}.png", path, name);
                         save_bitmap_as_png(hbitmap, &path);
+                        let powershell_str = format!("explorer shell:AppsFolder\\{:}", start_path);
                         arr.push(ProgramInfo {
                             r#type: String::from("cmd"),
                             name: name,
                             icoPath: path,
-                            targetPath: start_path.clone(),
-                            lnkPath: start_path,
+                            targetPath: powershell_str.clone(),
+                            lnkPath: powershell_str,
                         });
                     }
                 }
@@ -232,22 +231,4 @@ pub async fn get_uwp(path: &str) -> Result<Vec<ProgramInfo>, String> {
         CoUninitialize();
     }
     Ok(arr)
-}
-
-#[tauri::command]
-pub fn launch_shell_item(path: &str) -> Result<(), String> {
-    unsafe {
-        let operation = HSTRING::from("open");
-        let file = HSTRING::from(path);
-        println!("shell_path:{:?}", path);
-        ShellExecuteW(
-            Some(HWND::default()),
-            &operation,
-            &file,
-            None,
-            None,
-            SW_SHOWNORMAL,
-        );
-        Ok(()).map_err(|e: windows::core::Error| e.to_string())
-    }
 }

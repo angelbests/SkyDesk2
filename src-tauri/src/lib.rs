@@ -81,7 +81,6 @@ pub fn run() {
             shell::get_lnk_png,
             shell::get_localized_display_name,
             shell::get_uwp,
-            shell::launch_shell_item,
             open_devtool
         ])
         .run(tauri::generate_context!())

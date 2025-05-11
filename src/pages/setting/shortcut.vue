@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, toRefs } from "vue";
-import { get_pe_ico, setIcon2 } from "../../functions/peIcon";
+import { get_pe_ico, get_uwp, setIcon2 } from "../../functions/peIcon";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { systemStore } from "../../stores/system";
 import { shortcutStore } from "../../stores/shortcut";
@@ -92,10 +92,12 @@ const scanProgram = async function () {
     scanbtn.value = false;
     if (!scanbar.value) {
       scanbar.value = true;
-      // let arr = await get_uwp();
-      // console.log(arr)
+      let arr = await get_uwp();
+      for (let i = 0; i < arr.length; i++) {
+        console.log(arr[i].lnkPath)
+      }
       let res = await setIcon2();
-      res.push(...systemprogram)
+      res.push(...systemprogram, ...arr)
       shortcutsTemp.value = res
       // const map = new Map();
       // res.filter((v) => !map.has(v.name) && map.set(v.name, v));
