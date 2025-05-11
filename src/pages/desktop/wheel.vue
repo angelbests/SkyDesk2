@@ -4,10 +4,10 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { onMounted, reactive, ref } from "vue";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Command } from "@tauri-apps/plugin-shell";
 import { shortcutStore } from "../../stores/shortcut";
+import { ShortCut } from "../../types/storeType";
 const shortcutstore = shortcutStore();
-const wheel = ref<any[]>([]);
+const wheel = ref<ShortCut[]>([]);
 const app = getCurrentWebviewWindow();
 app.setShadow(false);
 const position = reactive({
@@ -32,9 +32,8 @@ const updatewheel = () => {
       wheel.value.push(shortcutstore.wheels[i]);
     } else {
       wheel.value.push({
+        type: "openPath",
         targetPath: "",
-        iconLocationPeFile: "",
-        iconLocation: "",
         lnkPath: "",
         icoPath: "",
         name: "",
@@ -66,17 +65,11 @@ listen("mouse-move", (e: { payload: { message: string } }) => {
 });
 
 const index = ref(-2);
-const exec = async function (item: any, i: number) {
+import { exec as execopen } from "../../functions/open";
+const exec = async function (item: ShortCut, i: number) {
   index.value = i;
-
   if (item.name) {
-    if (item.lnkPath) {
-      await Command.create("powershell", `& "${item.lnkPath}"`, {
-        encoding: "GBK",
-      }).execute();
-    } else {
-      await Command.create("powershell", item.targetPath).execute();
-    }
+    execopen(item)
     app.hide();
   }
   index.value = -2;
