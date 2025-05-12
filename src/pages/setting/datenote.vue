@@ -61,34 +61,34 @@ const wheelmonth = function (e: WheelEvent) {
   }
 }
 
-const repeat = [
-  { title: "不重复", value: 0 },
-  { title: "每天", value: 1 },
-  { title: "每周", value: 2 },
-  { title: "每月", value: 3 },
-  { title: "每年", value: 4 },
-]
-const reminder = [
-  { title: "不提醒", value: 0 },
-  { title: "准时", value: 1 },
-  { title: "15 分钟前", value: 2 },
-  { title: "30 分钟前", value: 3 },
-  { title: "1 小时前", value: 4 },
-  { title: "2 小时前", value: 5 },
-  { title: "12 小时前", value: 6 },
-  { title: "1 天前", value: 6 },
-  { title: "2 天前", value: 7 },
-  { title: "1 周前", value: 8 },
-]
-const weekday = [
-  { title: "周一", value: 1 },
-  { title: "周二", value: 2 },
-  { title: "周三", value: 3 },
-  { title: "周四", value: 4 },
-  { title: "周五", value: 5 },
-  { title: "周六", value: 6 },
-  { title: "周天", value: 7 },
-]
+// const repeat = [
+//   { title: "不重复", value: 0 },
+//   { title: "每天", value: 1 },
+//   { title: "每周", value: 2 },
+//   { title: "每月", value: 3 },
+//   { title: "每年", value: 4 },
+// ]
+// const reminder = [
+//   { title: "不提醒", value: 0 },
+//   { title: "准时", value: 1 },
+//   { title: "15 分钟前", value: 2 },
+//   { title: "30 分钟前", value: 3 },
+//   { title: "1 小时前", value: 4 },
+//   { title: "2 小时前", value: 5 },
+//   { title: "12 小时前", value: 6 },
+//   { title: "1 天前", value: 6 },
+//   { title: "2 天前", value: 7 },
+//   { title: "1 周前", value: 8 },
+// ]
+// const weekday = [
+//   { title: "周一", value: 1 },
+//   { title: "周二", value: 2 },
+//   { title: "周三", value: 3 },
+//   { title: "周四", value: 4 },
+//   { title: "周五", value: 5 },
+//   { title: "周六", value: 6 },
+//   { title: "周天", value: 7 },
+// ]
 
 </script>
 

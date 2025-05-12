@@ -370,6 +370,7 @@ const copy = async function (item: searchResult) {
     } else {
         await invoke("copyfile", { path })
     }
+    getCurrentWebviewWindow().hide()
 }
 </script>
 
