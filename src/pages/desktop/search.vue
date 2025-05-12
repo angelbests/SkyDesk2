@@ -19,7 +19,7 @@ type searchResult = {
     path: string,
     kind: string,
     ext: string,
-    dir?: string,
+    dir: string,
     icon: string
 }
 const shortcutstore = shortcutStore()
@@ -157,7 +157,15 @@ const search = async function (e: any) {
         let value = e.target.value.trim().replace("'", "");
         let show = await getCurrentWebviewWindow().isVisible();
         if (show) {
-            let shortcutres = shortcutstore.shortcutsTemp.filter(item => {
+            let shortcut: ShortCut[] = []
+            shortcutstore.shortcuts.filter(e => {
+                shortcut.push(...e.shortcut)
+            })
+            shortcut.push(...shortcutstore.shortcutsTemp)
+            const map = new Map();
+            shortcut.filter((v) => !map.has(v.lnkPath) && map.set(v.lnkPath, v));
+
+            let shortcutres = shortcut.filter(item => {
                 let path = item.name.toLocaleLowerCase();
                 let str = value.toLocaleLowerCase()
                 return path.indexOf(str) >= 0
@@ -198,9 +206,7 @@ const search = async function (e: any) {
             let music = res.filter(e => {
                 return e.kind == "音乐"
             })
-            setTimeout(() => {
-                searchresult.value = [...program, ...url, ...document, ...image, ...video, ...music, ...dir,]
-            }, 20)
+            searchresult.value = [...program, ...url, ...document, ...image, ...video, ...music, ...dir,]
             searchstatus.value = false
         }
     }, 500);
@@ -320,7 +326,7 @@ const openshortcut = function (item: any) {
     getCurrentWebviewWindow().hide()
     exec(item);
 }
-
+const contextmenuShow = ref(false)
 const createnote = async function () {
     let label = "note-" + uuid();
     let w = await createWindow(label, {
@@ -339,10 +345,42 @@ const createnote = async function () {
     });
     w?.center()
 };
+
+const rightclick = function (e: MouseEvent, item: searchResult) {
+    contextmenuShow.value = false
+    console.log(e, item)
+    let dom = document.getElementById("contextmenu")
+    if (!dom) return;
+    dom.style.left = e.clientX + 'px'
+    dom.style.top = e.clientY - 20 + 'px'
+    console.log(e.offsetX, e.offsetY)
+    contextmenuShow.value = false
+}
+
+const opendir = function (item: searchResult) {
+    console.log(item)
+    openPath(item.dir)
+}
+
+import { writeText } from "@tauri-apps/plugin-clipboard-manager"
+const copy = async function (item: searchResult) {
+    let path = item.path.replace("file:", "")
+    if (item.kind == '文件夹') {
+        await writeText(path)
+    } else {
+        await invoke("copyfile", { path })
+    }
+}
 </script>
 
 <template>
     <div class="container" id="container">
+        <div id="contextmenu" style="position: absolute;z-index: 100;width: 100px;height: 100px;width: 120px;height:90px;
+        padding: 10px;display: flex;flex-direction: column;align-items: center;justify-content: space-evenly;"
+            v-show="contextmenuShow">
+            <v-btn size="small" width="100px">打开文件夹</v-btn>
+            <v-btn size='small' width="100px">复制路径</v-btn>
+        </div>
         <div class="search-bar">
             <v-icon style="font-size: 26px;margin-left: 25px;color:rgba(123,123,123,0.8);">mdi-magnify</v-icon>
             <input id="input" autocomplete="off" @input="search" v-model="inputvalue" type="text"
@@ -365,16 +403,34 @@ const createnote = async function () {
             </div>
             <div class="search-system" id="search-system"
                 :style="{ height: searchshortcut.length == 0 ? '440px' : '360px' }">
-                <div v-if="searchresult.length > 0" tabindex="0" v-for="(item, index) in searchresult"
-                    :id="'search-' + index" :key="item.path" class="search-item" @click="openfile(item)"
-                    :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)">
-                    <!-- <v-chip v-if="item.kind" class="search-item-kind" color="primary" variant="flat">{{ item.kind
-                    }}</v-chip> -->
 
-                    <img style="width: 25px;margin-right: 10px;" :src="item.icon">
-                    <div class="search-item-name">{{ item.name }}</div>
+                <div v-if="searchresult.length > 0" tabindex="0" v-for="(item, index) in searchresult"
+                    :id="'search-' + index" :key="item.path" class="search-item"
+                    :style="{ background: focusindex == index ? '#e6e9f0' : '' }" @keyup.enter="openfile(item)"
+                    @contextmenu="rightclick($event, item)">
+                    <v-chip @click="openfile(item)" v-if="item.kind" class="search-item-kind">
+                        <template v-slot:default>
+                            <img class="search-item-kind-img" :src="item.icon">
+                            {{ item.kind }}
+                        </template>
+                    </v-chip>
+                    <div @click="openfile(item)" class="search-item-name">{{ item.name }}</div>
+
+                    <v-btn class="search-item-btn" size="small" @click="opendir(item)">
+                        <template v-slot:prepend>
+                            <img style="width: 20px;" src="/icons/Folder Live - Back.png">
+                        </template>
+                        文件夹
+                    </v-btn>
+                    <v-btn class="search-item-btn" size="small" @click="copy(item)">
+                        <template v-slot:prepend>
+                            <img style="width: 20px;" src="/icons/copy.png">
+                        </template>
+                        复制
+                    </v-btn>
                     <!-- <v-btn style="margin-left: 10px;" size="x-small">文件夹</v-btn> -->
                 </div>
+                <!-- 搜索提示与错误 -->
                 <div v-else style="display: flex;justify-content: center;align-items: center;height: 100%;">
                     <div v-if="searchstatus"
                         style="display:flex;flex-direction: column;justify-content: center;align-items: center;">
@@ -533,7 +589,30 @@ div:focus-visible {
     transition: all 0.2s linear;
 }
 
+.search-item-name {
+    font-size: 14px;
+    width: 450px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
 .search-item-kind {
+    margin-right: 10px;
+    font-size: 12px;
+    width: 100px;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-item-btn {
+    background: transparent;
+    margin-right: 10px;
+}
+
+.search-item-kind-img {
+    width: 23px;
     margin-right: 10px;
 }
 

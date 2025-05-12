@@ -26,14 +26,19 @@ use windows::{
     },
 };
 use windows::{Win32::Foundation::*, Win32::System::Com::*, Win32::UI::Shell::*};
+
 #[tauri::command]
-pub fn get_lnk_png(path: &str, savepath: &str, width: i32, height: i32) {
+pub async fn get_lnk_png(
+    path: &str,
+    savepath: &str,
+    width: i32,
+    height: i32,
+) -> Result<String, String> {
     let path = path.to_string();
     let savepath = savepath.to_string();
-    tauri::async_runtime::spawn(async move {
-        let h = get_file_thumbnail(&path, width, height);
-        save_bitmap_as_png(h, &savepath);
-    });
+    let h = get_file_thumbnail(&path, width, height);
+    save_bitmap_as_png(h, &savepath);
+    Ok(savepath)
 }
 
 fn get_file_thumbnail(path: &str, width: i32, height: i32) -> HBITMAP {

@@ -99,8 +99,8 @@ const scanProgram = async function () {
       let res = await setIcon2();
       res.push(...systemprogram, ...arr)
       shortcutsTemp.value = res
-      // const map = new Map();
-      // res.filter((v) => !map.has(v.name) && map.set(v.name, v));
+      const map = new Map();
+      res.filter((v) => !map.has(v.lnkPath) && map.set(v.lnkPath, v));
       scanbar.value = false;
     }
   } else {

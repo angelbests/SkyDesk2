@@ -1,3 +1,4 @@
+use std::path::Path;
 use tauri::{path::BaseDirectory, Error, Manager, Window};
 use tauri_plugin_autostart::MacosLauncher;
 mod capture;
@@ -9,6 +10,7 @@ mod wallpaper;
 mod wheel;
 use chrono::prelude::*;
 mod audio;
+mod clipboard;
 mod desktop;
 mod hovertop;
 mod lockscreen;
@@ -81,6 +83,8 @@ pub fn run() {
             shell::get_lnk_png,
             shell::get_localized_display_name,
             shell::get_uwp,
+            clipboard::copyfile,
+            check_path_type,
             open_devtool
         ])
         .run(tauri::generate_context!())
@@ -94,4 +98,21 @@ fn open_devtool(window: Window, label: String) -> Result<(), Error> {
         .ok_or(Error::WebviewNotFound)?;
     webview.open_devtools();
     return Ok(());
+}
+
+#[tauri::command]
+fn check_path_type(path: String) -> String {
+    let path = Path::new(&path);
+    match path.metadata() {
+        Ok(meta) => {
+            if meta.is_file() {
+                "file".into()
+            } else if meta.is_dir() {
+                "directory".into()
+            } else {
+                "other".into()
+            }
+        }
+        Err(_) => "invalid".into(),
+    }
 }
