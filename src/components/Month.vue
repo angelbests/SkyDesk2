@@ -14,49 +14,49 @@
         grid-template-rows: repeat(1, 1fr);
       ">
       <div style="border: 1px solid gray; border-bottom: none; text-align: center">
-        星期一
+        一
       </div>
       <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
         ">
-        星期二
+        二
       </div>
       <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
         ">
-        星期三
+        三
       </div>
       <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
         ">
-        星期四
+        四
       </div>
       <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
         ">
-        星期五
+        五
       </div>
       <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
         ">
-        星期六
+        六
       </div>
       <div style="
           border-right: 1px solid gray;
           border-top: 1px solid gray;
           text-align: center;
         ">
-        星期日
+        日
       </div>
     </div>
     <div style="width: 100%; height: 100%; position: relative">
