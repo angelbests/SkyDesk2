@@ -90,7 +90,8 @@ const delvideo = function (path: string) {
         <GridContainer style="width: 100%; height: 100%; min-height: 100%" v-model="capturestore.video"
           :gridheight="240" :gridwidth="320" :padding="10">
           <template v-slot="{ item }">
-            <v-card width="320" height="240" variant="elevated" elevation="10" style="width: 100%; height: 100%">
+            <v-card width="320" height="240" variant="elevated" elevation="10"
+              style="width: 100%; height: 100%;background: transparent;">
               <v-card-text style="width: 100%; height: 80%; padding: 0px">
                 <video style="width: 100%; height: 100%; object-fit: cover" :src="convertFileSrc(item.path)"></video>
               </v-card-text>

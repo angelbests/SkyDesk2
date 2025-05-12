@@ -204,7 +204,7 @@ const notewallpaper = async function (note: any) {
       <GridContainer style="width: 100%; height: 100%; min-height: 100%" v-model="notestore.note" :gridheight="240"
         :gridwidth="320" :padding="10">
         <template v-slot="{ item }">
-          <v-card style="width: 100%; height: 100%" variant="elevated" elevation="5">
+          <v-card style="width: 100%; height: 100%;background: transparent;" variant="elevated" elevation="5">
             <v-card-text :style="{
               width: '100%',
               height: '80%',

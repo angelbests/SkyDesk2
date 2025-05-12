@@ -477,7 +477,7 @@ const wallpapersetting = function () {
             <GridContainer style="width: 100%;height: 100%;min-height: 100%;" v-model="wallpapers.wallpaperList"
                 :gridheight="240" :gridwidth="320" :padding="10">
                 <template v-slot="{ item, index }">
-                    <v-card style="width: 100%;height: 100%;" variant="elevated" elevation="5">
+                    <v-card style="width: 100%;height: 100%;background: transparent;" variant="elevated" elevation="5">
                         <v-card-text style="width: 100%;height: 80%;padding: 0px;">
                             <img :src="convertFileSrc(item.preview)"
                                 style="width: 100%;height: 100%;object-fit: cover;">
