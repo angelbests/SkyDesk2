@@ -589,6 +589,11 @@ div:focus-visible {
     transition: all 0.2s linear;
 }
 
+.search-item:hover {
+    background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+
+}
+
 .search-item-name {
     font-size: 14px;
     width: 450px;
@@ -614,10 +619,6 @@ div:focus-visible {
 .search-item-kind-img {
     width: 23px;
     margin-right: 10px;
-}
-
-.search-item:hover {
-    background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
 }
 
 .icon:hover {
