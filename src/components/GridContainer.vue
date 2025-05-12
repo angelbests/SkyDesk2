@@ -17,7 +17,9 @@ const props = defineProps<{
   | undefined;
 }>();
 const { gridwidth, gridheight, padding } = toRefs(props);
+
 onMounted(() => {
+  if (!padding.value) padding.value = 0
   updateElementHeight();
   window.addEventListener("resize", updateElementHeight);
 });
@@ -31,13 +33,12 @@ const updateElementHeight = function () {
 };
 
 const gridcontainerheight = computed(() => {
-  return (
-    Math.ceil(
-      array.value.length /
-      Math.trunc(gridcontainerwidth.value / gridwidth.value)
-    ) *
-    (gridheight.value + 10)
-  );
+
+  let num = Math.ceil(array.value.length / Math.trunc(gridcontainerwidth.value / gridwidth.value))
+  //(gridheight.value)
+  // 
+  if (!padding.value) padding.value = 0
+  return ((num + 1) * padding.value) + gridheight.value * num
 });
 </script>
 

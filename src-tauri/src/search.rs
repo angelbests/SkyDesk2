@@ -102,7 +102,7 @@ pub async fn search_query(str: String) -> SearchResult {
             let path = get_field_value(&fields, "System.ItemUrl");
             let ext = get_field_value(&fields, "System.FileExtension");
             let kind = get_field_value(&fields, "System.KindText");
-            // println!("{} - {} - {} - {}", name, path, kind, ext);
+            println!("{} - {} - {} - {}", name, path, kind, ext);
             let item = SearchItem {
                 name,
                 path,

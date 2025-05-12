@@ -166,9 +166,13 @@ const search = async function (e: any) {
             shortcut.filter((v) => !map.has(v.lnkPath) && map.set(v.lnkPath, v));
 
             let shortcutres = shortcut.filter(item => {
-                let path = item.name.toLocaleLowerCase();
-                let str = value.toLocaleLowerCase()
-                return path.indexOf(str) >= 0
+                console.log(item)
+                if (item.name) {
+                    let path = item.name.toLocaleLowerCase();
+                    let str = value.toLocaleLowerCase()
+                    return path.indexOf(str) >= 0
+                }
+
             });
             searchshortcut.value = [...shortcutres]
             let searchinvoke: {
@@ -461,8 +465,7 @@ const copy = async function (item: searchResult) {
             <v-tabs-window v-model="tab" style="width: 100%; height: calc(100% - 86px);">
                 <v-tabs-window-item v-for="item1 in shortcuts" style="width: 100%;height: 100%;">
                     <GridContainer v-model="item1.shortcut" :animation="150" :gridwidth="90" :gridheight="90"
-                        :group="{ name: 'shortcut', pull: 'clone' }"
-                        style="box-sizing: border-box;padding-top: 10px;border-radius: 0px;">
+                        :group="{ name: 'shortcut', pull: 'clone' }">
                         <template v-slot="{ item }">
                             <div tabindex="0" @keyup.enter="openshortcut(item)"
                                 :style="{ height: '80px', backgroundSize: 'cover', }" class="shortcut-container">
@@ -504,7 +507,7 @@ const copy = async function (item: searchResult) {
     </div>
 </template>
 
-<style scoped>
+<style>
 div:focus-visible {
     outline: none;
     background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
@@ -682,5 +685,9 @@ div:focus-visible {
 
 .settingbottom-icon:hover {
     width: 50px;
+}
+
+.v-window__container {
+    height: 100% !important;
 }
 </style>
