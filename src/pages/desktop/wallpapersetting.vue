@@ -83,13 +83,19 @@ onMounted(() => {
             <v-list-item>
               <v-list-item-title> 字体颜色 </v-list-item-title>
               <template v-slot:append>
-                <v-radio-group v-model="item.config.color" inline density="compact" hide-details="auto">
+                <v-radio-group v-model="item.config.datecolor" inline density="compact" hide-details="auto">
                   <v-radio style="width: 100px" label="白色" value="white"></v-radio>
                   <v-radio style="width: 100px" label="黑色" value="black"></v-radio>
-                  <!-- <v-radio style="width: 100px" label="磁带" value="3"></v-radio> -->
                 </v-radio-group>
               </template>
             </v-list-item>
+            <v-list-item>
+              <v-list-item-title>阴影</v-list-item-title>
+              <template v-slot:append>
+                <v-switch color="info" hide-details v-model.lazy="item.config.dateshadow"></v-switch>
+              </template>
+            </v-list-item>
+            <!-- 天气 -->
             <v-divider></v-divider>
             <v-list-subheader style="background: #d1c4e9">天气</v-list-subheader>
             <v-list-item>
@@ -114,6 +120,22 @@ onMounted(() => {
                   <v-slider :model-value="item.config.weathery" @end="e => item.config.weathery = e" min="0" max="100"
                     step="1" thumb-label hide-details></v-slider>
                 </div>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>阴影</v-list-item-title>
+              <template v-slot:append>
+                <v-switch color="info" hide-details v-model.lazy="item.config.weathershadow"></v-switch>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title> 预报 </v-list-item-title>
+              <template v-slot:append>
+                <v-radio-group v-model="item.config.weatherd7" inline density="compact" hide-details="auto">
+                  <v-radio style="width: 100px" label="当天" value="1"></v-radio>
+                  <v-radio style="width: 100px" label="七日" value="7"></v-radio>
+                  <!-- <v-radio style="width: 100px" label="磁带" value="3"></v-radio> -->
+                </v-radio-group>
               </template>
             </v-list-item>
             <v-divider></v-divider>
@@ -143,7 +165,13 @@ onMounted(() => {
               </template>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title> APP </v-list-item-title>
+              <v-list-item-title>阴影</v-list-item-title>
+              <template v-slot:append>
+                <v-switch color="info" hide-details v-model.lazy="item.config.musicshadow"></v-switch>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title> 设备 </v-list-item-title>
               <template v-slot:append>
                 <v-radio-group v-model="item.config.musictype" inline density="compact" hide-details="auto">
                   <v-radio style="width: 100px" label="胶片" value="1"></v-radio>
@@ -153,7 +181,7 @@ onMounted(() => {
               </template>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title> APP </v-list-item-title>
+              <v-list-item-title> 应用 </v-list-item-title>
               <template v-slot:append>
                 <v-radio-group v-model="item.config.musicapp" inline density="compact" hide-details="auto">
                   <v-radio style="width: 100px" label="网易云" value="cloudmusic.exe"></v-radio>

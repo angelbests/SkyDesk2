@@ -9,6 +9,7 @@ import MusicDisk from "../../components/wallpaper/MusicDisk.vue";
 import MusicVinyl from "../../components/wallpaper/MusicVinyl.vue";
 import MusicTape from "../../components/wallpaper/MusicTape.vue";
 import Weather from "../../components/wallpaper/Weather.vue";
+import WeatherD7 from "../../components/wallpaper/WeatherD7.vue";
 import Date from "../../components/wallpaper/Date.vue";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
 import { startSakura, stopp } from "../../functions/sakura";
@@ -44,7 +45,6 @@ const init = async function () {
   index.value = wallpaperstore.wallpaperConfig.findIndex(
     (item) => item.monitor == monitor.value?.name
   );
-  console.log(index.value)
   if (type.value == 'image') {
     dom.value = document.getElementById("wallpaperimg")
   } else if (type.value == 'video') {
@@ -104,6 +104,18 @@ const listen_desktop = function () {
   }
   animate()
 }
+// import { get_all_festival } from '../../functions/calendar'
+
+// const today = ref<{
+//   year: number
+//   month: number
+//   day: number
+// }>({
+//   year: (new window.Date()).getFullYear(),
+//   month: new window.Date().getMonth() + 1,
+//   day: new window.Date().getDate()
+// })
+// const festivals = get_all_festival(today.value.year, today.value.month, today.value.day)
 
 </script>
 
@@ -126,6 +138,7 @@ const listen_desktop = function () {
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+        filter: wallpaperstore.wallpaperConfig[index].config.musicshadow ? 'drop-shadow(0px 0px 10px black)' : ''
       }"></MusicVinyl>
     <!-- music2-->
     <MusicDisk
@@ -133,6 +146,7 @@ const listen_desktop = function () {
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
+        filter: wallpaperstore.wallpaperConfig[index].config.musicshadow ? 'drop-shadow(0px 0px 10px black)' : ''
       }"></MusicDisk>
     <!-- music3 -->
     <MusicTape
@@ -143,21 +157,54 @@ const listen_desktop = function () {
       }">
     </MusicTape>
     <!-- weather -->
-    <Weather v-if="wallpaperstore.wallpaperConfig[index].config.weather" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
-    }">
+    <Weather
+      v-if="(wallpaperstore.wallpaperConfig[index].config.weather && wallpaperstore.wallpaperConfig[index].config.weatherd7 == 1)"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
+        boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : 'none'
+      }">
     </Weather>
-    <!-- date -->
+    <WeatherD7
+      v-if="(wallpaperstore.wallpaperConfig[index].config.weather && wallpaperstore.wallpaperConfig[index].config.weatherd7 == 7)"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
+        boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : ''
+      }">
+    </WeatherD7> <!-- date -->
     <Date v-if="wallpaperstore.wallpaperConfig[index].config.date" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
       top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
-      color: `${wallpaperstore.wallpaperConfig[index].config.color}`
+      color: `${wallpaperstore.wallpaperConfig[index].config.datecolor}`,
+      textShadow: wallpaperstore.wallpaperConfig[index].config.dateshadow ? '0px 0px 10px black' : ''
     }"></Date>
+    <!-- <div :style="{
+      left: '20px',
+      top: '400px',
+      color: `${wallpaperstore.wallpaperConfig[index].config.color}`
+    }" class="countdown">
+      {{ festivals[0].festival }} 还有
+      <span style="font-size: 40px;">
+        {{ festivals[0].day }}
+      </span> 天
+    </div> -->
   </div>
 </template>
 
 <style scoped>
+.countdown {
+  position: absolute;
+  z-index: 600;
+  width: 300px;
+  height: 300px;
+  background: rgba(253, 253, 253, 0);
+  box-shadow: 0px 0px 10px black;
+  border-radius: 50px;
+  /* background: white; */
+}
+
+
 @font-face {
   font-family: "Quicksand";
   src: url("/font/Quicksand-Light.ttf") format(woff);

@@ -130,10 +130,10 @@ onUnmounted(() => {
             </mask>
         </svg>
         <!-- disk -->
-        <div style="z-index: 301;left: 15px;top: 15px;" class="disk_shadow disk_div">
+        <div style="z-index: 301;left: 15px;top: 15px;" class="disk_div">
             <img :src="history_thumb ? history_thumb : new_thumb" class="disk">
         </div>
-        <div style="position: absolute;z-index: 301;" class="disk_shadow">
+        <div style="position: absolute;z-index: 301;" class="w">
             <img :src="history_thumb" style="top: 15px;left: 15px;" class="disk_thumb" />
         </div>
         <!-- disk -->
@@ -171,7 +171,6 @@ onUnmounted(() => {
     box-sizing: border-box;
     width: 400px;
     height: 360px;
-    /* background: white; */
 }
 
 .disk_shadow {

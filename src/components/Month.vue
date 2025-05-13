@@ -1,176 +1,95 @@
 <template>
-  <div style="
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-    ">
     <div style="
-        display: grid;
+        display: flex;
+        flex-direction: column;
         width: 100%;
-        grid-template-columns: repeat(7, 1fr);
-        grid-template-rows: repeat(1, 1fr);
+        height: 100%;
+        box-sizing: border-box;
+        padding: 10px;
       ">
-      <div style="border: 1px solid gray; border-bottom: none; text-align: center">
-        一
-      </div>
-      <div style="
-          border-right: 1px solid gray;
-          border-top: 1px solid gray;
-          text-align: center;
+        <div style="
+          display: grid;
+          width: 100%;
+          grid-template-columns: repeat(7, 1fr);
+          grid-template-rows: repeat(1, 1fr);
         ">
-        二
-      </div>
-      <div style="
-          border-right: 1px solid gray;
-          border-top: 1px solid gray;
-          text-align: center;
-        ">
-        三
-      </div>
-      <div style="
-          border-right: 1px solid gray;
-          border-top: 1px solid gray;
-          text-align: center;
-        ">
-        四
-      </div>
-      <div style="
-          border-right: 1px solid gray;
-          border-top: 1px solid gray;
-          text-align: center;
-        ">
-        五
-      </div>
-      <div style="
-          border-right: 1px solid gray;
-          border-top: 1px solid gray;
-          text-align: center;
-        ">
-        六
-      </div>
-      <div style="
-          border-right: 1px solid gray;
-          border-top: 1px solid gray;
-          text-align: center;
-        ">
-        日
-      </div>
-    </div>
-    <div style="width: 100%; height: 100%; position: relative">
-      <div class="month">
-        <div class="day" v-for="day in days">
-          <slot :day="day"></slot>
+
         </div>
-      </div>
-      <div class="monthz">
-        <!-- :style="{background:(item%2==0)?'gray':'black',opacity:0.5}" -->
-        <div class="dayz" v-for="item in 6">
-          <slot name="z" :z="item"></slot>
+        <div style="width: 100%; height: 100%; position: relative">
+            <div class="month">
+                <div class="week">一</div>
+                <div class="week">二</div>
+                <div class="week">三</div>
+                <div class="week">四</div>
+                <div class="week">五</div>
+                <div class="week">六</div>
+                <div class="week">日</div>
+                <div class="day" v-for="day in days">
+                    <slot :day="day"></slot>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
-<script setup>
-import calendar from "js-calendar-converter";
+<script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
-const days = ref([]);
-const date = defineModel("date", {
-  default: {
-    year: new Date().getFullYear(),
-    month: new Date().getMonth(),
-  },
-  type: {
-    year: Number,
-    month: Number,
-  },
+import { DayInfo, today } from "../functions/calendar";
+const days = ref<DayInfo[]>([]);
+const date = defineModel<{ year: number, month: number }>("date", {
+    default: () => ({
+        year: new Date().getFullYear(),
+        month: new Date().getMonth(),
+    }),
 });
 
-onMounted(() => {
-  days.value = monthdays(date.value.year, date.value.month);
+onMounted(async () => {
+    days.value = await monthdays(date.value.year, date.value.month);
 });
 
-watch(date.value, () => {
-  days.value = monthdays(date.value.year, date.value.month);
-  console.log(days.value);
+watch(date.value, async () => {
+    days.value = await monthdays(date.value.year, date.value.month);
 });
 
-const monthdays = function (year, month) {
-  let days = [];
-  let now = new Date();
-  now.setFullYear(year);
-  now.setMonth(month - 1);
-  now.setDate(1);
-  let week = getWeekday(year, month - 1, 1);
-  now.setDate(now.getDate() - week);
-  for (let i = 0; i < 42; i++) {
-    now.setDate(now.getDate() + 1);
-    let fes = getFestival(now.getFullYear(), now.getMonth() + 1, now.getDate());
-    days.push(fes);
-  }
-  return days;
+const monthdays = async function (year: number, month: number) {
+    let days: DayInfo[] = [];
+    let now = new Date();
+    now.setFullYear(year);
+    now.setMonth(month - 1);
+    now.setDate(1);
+    let week = getWeekday(year, month - 1, 1);
+    now.setDate(now.getDate() - week);
+    for (let i = 0; i < 42; i++) {
+        now.setDate(now.getDate() + 1);
+        let day = today(now.getFullYear(), now.getMonth() + 1, now.getDate())
+        days.push({
+            ...day
+        })
+    }
+    return days;
 };
-
-const getMonthDays = function (year, month) {
-  return new Date(year, month, 0).getDate();
-};
-
-const getFestival = function (year, month, day) {
-  return calendar.solar2lunar(year, month, day);
-};
-
-const getWeekday = function (year, month, day) {
-  let week = new Date(year, month, day).getDay();
-  if (week == 0) {
-    week = 7;
-  }
-  return week;
+const getWeekday = function (year: number, month: number, day: number) {
+    let week = new Date(year, month, day).getDay();
+    if (week == 0) {
+        week = 7;
+    }
+    return week;
 };
 </script>
 
 <style>
 .month {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-rows: repeat(6, 1fr);
-  grid-template-columns: repeat(7, 1fr);
-  position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: repeat(7, 1fr);
+    grid-template-columns: repeat(7, 1fr);
+    position: relative;
+    text-align: center;
+    align-items: center;
 }
 
-.monthz {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 99;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-rows: repeat(6, 1fr);
-  grid-template-columns: 1r;
-}
-
-.day:nth-child(7n + 1) {
-  border-left: 1px solid gray;
-}
-
-.day:nth-child(-n + 7) {
-  border-top: 1px solid gray;
-}
-
-.day {
-  font-size: 13px;
-  border-right: 1px solid gray;
-  border-bottom: 1px solid gray;
-}
-
-.dayz {
-  width: 100%;
-  height: 100%;
-  font-size: 13px;
+.week {
+    font-size: 17px;
 }
 </style>

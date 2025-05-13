@@ -47,15 +47,23 @@ onMounted(async () => {
                     date: false,
                     datex: 0,
                     datey: 0,
-                    color: 'white',
+                    datecolor: 'white',
+                    dateshadow: false,
                     weather: false,
                     weatherx: 0,
                     weathery: 0,
+                    weatherd7: 1,
+                    weathershadow: false,
                     music: false,
                     musictype: 1,
                     musicx: 0,
                     musicy: 0,
                     musicapp: "QQMusic.exe",
+                    musicshadow: false,
+                    festivalcountdown: false,
+                    festivalcountdownx: 0,
+                    festivalcountdowny: 0,
+                    festivals: []
                 }
             })
         }

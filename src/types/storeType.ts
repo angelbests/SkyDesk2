@@ -1,6 +1,7 @@
 import { WindowOptions } from "@tauri-apps/api/window"
 import { WebviewOptions } from "@tauri-apps/api/webview"
 import { Monitor } from "@tauri-apps/api/window"
+import { Festival } from "./../functions/calendar"
 type Windows = {
   label: string
   monitor?: boolean
@@ -30,21 +31,35 @@ type WallpaperConfig = {
   monitor: string
   label: string
   config: {
+    // 动效
     action: boolean
     sakura: boolean
+    // 声音
     audio: number
+    // 日期
     date: boolean
     datex: number
     datey: number
-    color: string
+    datecolor: string
+    dateshadow: boolean
+    // 天气
     weather: boolean
     weatherx: number
     weathery: number
+    weatherd7: number
+    weathershadow: boolean
+    // 音乐
     music: boolean
     musicx: number
     musicy: number
     musictype: number
     musicapp: string
+    musicshadow: boolean
+    // 计时
+    festivalcountdown: boolean
+    festivalcountdownx: number
+    festivalcountdowny: number
+    festivals: Festival[] // Define or import the Festival type
   }
 }
 

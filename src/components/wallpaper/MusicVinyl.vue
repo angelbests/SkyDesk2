@@ -244,7 +244,6 @@ onUnmounted(() => {
     height: 320px;
     background: rgba(203, 203, 223, 0.9);
     border-radius: 50px;
-    filter: drop-shadow(0px 0px 10px black);
     border: 5px solid white;
     padding: 0px;
     margin: 0px;

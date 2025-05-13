@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { get_time, TimeWallpaper } from "../../functions/date";
+import { today } from "../../functions/calendar";
 const time = ref<TimeWallpaper>({ year: "0000", month: "00", day: "00", "week": "星期一", hour: "00", minute: "00", second: "00" });
 setInterval(() => {
     time.value = get_time()
 }, 1000);
+let now = new Date();
+let day = today(now.getFullYear(), now.getMonth() + 1, now.getDate())
+// let day = today(2025, 5, 31)
 </script>
 <template>
     <div class="date">
@@ -16,7 +20,14 @@ setInterval(() => {
         <div class="date_date">
             {{ time.year }} - {{ time.month }} - {{ time.day }}
         </div>
-        <div class="date_week">{{ time.week }}</div>
+        <div class="date_week">
+            <span v-if="day.solar_festival">{{ day.solar_festival }}</span>
+            <span v-else-if="day.lunar_festival">{{ day.lunar_festival }}</span>
+            <span v-else-if="day.lunar_term">{{ day.lunar_term }}</span>
+            <span v-else> {{ day.lunar_month }}{{ day.lunar_day }}</span>
+            <span> {{ " " + time.week }}</span>
+        </div>
+
     </div>
 </template>
 <style>
@@ -28,6 +39,7 @@ setInterval(() => {
     height: 200px;
     border-radius: 50px;
     text-align: center;
+
 }
 
 .date_time {

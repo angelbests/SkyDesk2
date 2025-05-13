@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
-// import { lunar2solar } from '../../functions/calendar'
+import { computed, ref } from "vue"
 import vMonth from "../../components/Month.vue"
 import { systemStore } from "../../stores/system"
 const systemstore = systemStore()
@@ -16,7 +15,6 @@ const date = ref<{
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
 })
-
 const today = ref<{
   year: number
   month: number
@@ -26,6 +24,11 @@ const today = ref<{
   month: new Date().getMonth() + 1,
   day: new Date().getDate()
 })
+
+const showmonth = computed(() => {
+  return date.value.month < 10 ? "0" + date.value.month : date.value.month
+})
+
 
 const wheelyear = function (e: WheelEvent) {
   if (e.deltaY == -100) {
@@ -112,35 +115,36 @@ const wheelmonth = function (e: WheelEvent) {
           {{ date.year }} 年
         </div>
         <div @wheel="wheelmonth" style="height: 100%; line-height: 300%">
-          {{ date.month < 10 ? "0" + date.month : date.month }} 月 </div>
+          {{ showmonth }} 月
         </div>
+      </div>
+      <v-btn style="margin-right: 20px">
+        <template v-slot:prepend>
+          <v-icon>mdi-calendar-range</v-icon>
+        </template>
+        节日计时
+      </v-btn>
     </v-card>
     <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
     <div @wheel="wheelmonth" style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden">
       <v-month v-model:date="date">
         <template v-slot:default="{ day }">
           <div :style="{
-            width: '100%',
-            height: '100%',
-            textAlign: 'center',
             background:
-              today.year == day.cYear &&
-                today.month == day.cMonth &&
-                today.day == day.cDay
+              today.year == day.solar_year &&
+                today.month == day.solar_month &&
+                today.day == day.solar_day
                 ? 'rgba(133,133,133,0.5)'
                 : '',
-          }" @click="() => console.log(day)">
-            <div style="display: flex;justify-content: space-evenly;">
-              <span>
-                {{ day.cDay }}
-              </span>
-              {{ day.lunarFestival }}
-              {{ day.festival }}
-              {{ day.Term }}
+          }" class="day">
+            <div style="font-size: 17px;">
+              {{ day.solar_day }}
             </div>
             <div>
-              {{ day.IMonthCn }}
-              {{ day.IDayCn }}
+              <span v-if="day.solar_festival">{{ day.solar_festival }}</span>
+              <span v-else-if="day.lunar_festival">{{ day.lunar_festival }}</span>
+              <span v-else-if="day.lunar_term">{{ day.lunar_term }}</span>
+              <span v-else> {{ day.lunar_day == '初一' ? day.lunar_month : day.lunar_day }}</span>
             </div>
           </div>
         </template>
@@ -163,5 +167,20 @@ const wheelmonth = function (e: WheelEvent) {
   box-sizing: border-box;
   padding: 0 20px;
   filter: drop-shadow(0px 2px 5px gray);
+}
+
+.day {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.1s linear;
+  border-radius: 10px;
+}
+
+.day:hover {
+  padding: 5px;
+  background: rgba(222, 222, 222, 0.3);
+  border-radius: 10px;
 }
 </style>

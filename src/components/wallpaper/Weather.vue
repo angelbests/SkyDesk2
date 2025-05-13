@@ -46,16 +46,6 @@ const getWindIcon = function (id: number) {
     })
     return `/svg/${res[0].icon}.svg`
 }
-
-// import { readDir } from "@tauri-apps/plugin-fs";
-// const readfile = async function () {
-//     let res = await readDir("D:\\SkyDesk2\\public\\svg")
-//     let arr = []
-//     res.filter(e => {
-//         arr.push(e.name)
-//     })
-// }
-// readfile()
 </script>
 
 <template>
@@ -96,12 +86,10 @@ const getWindIcon = function (id: number) {
 .weather {
     width: 200px;
     height: 200px;
-    background: rgba(253, 253, 253, 0.1);
     border-radius: 50px;
     position: absolute;
     z-index: 400;
     color: rgba(250, 250, 250, 1);
-    box-shadow: 0px 0px 10px black;
 }
 
 .weather_city {

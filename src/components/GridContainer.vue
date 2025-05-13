@@ -5,7 +5,7 @@ import { GroupOptions, SortableEvent } from "sortablejs";
 const array = defineModel<any[]>({
   default: [],
 });
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   gridwidth: number;
   gridheight: number;
   padding?: number;
@@ -15,11 +15,12 @@ const props = defineProps<{
   setData?:
   | ((dataTransfer: DataTransfer, draggedElement: HTMLElement) => void)
   | undefined;
-}>();
+}>(), {
+  padding: 0
+})
 const { gridwidth, gridheight, padding } = toRefs(props);
 
 onMounted(() => {
-  if (!padding.value) padding.value = 0
   updateElementHeight();
   window.addEventListener("resize", updateElementHeight);
 });
@@ -33,11 +34,7 @@ const updateElementHeight = function () {
 };
 
 const gridcontainerheight = computed(() => {
-
   let num = Math.ceil(array.value.length / Math.trunc(gridcontainerwidth.value / gridwidth.value))
-  //(gridheight.value)
-  // 
-  if (!padding.value) padding.value = 0
   return ((num + 1) * padding.value) + gridheight.value * num
 });
 </script>
