@@ -163,8 +163,7 @@ const search = async function (e: any) {
             })
             shortcut.push(...shortcutstore.shortcutsTemp)
             const map = new Map();
-            shortcut.filter((v) => !map.has(v.lnkPath) && map.set(v.lnkPath, v));
-
+            shortcut = shortcut.filter((v) => !map.has(v.lnkPath) && map.set(v.lnkPath, v));
             let shortcutres = shortcut.filter(item => {
                 console.log(item)
                 if (item.name) {
@@ -172,7 +171,6 @@ const search = async function (e: any) {
                     let str = value.toLocaleLowerCase()
                     return path.indexOf(str) >= 0
                 }
-
             });
             searchshortcut.value = [...shortcutres]
             let searchinvoke: {

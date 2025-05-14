@@ -29,6 +29,7 @@ const ws = ref<{
 
 weatherD7Wallpaper((e) => {
     let now = new Date()
+    ws.value.daily.length = 0;
     for (let i = 0; i < e.daily.length; i++) {
         let iconsrc = getWeatherIcon(Number(e.daily[i].iconDay))
         let week: number | string = now.getDay()
@@ -50,6 +51,7 @@ weatherD7Wallpaper((e) => {
         })
     }
 }).then((e) => {
+    ws.value.daily.length = 0;
     let now = new Date()
     for (let i = 0; i < e.daily.length; i++) {
         let iconsrc = getWeatherIcon(Number(e.daily[i].iconDay))
