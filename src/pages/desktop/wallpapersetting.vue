@@ -45,7 +45,7 @@ onMounted(() => {
             <!-- 声音 -->
             <v-list-subheader style="background: #d1c4e9">声音</v-list-subheader>
             <v-list-item>
-              <v-list-item-title>静音</v-list-item-title>
+              <v-list-item-title>声音</v-list-item-title>
               <template v-slot:append>
                 <div style="width: 280px">
                   <v-slider :model-value="item.config.audio" @end="(e) => { item.config.audio = e }" min="0" max="100"
