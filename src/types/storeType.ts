@@ -60,6 +60,12 @@ type WallpaperConfig = {
     festivalcountdownx: number
     festivalcountdowny: number
     festivals: Festival[] // Define or import the Festival type
+    // calendar
+    calendar: boolean
+    calendarx: number
+    calendary: number
+    calendarshadow: boolean
+    calendarcolor: string
   }
 }
 

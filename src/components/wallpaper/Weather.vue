@@ -103,7 +103,6 @@ const getWindIcon = function (id: number) {
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0px 0px 10px black;
 }
 
 .weather_w {
@@ -112,7 +111,6 @@ const getWindIcon = function (id: number) {
     position: absolute;
     left: 0px;
     top: 20px;
-    filter: drop-shadow(0px 0px 5px black);
 }
 
 .weather_wind {
@@ -121,7 +119,6 @@ const getWindIcon = function (id: number) {
     position: absolute;
     left: 0px;
     top: 100px;
-    filter: drop-shadow(0px 0px 10px gray);
 }
 
 .weather_temp {
@@ -135,7 +132,7 @@ const getWindIcon = function (id: number) {
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0px 0px 10px black;
+
 }
 
 .weather_temp_c {
@@ -144,7 +141,7 @@ const getWindIcon = function (id: number) {
     font-size: 15px;
     display: flex;
     align-items: start;
-    text-shadow: 0px 0px 10px black;
+
 }
 
 .weather_temp_rang {
@@ -158,14 +155,12 @@ const getWindIcon = function (id: number) {
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0px 0px 10px black;
 }
 
 .weather_temp_rang_c {
     margin-left: 1px;
     height: 20px;
     font-size: 8px;
-    text-shadow: 0px 0px 10px black;
 }
 
 .weather_text {
@@ -179,7 +174,6 @@ const getWindIcon = function (id: number) {
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0px 0px 10px black;
 }
 
 .weather_winddir {
@@ -193,7 +187,6 @@ const getWindIcon = function (id: number) {
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0px 0px 10px black;
 }
 
 .weather_rh {
@@ -207,6 +200,5 @@ const getWindIcon = function (id: number) {
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 0px 0px 10px black;
 }
 </style>

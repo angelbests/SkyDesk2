@@ -1,39 +1,20 @@
 <template>
-    <div style="
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        padding: 10px;
-      ">
-        <div style="
-          display: grid;
-          width: 100%;
-          grid-template-columns: repeat(7, 1fr);
-          grid-template-rows: repeat(1, 1fr);
-        ">
-
-        </div>
-        <div style="width: 100%; height: 100%; position: relative">
-            <div class="month">
-                <div class="week">一</div>
-                <div class="week">二</div>
-                <div class="week">三</div>
-                <div class="week">四</div>
-                <div class="week">五</div>
-                <div class="week">六</div>
-                <div class="week">日</div>
-                <div class="day" v-for="day in days">
-                    <slot :day="day"></slot>
-                </div>
-            </div>
+    <div class="month" style="width: 100%; height: 100%;">
+        <div :style="{ fontSize: `${weekfontsize}px` }">一</div>
+        <div :style="{ fontSize: `${weekfontsize}px` }">二</div>
+        <div :style="{ fontSize: `${weekfontsize}px` }">三</div>
+        <div :style="{ fontSize: `${weekfontsize}px` }">四</div>
+        <div :style="{ fontSize: `${weekfontsize}px` }">五</div>
+        <div :style="{ fontSize: `${weekfontsize}px` }">六</div>
+        <div :style="{ fontSize: `${weekfontsize}px` }">日</div>
+        <div class="day" v-for="day in days">
+            <slot :day="day"></slot>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, toRefs, watch } from "vue";
 import { DayInfo, today } from "../functions/calendar";
 const days = ref<DayInfo[]>([]);
 const date = defineModel<{ year: number, month: number }>("date", {
@@ -42,6 +23,14 @@ const date = defineModel<{ year: number, month: number }>("date", {
         month: new Date().getMonth(),
     }),
 });
+
+const props = withDefaults(defineProps<{
+    weekfontsize?: number,
+}>(), {
+    weekfontsize: 18,
+})
+
+const { weekfontsize } = toRefs(props)
 
 onMounted(async () => {
     days.value = await monthdays(date.value.year, date.value.month);
@@ -87,9 +76,5 @@ const getWeekday = function (year: number, month: number, day: number) {
     position: relative;
     text-align: center;
     align-items: center;
-}
-
-.week {
-    font-size: 17px;
 }
 </style>

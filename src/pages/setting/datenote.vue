@@ -118,12 +118,12 @@ const wheelmonth = function (e: WheelEvent) {
           {{ showmonth }} 月
         </div>
       </div>
-      <v-btn style="margin-right: 20px">
+      <!-- <v-btn style="margin-right: 20px">
         <template v-slot:prepend>
           <v-icon>mdi-calendar-range</v-icon>
         </template>
-        节日计时
-      </v-btn>
+节日计时
+</v-btn> -->
     </v-card>
     <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
     <div @wheel="wheelmonth" style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden">

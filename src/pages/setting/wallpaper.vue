@@ -41,8 +41,8 @@ onMounted(async () => {
                 label: "",
                 monitor: monitors.value[i].name as string,
                 config: {
-                    action: true,
-                    sakura: true,
+                    action: false,
+                    sakura: false,
                     audio: 0,
                     date: false,
                     datex: 0,
@@ -63,7 +63,12 @@ onMounted(async () => {
                     festivalcountdown: false,
                     festivalcountdownx: 0,
                     festivalcountdowny: 0,
-                    festivals: []
+                    festivals: [],
+                    calendar: false,
+                    calendarx: 0,
+                    calendary: 0,
+                    calendarcolor: 'white',
+                    calendarshadow: false
                 }
             })
         }

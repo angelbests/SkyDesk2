@@ -11,6 +11,7 @@ import MusicTape from "../../components/wallpaper/MusicTape.vue";
 import Weather from "../../components/wallpaper/Weather.vue";
 import WeatherD7 from "../../components/wallpaper/WeatherD7.vue";
 import Date from "../../components/wallpaper/Date.vue";
+import Calendar from "../../components/wallpaper/Calendar.vue";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
 import { startSakura, stopp } from "../../functions/sakura";
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -162,7 +163,8 @@ const listen_desktop = function () {
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
-        boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : 'none'
+        textShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
+        boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
       }">
     </Weather>
     <WeatherD7
@@ -170,15 +172,24 @@ const listen_desktop = function () {
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
-        boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : ''
+        boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
+        textShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
       }">
     </WeatherD7> <!-- date -->
     <Date v-if="wallpaperstore.wallpaperConfig[index].config.date" :style="{
       left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
       top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
       color: `${wallpaperstore.wallpaperConfig[index].config.datecolor}`,
-      textShadow: wallpaperstore.wallpaperConfig[index].config.dateshadow ? '0px 0px 10px black' : ''
+      textShadow: wallpaperstore.wallpaperConfig[index].config.dateshadow ? '0px 0px 10px black' : '',
+
     }"></Date>
+    <calendar v-if="wallpaperstore.wallpaperConfig[index].config.calendar" :style="{
+      left: `${wallpaperstore.wallpaperConfig[index].config.calendarx}%`,
+      top: `${wallpaperstore.wallpaperConfig[index].config.calendary}%`,
+      color: `${wallpaperstore.wallpaperConfig[index].config.calendarcolor}`,
+      boxShadow: wallpaperstore.wallpaperConfig[index].config.calendarshadow ? '0px 0px 10px black' : '',
+      textShadow: wallpaperstore.wallpaperConfig[index].config.calendarshadow ? '0px 0px 10px black' : ''
+    }"></calendar>
     <!-- <div :style="{
       left: '20px',
       top: '400px',
