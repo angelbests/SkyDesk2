@@ -9,7 +9,7 @@ import { createWindow } from "../../functions/window";
 import { uuid } from "../../functions";
 import { open } from "@tauri-apps/plugin-dialog";
 import { exec } from "../../functions/open";
-import { basename, resourceDir } from "@tauri-apps/api/path";
+import { basename } from "@tauri-apps/api/path";
 import GridContainer from "../../components/GridContainer.vue";
 import { emit } from "@tauri-apps/api/event";
 import { ShortCut } from "../../types/storeType";
@@ -50,44 +50,6 @@ onMounted(async () => {
 });
 
 const scanProgram = async function () {
-  let respath = await resourceDir();
-  let systemprogram: ShortCut[] = [
-    {
-      type: "openPath",
-      icoPath: respath + "/resources/notepad.png",
-      lnkPath: "",
-      name: "记事本",
-      targetPath: "C:/Windows/notepad.exe",
-    },
-    {
-      type: "openPath",
-      icoPath: respath + "/resources/calc.png",
-      lnkPath: "",
-      name: "计算器",
-      targetPath: "C:/Windows/system32/calc.exe",
-    },
-    {
-      type: "openPath",
-      icoPath: respath + "/resources/disk.png",
-      targetPath: "C:/Windows/system32/diskmgmt.msc",
-      name: "磁盘管理",
-      lnkPath: "",
-    },
-    {
-      type: "openPath",
-      icoPath: respath + "/resources/keyboard.png",
-      targetPath: "C:/Windows/system32/osk.exe",
-      name: "屏幕键盘",
-      lnkPath: "",
-    },
-    {
-      type: "openPath",
-      icoPath: respath + "/resources/Volume.png",
-      targetPath: "C:/Windows/system32/SndVol.exe",
-      name: "音量合成器",
-      lnkPath: "",
-    },
-  ];
   if (scanbtn.value) {
     scanbtn.value = false;
     if (!scanbar.value) {
@@ -97,7 +59,7 @@ const scanProgram = async function () {
         console.log(arr[i].lnkPath)
       }
       let res = await setIcon2();
-      res.push(...systemprogram, ...arr)
+      res.push(...arr)
       shortcutsTemp.value = res
       const map = new Map();
       res.filter((v) => !map.has(v.lnkPath) && map.set(v.lnkPath, v));

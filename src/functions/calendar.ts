@@ -72,7 +72,6 @@ export const today = function (year: number, month: number, day: number) {
     solar_month: month,
     solar_day: day,
   }
-  console.log(today)
   return today
 }
 

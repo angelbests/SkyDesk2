@@ -212,6 +212,9 @@ const typechange = function (value: any) {
 // 新增壁纸
 const overlay = ref(false)
 const addWallpaper = async function () {
+    if (!addWallPaperData.value.path || !addWallPaperData.value.preview) {
+        return
+    }
     overlay.value = true
     let path = ""
     let dirid = uuid()
@@ -225,16 +228,17 @@ const addWallpaper = async function () {
     if (addWallPaperData.value.type == "image") {
         path = await resolve(await appDataDir(), "wallpapers\\image", dirid)
         await mkdir(path)
-        console.log(path)
-        await copyFile(addWallPaperData.value.path, path + "\\" + addWallPaperData.value.filename)
-        addWallPaperData.value.path = path + "\\" + addWallPaperData.value.filename
+        let topath = path + "\\" + uuid() + '.png'
+        await copyFile(addWallPaperData.value.path, topath)
+        addWallPaperData.value.path = topath
         await copyFile(addWallPaperData.value.preview, path + "\\preview.png")
         addWallPaperData.value.preview = path + "\\preview.png"
     } else if (addWallPaperData.value.type == "video") {
         path = await resolve(await appDataDir(), "wallpapers\\video", dirid)
         await mkdir(path)
-        await copyFile(addWallPaperData.value.path, path + "\\" + addWallPaperData.value.filename)
-        addWallPaperData.value.path = path + "\\" + addWallPaperData.value.filename
+        let topath = path + "\\" + uuid() + '.mp4'
+        await copyFile(addWallPaperData.value.path, topath)
+        addWallPaperData.value.path = topath
         await copyFile(addWallPaperData.value.preview, path + "\\preview.png")
         addWallPaperData.value.preview = path + "\\preview.png"
     } else {

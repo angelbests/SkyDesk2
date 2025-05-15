@@ -28,6 +28,7 @@ const unlisten = ref<any>()
 onMounted(() => {
   document.title = "skydesk2-wallpaper"
   path.value = route.query.path;
+  console.log(path.value)
   type.value = route.query.type;
   setTimeout(async () => {
     await init()
@@ -67,21 +68,21 @@ const init = async function () {
       if (wallpaperstore.wallpaperConfig[index.value].config.action) {
         listen_desktop()
       } else {
-        unlisten.value()
+        if (unlisten.value) {
+          unlisten.value()
+        }
       }
     }
   });
-
-
 }
 
 // 鼠标跟随 //////////////////////////////////////////
-const listen_desktop = function () {
+const listen_desktop = async function () {
   let rx: number = 0;
   let ry: number = 0;
   let tx: number = 0;
   let ty: number = 0;
-  unlisten.value = listen("desktop", async (e: Event<MouseEvent>) => {
+  unlisten.value = await listen("desktop", async (e: Event<MouseEvent>) => {
     if (monitor.value?.name !== e.payload.monitor.name) return
     if (e.payload.mouse == MouseAction.Move) {
       let { x, y } = e.payload
@@ -127,10 +128,10 @@ const listen_desktop = function () {
 
     </div>
     <!-- wallpaper -->
-    <img id="wallpaperimg" v-show="type == 'image'" :src="convertFileSrc(path)" :class="{
+    <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" :class="{
       image: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action
     }" />
-    <video id="wallpapervideo" v-show="type == 'video'"
+    <video id="wallpapervideo" v-if="type == 'video'"
       :class="{ video: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action }"
       :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
     <!-- music1 -->
