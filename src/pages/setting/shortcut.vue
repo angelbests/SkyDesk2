@@ -22,6 +22,8 @@ const dialog2 = ref(false);
 const dialog = ref(false);
 const index = ref(0);
 const setting = ref(false);
+const selecttype = ref<string>("file")
+const selectmuti = ref<'single' | 'multiple'>('single')
 const shortcut = ref<ShortCut>({
   type: "openPath",
   lnkPath: "",
@@ -121,7 +123,9 @@ const createDocker = async function () {
 // 获取快捷文件并自动生成名称和图标
 const getlnk = async function () {
   let res = await open({
-    "directory": addselect.value == "file" ? false : true,
+    "directory": selecttype.value == "file" ? false : true,
+    "multiple": selectmuti.value == 'multiple' ? true : false,
+    "title": "选择文件",
     filters: [
       {
         extensions: ["lnk", "exe", "url"],
@@ -133,14 +137,32 @@ const getlnk = async function () {
       }
     ],
   });
-  if (res) {
-    let name = await basename(res)
-    shortcut.value.name = name.split(".")[0]
-    shortcut.value.icoPath = await get_pe_ico(res)
-    shortcut.value.lnkPath = res;
+  if (selectmuti.value == 'multiple') {
+    if (res) {
+      for (let i = 0; i < res.length; i++) {
+        let name = await basename(res[i])
+        name = name.split(".")[0]
+        let icoPath = await get_pe_ico(res[i])
+        shortcuts.value[tab.value].shortcut.push({
+          type: "openPath",
+          targetPath: res[i],
+          lnkPath: res[i],
+          icoPath,
+          name,
+        });
+      }
+      cancelsubmit();
+    }
+  } else {
+    if (res) {
+      let name = await basename(res)
+      shortcut.value.name = name.split(".")[0]
+      shortcut.value.icoPath = await get_pe_ico(res)
+      shortcut.value.lnkPath = res;
+    }
   }
-};
 
+};
 // 用户选择图标
 const getico = async function () {
   let res = await open({
@@ -201,6 +223,8 @@ const submitshortcut2 = async function () {
 
 // 清除输入
 const cancelsubmit = function () {
+  dialog2.value = false;
+  dialog.value = false;
   shortcut.value = {
     type: "openPath",
     lnkPath: "",
@@ -208,9 +232,8 @@ const cancelsubmit = function () {
     name: "",
     targetPath: ""
   };
-  addselect.value = "file"
-  dialog2.value = false;
-  dialog.value = false;
+  selecttype.value = "file"
+  selectmuti.value = 'single'
 };
 
 //#region ///////////////拖拽//////////////////////////////////////////
@@ -298,7 +321,7 @@ const deltab = function () {
   deltabshow.value = false;
 };
 //#endregion
-const addselect = ref<string>("file")
+
 </script>
 
 <template>
@@ -331,14 +354,14 @@ const addselect = ref<string>("file")
     <v-dialog max-width="500" v-model="dialog">
       <v-list>
         <v-list-item>
-          <v-radio-group v-model="addselect" inline density="compact" hide-details="auto">
+          <v-radio-group v-model="selecttype" inline density="compact" hide-details="auto">
             <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
             <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
           </v-radio-group>
         </v-list-item>
         <v-list-item>
           <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getlnk" :label="addselect == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
+            @click="getlnk" :label="selecttype == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
         </v-list-item>
         <v-list-item>
           <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
@@ -362,20 +385,26 @@ const addselect = ref<string>("file")
     <v-dialog max-width="500" v-model="dialog2">
       <v-list>
         <v-list-item>
-          <v-radio-group v-model="addselect" inline density="compact" hide-details="auto">
+          <v-radio-group v-model="selecttype" inline density="compact" hide-details="auto">
             <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
             <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
           </v-radio-group>
         </v-list-item>
         <v-list-item>
-          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getlnk" :label="addselect == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
+          <v-radio-group v-model="selectmuti" inline density="compact" hide-details="auto">
+            <v-radio style="width: 100px;" label="单选" value="single"></v-radio>
+            <v-radio style="width: 100px;" label="多选" value="multiple"></v-radio>
+          </v-radio-group>
         </v-list-item>
         <v-list-item>
+          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+            @click="getlnk" :label="selecttype == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
+        </v-list-item>
+        <v-list-item v-show="selectmuti == 'single'">
           <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
             @click="getico" label="图标路径"></v-text-field>
         </v-list-item>
-        <v-list-item>
+        <v-list-item v-show="selectmuti == 'single'">
           <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
         </v-list-item>
       </v-list>
