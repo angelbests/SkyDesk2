@@ -14,10 +14,12 @@ import Date from "../../components/wallpaper/Date.vue";
 import Calendar from "../../components/wallpaper/Calendar.vue";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
 import { startSakura, stopp } from "../../functions/sakura";
+import { systemStore } from "../../stores/system";
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { invoke } from "@tauri-apps/api/core";
 // invoke("open_devtool", { label: getCurrentWebviewWindow().label })
 const wallpaperstore = wallpaperStore();
+const systemstore = systemStore();
 const index = ref<number>(0);
 const route = useRoute();
 const path = ref();
@@ -54,7 +56,10 @@ const init = async function () {
     dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
   }
   window.addEventListener("storage", (e) => {
-    if (e.key == "wallpaper") {
+    if (e.key == "system") {
+      systemstore.$hydrate()
+    }
+    else if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
       if (type.value == 'video') {
         dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
@@ -106,6 +111,18 @@ const listen_desktop = async function () {
   }
   animate()
 }
+
+listen("desktop-volume", (e: Event<boolean>) => {
+  if (!systemstore.muted) {
+    dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
+    return
+  }
+  if (e.payload) {
+    dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
+  } else {
+    dom.value.volume = 0
+  }
+})
 // import { get_all_festival } from '../../functions/calendar'
 
 // const today = ref<{

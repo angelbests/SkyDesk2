@@ -40,6 +40,7 @@ pub fn run() {
                 .unwrap();
             server::open_server(path.to_str().unwrap().to_string(), 12345);
             desktop::desktop_mouse_listen(app.handle().clone());
+            desktop::focus_desktop(app.handle().clone());
             Ok(())
         })
         .plugin(

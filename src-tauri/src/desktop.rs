@@ -6,9 +6,10 @@ use windows::core::{s, BOOL};
 use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, EnumWindows, FindWindowExA, SetWindowsHookExA, WindowFromPoint, HC_ACTION,
-    HHOOK, MSLLHOOKSTRUCT, WH_MOUSE_LL, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP,
-    WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP,
+    CallNextHookEx, EnumWindows, FindWindowA, FindWindowExA, GetForegroundWindow,
+    SetWindowsHookExA, WindowFromPoint, HC_ACTION, HHOOK, MSLLHOOKSTRUCT, WH_MOUSE_LL,
+    WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL,
+    WM_RBUTTONDOWN, WM_RBUTTONUP,
 };
 #[derive(Clone, serde::Serialize, PartialEq)]
 enum MouseAction {
@@ -214,4 +215,21 @@ pub fn desktop_mouse_listen(app: AppHandle) {
             }
         });
     }
+}
+
+pub fn focus_desktop(app: AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        unsafe {
+            let progman = FindWindowA(s!("Progman"), None).unwrap();
+            loop {
+                let forewindow = GetForegroundWindow();
+                if progman.0 == forewindow.0 {
+                    let _ = app.emit("desktop-volume", true);
+                } else {
+                    let _ = app.emit("desktop-volume", false);
+                }
+                sleep(Duration::from_millis(500));
+            }
+        }
+    });
 }

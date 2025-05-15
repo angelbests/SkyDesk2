@@ -627,6 +627,13 @@ const hovertop = async function () {
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
+                  <v-switch color="info" v-model="systemstore.muted" @update:model-value="wheel_status"
+                    hide-details></v-switch>
+                </template>
+                <v-list-item-title>壁纸离屏静音</v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <template v-slot:append>
                   <v-btn @click="refresh">
                     <template v-slot:prepend>
                       <v-icon>mdi-refresh</v-icon>
