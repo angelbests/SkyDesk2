@@ -96,6 +96,10 @@ const routes: RouteRecordRaw[] = [
         path: "search",
         component: () => import("./../pages/desktop/search.vue"),
       },
+      {
+        path: "dragfile",
+        component: () => import("./../pages/desktop/dragfile.vue"),
+      },
     ],
   },
 ]

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, toRefs } from "vue";
+import { onMounted, ref, toRefs, watch } from "vue";
 import { get_pe_ico, get_uwp, setIcon2 } from "../../functions/peIcon";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { systemStore } from "../../stores/system";
@@ -11,8 +11,9 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { exec } from "../../functions/open";
 import { basename } from "@tauri-apps/api/path";
 import GridContainer from "../../components/GridContainer.vue";
-import { emit } from "@tauri-apps/api/event";
+import { emit, Event, UnlistenFn } from "@tauri-apps/api/event";
 import { ShortCut } from "../../types/storeType";
+import { DragDropEvent, getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 const systemstore = systemStore();
 const tab = ref();
 const tabshow = ref(false);
@@ -161,7 +162,6 @@ const getlnk = async function () {
       shortcut.value.lnkPath = res;
     }
   }
-
 };
 // 用户选择图标
 const getico = async function () {
@@ -235,6 +235,61 @@ const cancelsubmit = function () {
   selecttype.value = "file"
   selectmuti.value = 'single'
 };
+let dragwindow: WebviewWindow | undefined;
+let draglisten: UnlistenFn | undefined
+watch(dialog2, async () => {
+  if (!dialog2.value) {
+    if (draglisten) {
+      draglisten()
+      draglisten = undefined
+    }
+    if (dragwindow) {
+      dragwindow.destroy()
+      dragwindow = undefined
+    }
+    return
+  }
+  setTimeout(async () => {
+    let dom = document.getElementById("dragfile");
+    if (!dom) return
+    let { left, top, right, bottom } = dom.getBoundingClientRect()
+    let position = await getCurrentWebviewWindow().outerPosition()
+    let factor = await getCurrentWebviewWindow().scaleFactor()
+    dragwindow = new WebviewWindow("dragfile", {
+      url: "/#/pages/desktop/dragfile",
+      x: Math.ceil(position.x / factor + left) + 13,
+      y: Math.ceil(position.y / factor + top) - 13,
+      width: (right - left) + 4,
+      height: (bottom - top) + 20,
+      shadow: false,
+      resizable: false,
+      maximizable: false,
+      decorations: false,
+      transparent: true,
+      parent: 'main'
+    })
+    draglisten = await dragwindow.onDragDropEvent(async (e: Event<DragDropEvent>) => {
+      if (e.payload.type == "drop") {
+        let res = e.payload.paths
+        if (res) {
+          for (let i = 0; i < res.length; i++) {
+            let name = await basename(res[i])
+            name = name.split(".")[0]
+            let icoPath = await get_pe_ico(res[i])
+            shortcuts.value[tab.value].shortcut.push({
+              type: "openPath",
+              targetPath: res[i],
+              lnkPath: res[i],
+              icoPath,
+              name,
+            });
+          }
+          cancelsubmit();
+        }
+      }
+    })
+  }, 20)
+})
 
 //#region ///////////////拖拽//////////////////////////////////////////
 // 设置拖拽附带的数据
@@ -326,98 +381,99 @@ const deltab = function () {
 
 <template>
   <div id="shortcut" style="width: 100%; height: 100%; position: relative">
+    <!-- 删除合集 -->
     <v-dialog max-width="500" v-model="deltabshow">
-      <v-card title="是否删除此合集！">
-        <template v-slot:actions>
+      <v-card>
+        <v-card-actions>
           <v-btn @click="deltabshow = false"> 取消 </v-btn>
           <v-btn @click="deltab"> 确认 </v-btn>
-        </template>
+        </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- 添加合集 -->
     <v-dialog max-width="500" v-model="tabshow">
-      <v-list>
-        <v-list-item>
-          <v-text-field v-model="tabtitle" density="compact" hide-details="auto" label="合集名称"></v-text-field>
-        </v-list-item>
-      </v-list>
-      <div style="
-          background: white;
-          box-sizing: border-box;
-          padding: 10px;
-          display: flex;
-          justify-content: flex-end;
-        ">
-        <v-btn style="margin-right: 10px" @click="tabshow = false">取消</v-btn>
-        <v-btn style="margin-right: 10px" @click="addtab">确认</v-btn>
-      </div>
+      <v-card>
+        <v-list>
+          <v-list-item>
+            <v-text-field v-model="tabtitle" density="compact" hide-details="auto" label="合集名称"></v-text-field>
+          </v-list-item>
+        </v-list>
+        <v-card-actions>
+          <v-btn style="margin-right: 10px" @click="tabshow = false">取消</v-btn>
+          <v-btn style="margin-right: 10px" @click="addtab">确认</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
+    <!-- 修改快捷 -->
     <v-dialog max-width="500" v-model="dialog">
-      <v-list>
-        <v-list-item>
-          <v-radio-group v-model="selecttype" inline density="compact" hide-details="auto">
-            <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
-            <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
-          </v-radio-group>
-        </v-list-item>
-        <v-list-item>
-          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getlnk" :label="selecttype == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
-        </v-list-item>
-        <v-list-item>
-          <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getico" label="图标路径"></v-text-field>
-        </v-list-item>
-        <v-list-item>
-          <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
-        </v-list-item>
-      </v-list>
-      <div style="
-          background: white;
-          box-sizing: border-box;
-          padding: 10px;
-          display: flex;
-          justify-content: flex-end;
-        ">
-        <v-btn style="margin-right: 10px" @click="cancelsubmit">取消</v-btn>
-        <v-btn style="margin-right: 10px" @click="submitshortcut">确认</v-btn>
-      </div>
+      <v-card>
+        <v-list>
+          <v-list-item>
+            <v-radio-group v-model="selecttype" inline density="compact" hide-details="auto">
+              <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
+              <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
+            </v-radio-group>
+          </v-list-item>
+          <v-list-item>
+            <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+              @click="getlnk" :label="selecttype == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
+          </v-list-item>
+          <v-list-item>
+            <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
+              @click="getico" label="图标路径"></v-text-field>
+          </v-list-item>
+          <v-list-item>
+            <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
+          </v-list-item>
+        </v-list>
+        <v-card-actions>
+          <v-btn style="margin-right: 10px" @click="cancelsubmit">取消</v-btn>
+          <v-btn style="margin-right: 10px" @click="submitshortcut">确认</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-    <v-dialog max-width="500" v-model="dialog2">
-      <v-list>
-        <v-list-item>
-          <v-radio-group v-model="selecttype" inline density="compact" hide-details="auto">
-            <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
-            <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
-          </v-radio-group>
-        </v-list-item>
-        <v-list-item>
-          <v-radio-group v-model="selectmuti" inline density="compact" hide-details="auto">
-            <v-radio style="width: 100px;" label="单选" value="single"></v-radio>
-            <v-radio style="width: 100px;" label="多选" value="multiple"></v-radio>
-          </v-radio-group>
-        </v-list-item>
-        <v-list-item>
-          <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getlnk" :label="selecttype == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
-        </v-list-item>
-        <v-list-item v-show="selectmuti == 'single'">
-          <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
-            @click="getico" label="图标路径"></v-text-field>
-        </v-list-item>
-        <v-list-item v-show="selectmuti == 'single'">
-          <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
-        </v-list-item>
-      </v-list>
-      <div style="
-          background: white;
-          box-sizing: border-box;
-          padding: 10px;
-          display: flex;
-          justify-content: flex-end;
-        ">
-        <v-btn style="margin-right: 10px" @click="cancelsubmit">取消</v-btn>
-        <v-btn style="margin-right: 10px" @click="submitshortcut2">确认</v-btn>
-      </div>
+    <!-- 添加快捷 -->
+    <v-dialog max-width="500" height="350" v-model="dialog2">
+      <v-card style="width: 100%;height: 100%;">
+        <v-card-text>
+          <div style="display: flex;flex-direction: row;width: 100%;height: 100%;">
+            <v-list style="width: 350px;">
+              <v-list-item>
+                <v-radio-group v-model="selecttype" inline density="compact" hide-details="auto">
+                  <v-radio style="width: 100px;" label="文件" value="file"></v-radio>
+                  <v-radio style="width: 100px;" label="文件夹" value="dir"></v-radio>
+                </v-radio-group>
+              </v-list-item>
+              <v-list-item>
+                <v-radio-group v-model="selectmuti" inline density="compact" hide-details="auto">
+                  <v-radio style="width: 100px;" label="单选" value="single"></v-radio>
+                  <v-radio style="width: 100px;" label="多选" value="multiple"></v-radio>
+                </v-radio-group>
+              </v-list-item>
+              <v-list-item>
+                <v-text-field v-model="shortcut.lnkPath" density="compact" hide-details="auto" :readonly="true"
+                  @click="getlnk" :label="selecttype == 'file' ? '选择文件' : '选择文件夹'"></v-text-field>
+              </v-list-item>
+              <v-list-item v-show="selectmuti == 'single'">
+                <v-text-field v-model="shortcut.icoPath" density="compact" hide-details="auto" :readonly="true"
+                  @click="getico" label="图标路径"></v-text-field>
+              </v-list-item>
+              <v-list-item v-show="selectmuti == 'single'">
+                <v-text-field v-model="shortcut.name" density="compact" hide-details="auto" label="快捷名称"></v-text-field>
+              </v-list-item>
+            </v-list>
+            <div id="dragfile" style="width: 150px;height: 90%;margin-top: 3%;
+             background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+             display: flex;justify-content: center;align-items: center;color: gray;">
+              拖入
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn style="margin-right: 10px" @click="cancelsubmit">取消</v-btn>
+          <v-btn style="margin-right: 10px" @click="submitshortcut2">确认</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
     <v-card :style="{
       background: systemstore.btnbarbackground,

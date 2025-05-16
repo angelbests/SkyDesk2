@@ -47,25 +47,7 @@ type SettingBottomItem = {
 const settingbottom = ref<SettingBottomItem[]>([]);
 
 onMounted(async () => {
-    // 注册快捷组合键
-    let res = await isRegistered("Alt+Space")
-    console.log("未注册");
-    if (!res) {
-        register("Alt+Space", async (e) => {
-            if (e.state !== "Pressed") return;
-            let show = await getCurrentWebviewWindow().isVisible();
-            if (show) {
-                getCurrentWebviewWindow().hide()
-                let dom = document.getElementById("container")
-                if (dom) dom.style.height = '50px'
-                getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
-            } else {
-                getCurrentWebviewWindow().show()
-                getCurrentWebviewWindow().center()
-                getCurrentWebviewWindow().setFocus();
-            }
-        })
-    }
+    await keyset()
     let path = await homeDir()
     console.log(path)
     settingbottom.value = [
@@ -128,14 +110,51 @@ onMounted(async () => {
             path: "/icons/calc.png",
             cmd: "calc",
             label: "计算器"
-        },
-        // {
-        //     path: "/icons/screenshot.png",
-        //     cmd: "start ms-screenclip:",
-        //     label: "截图"
-        // }
+        }
     ]
 })
+
+const keyset = async function () {
+    // 注册快捷组合键
+    let res = await isRegistered("Alt+Space")
+    console.log("未注册");
+    if (!res) {
+        register("Alt+Space", async (e) => {
+            if (e.state !== "Pressed") return;
+            let show = await getCurrentWebviewWindow().isVisible();
+            if (show) {
+                await getCurrentWebviewWindow().hide()
+                let dom = document.getElementById("container")
+                if (dom) dom.style.height = '50px'
+                await getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
+            } else {
+                await getCurrentWebviewWindow().center()
+                await getCurrentWebviewWindow().show()
+                await getCurrentWebviewWindow().setFocus()
+            }
+        })
+    }
+
+    // 添加窗口失焦事件
+    await getCurrentWebviewWindow().listen("tauri://blur", () => {
+        getCurrentWebviewWindow().hide()
+        focusindex.value = -1
+        searchresult.value = []
+        searchshortcut.value = []
+        inputvalue.value = ""
+        let dom = document.getElementById("container")
+        if (dom) dom.style.height = '50px'
+        getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
+    })
+
+    // 添加窗口聚焦事件
+    await getCurrentWebviewWindow().listen("tauri://focus", () => {
+        document.getElementById("input")?.focus()
+        getCurrentWebviewWindow().setSize(new LogicalSize(800, 500));
+        let dom = document.getElementById("container")
+        if (dom) dom.style.height = '500px'
+    })
+}
 
 const searchstatus = ref(false)
 // windows search 查询
@@ -215,25 +234,7 @@ const search = async function (e: any) {
 
 }
 
-// 添加窗口失焦事件
-getCurrentWebviewWindow().listen("tauri://blur", () => {
-    getCurrentWebviewWindow().hide()
-    focusindex.value = -1
-    searchresult.value = []
-    searchshortcut.value = []
-    inputvalue.value = ""
-    let dom = document.getElementById("container")
-    if (dom) dom.style.height = '50px'
-    getCurrentWebviewWindow().setSize(new LogicalSize(800, 50));
-})
 
-// 添加窗口聚焦事件
-getCurrentWebviewWindow().listen("tauri://focus", () => {
-    document.getElementById("input")?.focus()
-    getCurrentWebviewWindow().setSize(new LogicalSize(800, 500));
-    let dom = document.getElementById("container")
-    if (dom) dom.style.height = '500px'
-})
 
 // 鼠标点击打开程序或文件或路径
 const openfile = async function (item: searchResult) {

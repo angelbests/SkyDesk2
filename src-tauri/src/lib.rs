@@ -13,6 +13,7 @@ mod audio;
 mod calendar;
 mod clipboard;
 mod desktop;
+mod dropfile;
 mod hovertop;
 mod lockscreen;
 mod search;
