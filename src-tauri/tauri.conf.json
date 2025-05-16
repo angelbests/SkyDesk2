@@ -24,7 +24,9 @@
         "center": true,
         "dragDropEnabled": false,
         "alwaysOnTop": false,
-        "visible": false
+        "visible": false,
+        "windowClassname": "skydesk2",
+        "allowLinkPreview": false
       },
       {
         "x": 0,

@@ -11,9 +11,11 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { exec } from "../../functions/open";
 import { basename } from "@tauri-apps/api/path";
 import GridContainer from "../../components/GridContainer.vue";
-import { emit, Event, UnlistenFn } from "@tauri-apps/api/event";
+import { emit } from "@tauri-apps/api/event";
 import { ShortCut } from "../../types/storeType";
 import { DragDropEvent, getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { exists } from "@tauri-apps/plugin-fs";
+import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 const systemstore = systemStore();
 const tab = ref();
 const tabshow = ref(false);
@@ -140,18 +142,20 @@ const getlnk = async function () {
   });
   if (selectmuti.value == 'multiple') {
     if (res) {
+      let arr: ShortCut[] = []
       for (let i = 0; i < res.length; i++) {
         let name = await basename(res[i])
         name = name.split(".")[0]
         let icoPath = await get_pe_ico(res[i])
-        shortcuts.value[tab.value].shortcut.push({
+        arr.push({
           type: "openPath",
           targetPath: res[i],
           lnkPath: res[i],
           icoPath,
           name,
-        });
+        })
       }
+      shortcuts.value[tab.value].shortcut.push(...arr);
       cancelsubmit();
     }
   } else {
@@ -235,60 +239,57 @@ const cancelsubmit = function () {
   selecttype.value = "file"
   selectmuti.value = 'single'
 };
-let dragwindow: WebviewWindow | undefined;
-let draglisten: UnlistenFn | undefined
+
+// 拖拽窗口
+let dragwindow: WebviewWindow = new WebviewWindow("dragfile", {
+  url: "/#/pages/desktop/dragfile",
+  shadow: false,
+  resizable: false,
+  maximizable: false,
+  decorations: false,
+  transparent: true,
+  parent: 'main',
+  visible: false,
+})
+
+dragwindow.listen<DragDropEvent>("tauri://drag-drop", async (e) => {
+  console.log(e)
+  if (e.payload && Array.isArray((e.payload as any).paths) && (e.payload as any).paths.length > 0) {
+    dragwindow.hide();
+    cancelsubmit();
+    const paths = (e.payload as any).paths;
+    let arr: ShortCut[] = []
+    for (let i = 0; i < paths.length; i++) {
+      if (!(await exists(paths[i]))) continue;
+      let name = await basename(paths[i])
+      name = name.split(".")[0]
+      let icoPath = await get_pe_ico(paths[i])
+      arr.push({
+        type: "openPath",
+        targetPath: paths[i],
+        lnkPath: paths[i],
+        icoPath,
+        name,
+      });
+    }
+    shortcuts.value[tab.value].shortcut.push(...arr)
+  }
+})
+
+
 watch(dialog2, async () => {
   if (!dialog2.value) {
-    if (draglisten) {
-      draglisten()
-      draglisten = undefined
-    }
-    if (dragwindow) {
-      dragwindow.destroy()
-      dragwindow = undefined
-    }
-    return
-  }
-  setTimeout(async () => {
+    await dragwindow.hide()
+  } else {
+    await dragwindow.show()
+    let position = await getCurrentWebviewWindow().outerPosition()
+    let factor = await getCurrentWebviewWindow().scaleFactor()
     let dom = document.getElementById("dragfile");
     if (!dom) return
     let { left, top, right, bottom } = dom.getBoundingClientRect()
-    let position = await getCurrentWebviewWindow().outerPosition()
-    let factor = await getCurrentWebviewWindow().scaleFactor()
-    dragwindow = new WebviewWindow("dragfile", {
-      url: "/#/pages/desktop/dragfile",
-      x: Math.ceil(position.x / factor + left) + 13,
-      y: Math.ceil(position.y / factor + top) - 13,
-      width: (right - left) + 4,
-      height: (bottom - top) + 20,
-      shadow: false,
-      resizable: false,
-      maximizable: false,
-      decorations: false,
-      transparent: true,
-      parent: 'main'
-    })
-    draglisten = await dragwindow.onDragDropEvent(async (e: Event<DragDropEvent>) => {
-      if (e.payload.type == "drop") {
-        let res = e.payload.paths
-        if (res) {
-          for (let i = 0; i < res.length; i++) {
-            let name = await basename(res[i])
-            name = name.split(".")[0]
-            let icoPath = await get_pe_ico(res[i])
-            shortcuts.value[tab.value].shortcut.push({
-              type: "openPath",
-              targetPath: res[i],
-              lnkPath: res[i],
-              icoPath,
-              name,
-            });
-          }
-          cancelsubmit();
-        }
-      }
-    })
-  }, 20)
+    await dragwindow.setPosition(new LogicalPosition(Math.ceil(position.x / factor + left) + 13, Math.ceil(position.y / factor + top) - 13))
+    await dragwindow.setSize(new LogicalSize(right - left + 4, bottom - top + 20))
+  }
 })
 
 //#region ///////////////拖拽//////////////////////////////////////////
@@ -384,6 +385,9 @@ const deltab = function () {
     <!-- 删除合集 -->
     <v-dialog max-width="500" v-model="deltabshow">
       <v-card>
+        <v-card-text>
+          删除合集
+        </v-card-text>
         <v-card-actions>
           <v-btn @click="deltabshow = false"> 取消 </v-btn>
           <v-btn @click="deltab"> 确认 </v-btn>
