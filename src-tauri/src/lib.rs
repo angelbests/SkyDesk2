@@ -1,7 +1,6 @@
 use std::path::Path;
 use tauri::{path::BaseDirectory, Error, Manager, Window};
 use tauri_plugin_autostart::MacosLauncher;
-mod capture;
 mod icotopng;
 mod server;
 mod sysinfo;
@@ -75,7 +74,6 @@ pub fn run() {
             wallpaper::cancelwallpaper,
             icotopng::ico_to_png,
             icotopng::zipimage,
-            capture::start_capture,
             lockscreen::setlockscreen,
             wheel::wheel_status,
             smtc::play_control,

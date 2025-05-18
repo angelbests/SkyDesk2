@@ -23,10 +23,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("./../pages/setting/shortcut.vue"),
       },
       {
-        path: "capture",
-        component: () => import("./../pages/setting/capture.vue"),
-      },
-      {
         path: "note",
         component: () => import("./../pages/setting/note.vue"),
       },

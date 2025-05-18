@@ -406,8 +406,6 @@ const hovertop = async function () {
             title="便签" :href="'/#/pages/setting/note'"></v-list-item>
           <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline"
             title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-image-plus-outline"
-            title="录屏" :href="'/#/pages/setting/capture'"></v-list-item>
           <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range"
             title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
         </v-list>
