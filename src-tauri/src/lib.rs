@@ -9,7 +9,6 @@ mod wallpaper;
 mod wheel;
 use chrono::prelude::*;
 mod audio;
-mod calendar;
 mod clipboard;
 mod desktop;
 mod dropfile;
@@ -84,8 +83,6 @@ pub fn run() {
             shell::get_lnk_png,
             shell::get_localized_display_name,
             shell::get_uwp,
-            calendar::today,
-            calendar::get_all_festival,
             clipboard::copyfile,
             check_path_type,
             open_devtool

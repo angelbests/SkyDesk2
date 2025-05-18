@@ -189,13 +189,19 @@ const getpath = async function () {
             }
         ]
     })
+    overlay.value = true
     if (res) {
         addWallPaperData.value.path = res
         addWallPaperData.value.filename = await basename(res)
     }
     if (addWallPaperData.value.type == "image" && res) {
         addWallPaperData.value.preview = res
+    } else if (addWallPaperData.value.type == "video" && res) {
+        let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+        await getvideothumb(res, p_path)
+        addWallPaperData.value.preview = p_path
     }
+    overlay.value = false
 }
 
 // 类型改变时，清空内容
@@ -299,6 +305,7 @@ const setwallpaper = async function (src: string) {
 
 // 下载壁纸
 import { download } from "@tauri-apps/plugin-upload"
+import { getvideothumb } from "../../functions/videothumb";
 const downloadwallpaper = async function (src: string) {
     let name = await basename(src);
     let path = await pictureDir() + "\\skydesk2\\" + name;

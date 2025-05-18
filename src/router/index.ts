@@ -53,18 +53,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("./../pages/desktop/wallpaper.vue"),
       },
       {
-        path: "capture",
-        component: () => import("./../pages/desktop/capture.vue"),
-      },
-      {
-        path: "captureWindow",
-        component: () => import("./../pages/desktop/captureWindow.vue"),
-      },
-      {
-        path: "captureBtn",
-        component: () => import("./../pages/desktop/captureBtn.vue"),
-      },
-      {
         path: "wheel",
         component: () => import("./../pages/desktop/wheel.vue"),
       },
