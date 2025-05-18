@@ -1,8 +1,9 @@
 # SkyDesk2 - 一个简单易用的本地工具
 
-![Static Badge](https://img.shields.io/badge/Tauri-2-blue?logo=tauri)
-![Static Badge](https://img.shields.io/badge/Rust-1.81.0-blue?logo=rust)
-![Static Badge](https://img.shields.io/badge/vue3-vuetifyjs-gray)
+![Static Badge](https://img.shields.io/badge/Tauri-2.5.1-yellow?logo=tauri)
+![Static Badge](https://img.shields.io/badge/Rust-1.81.0-yellow?logo=rust)
+![Static Badge](https://img.shields.io/badge/vue3-3.3.4-yellow)
+![Static Badge](https://img.shields.io/badge/vuetify-3.7.1-yellow)
 
 ## 下载
 
@@ -155,7 +156,6 @@ pinia
 pinia-plugin-persistedstate
 wangeditor5
 ollama
-js-calendar-converter
 fabric
 markdown-it
 
@@ -168,10 +168,6 @@ image
 windows-capture
 tiny_http
 chrono
-
-#### sidecar
-
-[resources_extract](https://www.nirsoft.net/utils/resources_extract.html)
 
 ## License
 
