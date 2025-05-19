@@ -197,7 +197,7 @@ const getpath = async function () {
     if (addWallPaperData.value.type == "image" && res) {
         addWallPaperData.value.preview = res
     } else if (addWallPaperData.value.type == "video" && res) {
-        let p_path = await appDataDir() + '\\wallpapers\\temp\\p_' + name;
+        let p_path = await appDataDir() + '\\wallpapers\\temp\\' + uuid() + '.png';
         await getvideothumb(res, p_path)
         addWallPaperData.value.preview = p_path
     }
