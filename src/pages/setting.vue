@@ -436,7 +436,8 @@ const hovertop = async function () {
           <v-list style="width: 400px">
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.programbcakground" width="280" hide-details="auto" density="compact">
+                <v-text-field v-model="systemstore.programbcakground" variant="plain" width="280" hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(1)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -456,7 +457,8 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.leftbackground" width="280" hide-details="auto" density="compact">
+                <v-text-field v-model="systemstore.leftbackground" variant="plain" single-line width="280"
+                  hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(2)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -476,7 +478,8 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.topbackground" width="280" hide-details="auto" density="compact">
+                <v-text-field v-model="systemstore.topbackground" variant="plain" width="280" hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(3)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -496,7 +499,7 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.shortcutbackground" width="280" hide-details="auto"
+                <v-text-field v-model="systemstore.shortcutbackground" variant="plain" width="280" hide-details="auto"
                   density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(4)" style="margin-right: 5px">
@@ -517,8 +520,8 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.btnbackground" @update:model-value="changebtn(1)" width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field v-model="systemstore.btnbackground" variant="plain" @update:model-value="changebtn(1)"
+                  width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(5)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -538,8 +541,8 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.btnbarbackground" @update:model-value="changebtn(2)" width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field v-model="systemstore.btnbarbackground" variant="plain" @update:model-value="changebtn(2)"
+                  width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(7)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -559,8 +562,8 @@ const hovertop = async function () {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.fontcolor" @update:model-value="changebtn(2)" width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field v-model="systemstore.fontcolor" variant="plain" @update:model-value="changebtn(2)"
+                  width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="palette(6)">
                       <template v-slot:append>

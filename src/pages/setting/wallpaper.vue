@@ -35,8 +35,8 @@ onMounted(async () => {
     image.value = convertFileSrc(await resourceDir() + '\\resources\\image.png')
     html.value = convertFileSrc(await resourceDir() + '\\resources\\html.png')
     monitors.value = await availableMonitors()
-    if (wallpapers.wallpaperConfig.length == 0) {
-        for (let i = 0; i < monitors.value.length; i++) {
+    if (monitors.value.length > wallpapers.wallpaperConfig.length) {
+        for (let i = 0; i < (monitors.value.length - wallpapers.wallpaperConfig.length); i++) {
             wallpapers.wallpaperConfig.push({
                 label: "",
                 monitor: monitors.value[i].name as string,

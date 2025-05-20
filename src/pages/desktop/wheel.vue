@@ -42,11 +42,11 @@ const updatewheel = () => {
   }
 };
 
-listen("wheel-click", async (e: any) => {
+listen("wheel-click", async (e: { payload: string }) => {
   let scaleFactor = await getCurrentWebviewWindow().scaleFactor();
-  if (e.payload.message == "ButtonRelease(Middle)") {
+  if (e.payload == "ButtonRelease(Middle)") {
     await app.hide();
-  } else if (e.payload.message == "ButtonPress(Middle)") {
+  } else if (e.payload == "ButtonPress(Middle)") {
     await app.setFocus();
     await app.setPosition(
       new PhysicalPosition(
@@ -58,10 +58,9 @@ listen("wheel-click", async (e: any) => {
   }
 });
 
-listen("mouse-move", (e: { payload: { message: string } }) => {
-  let mouse = JSON.parse(e.payload.message as string);
-  position.x = mouse.x;
-  position.y = mouse.y;
+listen("mouse-move", (e: { payload: { x: number, y: number } }) => {
+  position.x = e.payload.x;
+  position.y = e.payload.y;
 });
 
 const index = ref(-2);
