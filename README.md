@@ -32,8 +32,7 @@ npm run tauri build
   frameborder="no"
   framespacing="0"
   allowfullscreen="true"
->
-</iframe>
+></iframe>
 ### 快捷
 
 扫描：扫描电脑内的快捷文件，并抓取对应程序的程序图标和名称。通过拖拽的方法拖拽到右侧的快捷栏。
