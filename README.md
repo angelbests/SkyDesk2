@@ -23,7 +23,7 @@ npm run tauri build
 ```
 
 ## 功能介绍
-
+<video src="https://www.bilibili.com/video/BV1M1Evz5E5f/"></video>
 ### 快捷
 
 扫描：扫描电脑内的快捷文件，并抓取对应程序的程序图标和名称。通过拖拽的方法拖拽到右侧的快捷栏。
