@@ -24,7 +24,7 @@ npm run tauri build
 
 ## 功能介绍
 
-[![B站视频封面](./screenshot/1.jpg)](https://www.bilibili.com/video/BV1M1Evz5E5f)
+[![演示视频]](https://www.bilibili.com/video/BV1M1Evz5E5f)
 
 ### 快捷
 
