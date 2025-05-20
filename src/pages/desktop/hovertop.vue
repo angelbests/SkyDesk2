@@ -20,10 +20,10 @@ listen("hovertop_status", (e: { payload: boolean }) => {
 })
 
 setTimeout(() => {
-    listen("mouse-move", async (e: { payload: { message: string } }) => {
+    listen("mouse-move", async (e: { payload: { x: number, y: number } }) => {
         console.log(loading)
         if (loading) return
-        let { x, y } = JSON.parse(e.payload.message as string);
+        let { x, y } = e.payload;
         let position = await getCurrentWebviewWindow().outerPosition();
         let size = await getCurrentWebviewWindow().outerSize();
         let cmonitor = await currentMonitor();
