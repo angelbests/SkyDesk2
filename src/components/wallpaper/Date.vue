@@ -64,6 +64,7 @@ let day = today(now.getFullYear(), now.getMonth() + 1, now.getDate())
     top: 170px;
     position: absolute;
     text-align: center;
+    font-weight: 600;
 }
 
 .date_week {
@@ -75,6 +76,7 @@ let day = today(now.getFullYear(), now.getMonth() + 1, now.getDate())
     top: 130px;
     position: absolute;
     text-align: center;
+    font-weight: 400;
 }
 
 .date_dot {

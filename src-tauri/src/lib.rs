@@ -80,6 +80,7 @@ pub fn run() {
             search::search_query,
             wheel::screen,
             taskbar::gettaskbarlist,
+            taskbar::closetaskbar,
             shell::get_lnk_png,
             shell::get_localized_display_name,
             shell::get_uwp,

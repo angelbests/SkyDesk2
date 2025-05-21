@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::thread;
-use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager};
+use std::{
+    sync::{LazyLock, Mutex},
+    thread,
+    time::Duration,
+};
+use tauri::{async_runtime::JoinHandle, AppHandle, Emitter, Manager};
 use windows::{
     core::{s, BOOL},
     Win32::{
@@ -21,10 +24,11 @@ struct Payload {
     width: i32,
     height: i32,
 }
-
+static TASKBAR: LazyLock<Mutex<Option<JoinHandle<()>>>> = LazyLock::new(|| Mutex::new(None));
 #[tauri::command]
 pub fn listentaskbar(app: AppHandle) {
-    tauri::async_runtime::spawn(async move {
+    let mut taskbar = TASKBAR.lock().unwrap();
+    *taskbar = Some(tauri::async_runtime::spawn(async move {
         let w = app.get_webview_window("taskbar").unwrap();
         let h = w.hwnd().unwrap();
         let mut factor = w.scale_factor().unwrap();
@@ -111,7 +115,16 @@ pub fn listentaskbar(app: AppHandle) {
                 thread::sleep(Duration::from_millis(300));
             }
         }
-    });
+    }));
+}
+
+#[tauri::command]
+pub fn closetaskbar() {
+    let mut taskbar = TASKBAR.lock().unwrap();
+    if let Some(handle) = taskbar.as_mut() {
+        handle.abort();
+        *taskbar = None;
+    }
 }
 
 #[tauri::command]

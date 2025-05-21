@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { systemStore } from "../../stores/system";
 import { NetSpeed, Netspeed } from "../../functions/sysinfo";
 getCurrentWebviewWindow().setSize(new LogicalSize(80, 45));
@@ -34,17 +34,7 @@ onMounted(() => {
   document.addEventListener("selectstart", (e) => {
     e.preventDefault();
   });
-});
-
-watch(systemstore, () => {
-  if (systemstore.netspeed.show) {
-    getCurrentWebviewWindow().show();
-  } else {
-    getCurrentWebviewWindow().hide();
-  }
-}, {
-  immediate: true,
-  deep: true
+  getCurrentWebviewWindow().show()
 });
 </script>
 

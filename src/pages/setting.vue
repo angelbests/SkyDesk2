@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow"
+import { computed, onMounted, ref, watch } from "vue"
+import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow"
 import { relaunch } from "@tauri-apps/plugin-process"
 import { windowStore } from "../stores/window"
 import { systemStore } from "../stores/system"
@@ -235,13 +235,6 @@ const selectcolor = function () {
 }
 //#endregion
 
-//#region 轮盘开关
-const wheel_status = function (e: any) {
-  console.log(e)
-  invoke("wheel_status", { bool: e })
-}
-//#endregion
-
 //#region  软件更新
 const helpshow = ref(false)
 const version = ref("")
@@ -337,6 +330,68 @@ const hovertop = async function () {
     title: "hovertop",
   })
 }
+let wheelwindow: WebviewWindow | undefined;
+let netspeedwindow: WebviewWindow | undefined;
+window.addEventListener("storage", (e) => {
+  if (e.key == "system") {
+    systemstore.$hydrate()
+  }
+})
+
+
+watch(systemstore, () => {
+  if (systemstore.wheel) {
+    netspeedwindow = new WebviewWindow("wheel", {
+      "x": 999999999999,
+      "y": 999999999999,
+      "width": 240,
+      "height": 240,
+      "shadow": false,
+      "decorations": false,
+      "transparent": true,
+      "alwaysOnTop": true,
+      "url": "/#/pages/desktop/wheel",
+      "title": "wheel",
+      "skipTaskbar": true,
+      "resizable": false,
+      "minimizable": false,
+      "maximizable": false,
+      "visible": false
+    })
+    invoke("wheel_status", { bool: systemstore.wheel })
+  } else {
+    invoke("wheel_status", { bool: systemstore.wheel })
+    if (netspeedwindow) {
+      netspeedwindow.destroy()
+    }
+  }
+
+  if (systemstore.netspeed.show) {
+    wheelwindow = new WebviewWindow("netspeed", {
+      "x": 0,
+      "y": 0,
+      "width": 80,
+      "height": 45,
+      "shadow": true,
+      "decorations": false,
+      "transparent": true,
+      "alwaysOnTop": true,
+      "url": "/#/pages/desktop/netspeed",
+      "title": "netspeed",
+      "skipTaskbar": true,
+      "resizable": false,
+      "minimizable": false,
+      "maximizable": false,
+      "visible": false
+    })
+  } else {
+    if (wheelwindow) wheelwindow.close()
+  }
+},
+  {
+    "deep": true,
+    "immediate": true
+  })
 </script>
 
 <template>
@@ -621,15 +676,13 @@ const hovertop = async function () {
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.wheel" @update:model-value="wheel_status"
-                    hide-details></v-switch>
+                  <v-switch color="info" v-model="systemstore.wheel" hide-details></v-switch>
                 </template>
                 <v-list-item-title>轮盘开关</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.muted" @update:model-value="wheel_status"
-                    hide-details></v-switch>
+                  <v-switch color="info" v-model="systemstore.muted" hide-details></v-switch>
                 </template>
                 <v-list-item-title>壁纸离屏静音</v-list-item-title>
               </v-list-item>
