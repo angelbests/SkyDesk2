@@ -92,6 +92,11 @@ onMounted(async () => {
             label: "资源管理器"
         },
         {
+            path: "/icons/RecycleBin.ico",
+            cmd: "shell:::{645FF040-5081-101B-9F08-00AA002F954E}",
+            label: "回收站"
+        },
+        {
             path: "/icons/setting.png",
             cmd: "ms-settings:",
             label: "设置"
@@ -110,7 +115,7 @@ onMounted(async () => {
             path: "/icons/calc.png",
             cmd: "calc",
             label: "计算器"
-        }
+        },
     ]
 })
 

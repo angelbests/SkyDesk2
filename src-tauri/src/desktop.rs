@@ -4,6 +4,11 @@ use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 use windows::core::{s, BOOL};
 use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, WPARAM};
+// use windows::Win32::Foundation::RECT;
+// use windows::Win32::Graphics::Gdi::{
+//     GetMonitorInfoW, MonitorFromWindow, MONITORINFO, MONITOR_DEFAULTTONEAREST,
+// };
+// use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 use windows::Win32::UI::WindowsAndMessaging::{
     CallNextHookEx, EnumWindows, FindWindowA, FindWindowExA, GetForegroundWindow,
@@ -228,7 +233,21 @@ pub fn focus_desktop(app: AppHandle) {
                 } else {
                     let _ = app.emit("desktop-volume", false);
                 }
-                sleep(Duration::from_millis(500));
+                // let mut rect = RECT::default();
+                // let _ = GetWindowRect(forewindow, &mut rect);
+                // let hmonitor = MonitorFromWindow(forewindow, MONITOR_DEFAULTTONEAREST);
+                // let mut mi: MONITORINFO = MONITORINFO {
+                //     cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+                //     ..Default::default()
+                // };
+                // let _ = GetMonitorInfoW(hmonitor, &mut mi);
+                // let bool = rect.left == mi.rcMonitor.left
+                //     && rect.top == mi.rcMonitor.top
+                //     && rect.right == mi.rcMonitor.right
+                //     && rect.bottom == mi.rcMonitor.bottom;
+                // println!("{:?},{:?},{:?}", mi, rect, bool);
+                // let _ = app.emit("desktop-fullscreen", bool);
+                sleep(Duration::from_millis(1000));
             }
         }
     });
