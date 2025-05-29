@@ -4,7 +4,6 @@ import { register, isRegistered } from "@tauri-apps/plugin-global-shortcut"
 import { createtray, traystart } from "./tray"
 import { initWindow } from "./window"
 import { exit } from "@tauri-apps/plugin-process"
-import { info } from "@tauri-apps/plugin-log"
 import { LogicalSize } from "@tauri-apps/api/dpi"
 export const maininit = async function () {
   if (await exists("ico", { baseDir: BaseDirectory.AppData })) {
@@ -43,8 +42,6 @@ export const maininit = async function () {
   })
   await mkdir("skydesk2", { baseDir: BaseDirectory.Picture, recursive: true })
   await mkdir("skydesk2", { baseDir: BaseDirectory.Video, recursive: true })
-
-  info("文件夹初始化完成")
   //#endregion
 
   //#region
@@ -62,21 +59,18 @@ export const maininit = async function () {
       await getCurrentWebviewWindow().hide()
     })
   }
-  info("快捷键注册完成")
   //#endregion
-  info("网速事务完成")
   await createtray()
   await traystart()
   await initWindow()
-  info("初始化窗口完成")
   // 任务栏关闭窗口
-  getCurrentWebviewWindow().onCloseRequested(() => {
+  await getCurrentWebviewWindow().onCloseRequested(() => {
     exit()
   })
   // 恢复阴影
-  getCurrentWebviewWindow().setShadow(true)
+  await getCurrentWebviewWindow().setShadow(true)
   const factor = await getCurrentWebviewWindow().scaleFactor()
-  getCurrentWebviewWindow().listen("tauri://resize", (e: any) => {
+  await getCurrentWebviewWindow().listen("tauri://resize", (e: any) => {
     let size = {
       width: Math.ceil(e.payload.width / factor),
       height: Math.ceil(e.payload.height / factor),
@@ -86,7 +80,7 @@ export const maininit = async function () {
   let datastr = localStorage.getItem("size")
   if (datastr) {
     let data = JSON.parse(datastr)
-    getCurrentWebviewWindow().setSize(new LogicalSize(data.width, data.height))
+    await getCurrentWebviewWindow().setSize(new LogicalSize(data.width, data.height))
   }
 }
 

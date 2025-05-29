@@ -29,24 +29,6 @@
         "allowLinkPreview": false
       },
       {
-        "x": 0,
-        "y": 0,
-        "width": 100,
-        "height": 100,
-        "shadow": false,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "url": "/#/pages/desktop/tray",
-        "title": "tray",
-        "label": "tray",
-        "skipTaskbar": true,
-        "resizable": false,
-        "minimizable": false,
-        "maximizable": false,
-        "visible": false
-      },
-      {
         "x": 99999999999,
         "y": 99999999999,
         "width": 80,

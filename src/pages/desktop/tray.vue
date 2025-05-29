@@ -23,6 +23,10 @@ const createnote = async function () {
   });
   w?.center()
 };
+
+getCurrentWebviewWindow().listen("tauri://blur", () => {
+  getCurrentWebviewWindow().destroy()
+})
 </script>
 
 <template>
