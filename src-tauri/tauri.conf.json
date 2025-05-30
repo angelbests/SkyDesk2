@@ -4,7 +4,7 @@
   "identifier": "com.skydesk2.app",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:24221",
+    "devUrl": "http://localhost:24222",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },

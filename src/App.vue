@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { allinit } from "./functions/maininit";
-
 onMounted(async () => {
   await allinit();
 });
