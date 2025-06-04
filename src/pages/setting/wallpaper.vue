@@ -36,7 +36,7 @@ onMounted(async () => {
     html.value = convertFileSrc(await resourceDir() + '\\resources\\html.png')
     monitors.value = await availableMonitors()
      if (wallpapers.wallpaperConfig.length == 0) {
-        for (let i = 0; i < (monitors.value.length - wallpapers.wallpaperConfig.length); i++) {
+        for (let i = 0; i < monitors.value.length ; i++) {
             wallpapers.wallpaperConfig.push({
                 label: "",
                 monitor: monitors.value[i].name as string,
@@ -87,10 +87,10 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
     }
     // 创建窗口到壁纸层
     let w = await createWindow(label, {
-        x: 9999999,
-        y: 9999999,
-        width: 1000,
-        height: 1000,
+        x: monitor.position.x,
+        y: monitor.position.y,
+        width: monitor.size.width,
+        height: monitor.size.height,
         decorations: true,
         transparent: true,
         fullscreen: true,

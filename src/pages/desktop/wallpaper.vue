@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { wallpaperStore } from "../../stores/wallpaper";
-import { listen, Event } from "@tauri-apps/api/event";
+import {  Event } from "@tauri-apps/api/event";
 import { currentMonitor, Monitor } from "@tauri-apps/api/window";
 import MusicDisk from "../../components/wallpaper/MusicDisk.vue";
 import MusicVinyl from "../../components/wallpaper/MusicVinyl.vue";
@@ -15,6 +15,7 @@ import Calendar from "../../components/wallpaper/Calendar.vue";
 import { MouseAction, MouseEvent } from "../../types/desktopType"
 import { startSakura, stopp } from "../../functions/sakura";
 import { systemStore } from "../../stores/system";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { invoke } from "@tauri-apps/api/core";
 // invoke("open_devtool", { label: getCurrentWebviewWindow().label })
@@ -27,21 +28,11 @@ const type = ref();
 const dom = ref<any>()
 const monitor = ref<Monitor>()
 const unlisten = ref<any>()
-onMounted(() => {
+onMounted(async () => {
   document.title = "skydesk2-wallpaper"
   path.value = route.query.path;
-  console.log(path.value)
   type.value = route.query.type;
-  setTimeout(async () => {
-    await init()
-    if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
-      startSakura()
-    }
-
-    if (wallpaperstore.wallpaperConfig[index.value].config.action) {
-      listen_desktop()
-    }
-  }, 50)
+  await init()
 });
 
 const init = async function () {
@@ -55,11 +46,12 @@ const init = async function () {
     dom.value = document.getElementById("wallpapervideo")
     dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
   }
+  if (wallpaperstore.wallpaperConfig[index.value].config.sakura) startSakura();
+  if (wallpaperstore.wallpaperConfig[index.value].config.action) listen_desktop();
   window.addEventListener("storage", (e) => {
     if (e.key == "system") {
       systemstore.$hydrate()
-    }
-    else if (e.key == "wallpaper") {
+    }else if (e.key == "wallpaper") {
       wallpaperstore.$hydrate();
       if (type.value == 'video') {
         dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
@@ -87,7 +79,7 @@ const listen_desktop = async function () {
   let ry: number = 0;
   let tx: number = 0;
   let ty: number = 0;
-  unlisten.value = await listen("desktop", async (e: Event<MouseEvent>) => {
+  unlisten.value = await getCurrentWebviewWindow().listen("desktop", async (e: Event<MouseEvent>) => {
     if (monitor.value?.name !== e.payload.monitor.name) return
     if (e.payload.mouse == MouseAction.Move) {
       let { x, y } = e.payload
@@ -112,7 +104,7 @@ const listen_desktop = async function () {
   animate()
 }
 
-listen("desktop-volume", (e: Event<boolean>) => {
+getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
   if (!systemstore.muted) {
     dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
     return
