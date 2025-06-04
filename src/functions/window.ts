@@ -50,11 +50,15 @@ export const initWindow = async function () {
     let w = new WebviewWindow(label, {
       ...option,
     })
-    let unlisten1 = await listenMove(w)
-    let unlisten2 = await listenSize(w)
-    await listenClose(w, unlisten1, unlisten2)
     if (wallpaper.status) {
-      setWindowToMonitor(label, wallpaper.x, wallpaper.y, wallpaper.w, wallpaper.h, wallpaper.z)
+      await listenClose(w)
+      setTimeout(()=>{
+        setWindowToMonitor(label, wallpaper.x, wallpaper.y, wallpaper.w, wallpaper.h, wallpaper.z)
+      },20);
+    }else{
+      let unlisten1 = await listenMove(w)
+      let unlisten2 = await listenSize(w)
+      await listenClose(w, unlisten1, unlisten2)
     }
   }
 }
