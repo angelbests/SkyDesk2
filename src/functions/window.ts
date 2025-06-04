@@ -45,19 +45,18 @@ export const createWindow = async function (
 
 export const initWindow = async function () {
   const windowstore = windowStore()
-  windowstore.windows.forEach(async (e) => {
-    let w = new WebviewWindow(e.label, {
-      ...e.option,
+  for(let i=0;i<windowstore.windows.length;i++){
+    let { option,label,wallpaper } = windowstore.windows[i];
+    let w = new WebviewWindow(label, {
+      ...option,
     })
     let unlisten1 = await listenMove(w)
     let unlisten2 = await listenSize(w)
-    listenClose(w, unlisten1, unlisten2)
-    if (e.wallpaper.status) {
-      setTimeout(() => {
-        setWindowToMonitor(e.label, e.wallpaper.x, e.wallpaper.y, e.wallpaper.w, e.wallpaper.h, e.wallpaper.z)
-      }, 100)
+    await listenClose(w, unlisten1, unlisten2)
+    if (wallpaper.status) {
+      setWindowToMonitor(label, wallpaper.x, wallpaper.y, wallpaper.w, wallpaper.h, wallpaper.z)
     }
-  })
+  }
 }
 
 const listenMove = async function (w: WebviewWindow) {
