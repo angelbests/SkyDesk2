@@ -78,9 +78,9 @@ getCurrentWebviewWindow().listen("tauri://focus", function () {
 let timer: any = undefined
 let timer2: any = undefined;
 const setconfig = async function () {
-  let doc = document.getElementsByTagName("body")[0];
-  doc.style.background = `rgba(${editorData.color},${editorData.opacity / 100
-    })`;
+  // let doc = document.getElementsByTagName("body")[0];
+  // doc.style.background = `rgba(${editorData.color},${editorData.opacity / 100
+  //   })`;
   let tool: any = document.getElementsByClassName("w-e-toolbar")[0];
   tool.style.background = `rgba(${editorData.color},${editorData.opacity / 100
     })`;
@@ -461,7 +461,7 @@ const createnote = async function () {
 </script>
 
 <template>
-  <right-bar :border-radius="'0px'" @right-click="rightClick">
+  <right-bar :border-radius="'10px'" @right-click="rightClick">
     <div style="
         display: flex;
         justify-content: space-evenly;
@@ -510,6 +510,7 @@ const createnote = async function () {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  border-radius: 10px;
 }
 
 /* tool */
