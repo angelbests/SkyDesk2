@@ -30,6 +30,10 @@ const routes: RouteRecordRaw[] = [
         path: "ollama",
         component: () => import("./../pages/setting/ollama.vue"),
       },
+      {
+        path:"webdav",
+        component:()=>import("./../pages/setting/webdav.vue")
+      }
     ],
   },
   {

@@ -91,7 +91,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [],
+    "externalBin": [
+      "bin/webdav/webdav"
+    ],
     "resources": [
       "icons/icon.ico",
       "resources/*"

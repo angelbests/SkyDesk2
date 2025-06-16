@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue"
-import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow"
-import { relaunch } from "@tauri-apps/plugin-process"
-import { windowStore } from "../stores/window"
-import { systemStore } from "../stores/system"
-import { noteStore } from "../stores/note"
-import { wallpaperStore } from "../stores/wallpaper"
-import { shortcutStore } from "../stores/shortcut"
-import { weatherStore } from "../stores/weather"
-import { captureStore } from "../stores/capture"
-import { disable, enable } from "@tauri-apps/plugin-autostart"
-import { maininit } from "../functions/maininit"
-import { convertFileSrc, invoke } from "@tauri-apps/api/core"
-import { open } from "@tauri-apps/plugin-dialog"
-import { copyFile } from "@tauri-apps/plugin-fs"
-import { Netspeed, NetSpeed } from "../functions/sysinfo"
-import { uuid } from "../functions"
-import { appDataDir, resolve } from "@tauri-apps/api/path"
-import { createWindow } from "../functions/window"
+import { computed, onMounted, ref, watch } from 'vue'
+import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { relaunch } from '@tauri-apps/plugin-process'
+import { windowStore } from '../stores/window'
+import { systemStore } from '../stores/system'
+import { noteStore } from '../stores/note'
+import { wallpaperStore } from '../stores/wallpaper'
+import { shortcutStore } from '../stores/shortcut'
+import { weatherStore } from '../stores/weather'
+import { disable, enable } from '@tauri-apps/plugin-autostart'
+import { maininit } from '../functions/maininit'
+import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-dialog'
+import { copyFile } from '@tauri-apps/plugin-fs'
+import { Netspeed, NetSpeed } from '../functions/sysinfo'
+import { uuid } from '../functions'
+import { appDataDir, resolve } from '@tauri-apps/api/path'
+import { createWindow } from '../functions/window'
 const systemstore = systemStore()
 const drawer = ref(true)
 const colorshow = ref(false)
@@ -29,16 +28,16 @@ onMounted(async () => {
   get_version()
 })
 
-window.addEventListener("drop", e => {
+window.addEventListener('drop', (e) => {
   e.preventDefault()
 })
 
-window.addEventListener("dragover", e => {
+window.addEventListener('dragover', (e) => {
   e.preventDefault()
 })
 
-getCurrentWebviewWindow().listen("create-note", async () => {
-  let label = "note-" + uuid();
+getCurrentWebviewWindow().listen('create-note', async () => {
+  let label = 'note-' + uuid()
   let w = await createWindow(label, {
     x: 200,
     y: 200,
@@ -50,9 +49,9 @@ getCurrentWebviewWindow().listen("create-note", async () => {
     decorations: false,
     transparent: true,
     skipTaskbar: true,
-    url: "/#/pages/desktop/note",
-    title: "note"
-  });
+    url: '/#/pages/desktop/note',
+    title: 'note',
+  })
   w?.center()
 })
 
@@ -60,26 +59,26 @@ getCurrentWebviewWindow().listen("create-note", async () => {
 const appbardraging = function () {
   // 设置窗口拖拽
   document
-    .getElementById("toolbar")
-    ?.querySelector(".v-toolbar__content")
-    ?.setAttribute("data-tauri-drag-region", "true")
+    .getElementById('toolbar')
+    ?.querySelector('.v-toolbar__content')
+    ?.setAttribute('data-tauri-drag-region', 'true')
   document
-    .getElementById("toolbar")
-    ?.querySelector(".v-toolbar-title__placeholder")
-    ?.setAttribute("data-tauri-drag-region", "true")
-  document.getElementById("toolbar")?.addEventListener("selectstart", function (e) {
+    .getElementById('toolbar')
+    ?.querySelector('.v-toolbar-title__placeholder')
+    ?.setAttribute('data-tauri-drag-region', 'true')
+  document.getElementById('toolbar')?.addEventListener('selectstart', function (e) {
     e.preventDefault()
   })
-  let dom = document.getElementById("app") as HTMLElement
+  let dom = document.getElementById('app') as HTMLElement
   if (systemstore.btnbackground) {
-    dom.style.setProperty("--btn-background", systemstore.btnbackground)
+    dom.style.setProperty('--btn-background', systemstore.btnbackground)
   } else {
-    dom.style.setProperty("--btn-background", "transparent")
+    dom.style.setProperty('--btn-background', 'transparent')
   }
   if (systemstore.fontcolor) {
-    dom.style.setProperty("--font-color", systemstore.fontcolor)
+    dom.style.setProperty('--font-color', systemstore.fontcolor)
   } else {
-    dom.style.setProperty("--font-color", "black")
+    dom.style.setProperty('--font-color', 'black')
   }
 }
 
@@ -93,7 +92,7 @@ const minus = async function () {
 }
 
 const closeApp = async function () {
-  if (getCurrentWebviewWindow().label == "main") {
+  if (getCurrentWebviewWindow().label == 'main') {
     getCurrentWebviewWindow().hide()
   } else {
     getCurrentWebviewWindow().destroy()
@@ -122,7 +121,6 @@ const refresh = function () {
   wallpaperStore().$reset()
   shortcutStore().$reset()
   weatherStore().$reset()
-  captureStore().$reset()
   relaunch()
 }
 //#endregion
@@ -130,11 +128,11 @@ const refresh = function () {
 //#region ui颜色设置
 const getImage = async function (i: number) {
   let res = await open({
-    filters: [{ extensions: ["png", "jpg", "jpeg"], name: "Image" }],
-    title: "选择背景图片",
+    filters: [{ extensions: ['png', 'jpg', 'jpeg'], name: 'Image' }],
+    title: '选择背景图片',
   })
   if (!res) return
-  let path = await resolve(await appDataDir(), "window\\" + uuid() + ".png")
+  let path = await resolve(await appDataDir(), 'window\\' + uuid() + '.png')
   await copyFile(res, path)
   if (res) {
     switch (i) {
@@ -157,29 +155,29 @@ const getImage = async function (i: number) {
         systemstore.btnbarbackground = `url('${convertFileSrc(path)}')`
         break
     }
-    let dom = document.getElementById("app") as HTMLElement
+    let dom = document.getElementById('app') as HTMLElement
     if (systemstore.btnbackground) {
-      dom.style.setProperty("--btn-background", systemstore.btnbackground)
+      dom.style.setProperty('--btn-background', systemstore.btnbackground)
     } else {
-      dom.style.setProperty("--btn-background", "transparent")
+      dom.style.setProperty('--btn-background', 'transparent')
     }
   }
 }
 
 // 色盘控制
 const changebtn = function (i: number) {
-  let dom = document.getElementById("app") as HTMLElement
+  let dom = document.getElementById('app') as HTMLElement
   if (i == 1) {
     if (systemstore.btnbackground) {
-      dom.style.setProperty("--btn-background", systemstore.btnbackground)
+      dom.style.setProperty('--btn-background', systemstore.btnbackground)
     } else {
-      dom.style.setProperty("--btn-background", "transparent")
+      dom.style.setProperty('--btn-background', 'transparent')
     }
   } else if (i == 2) {
     if (systemstore.fontcolor) {
-      dom.style.setProperty("--font-color", systemstore.fontcolor)
+      dom.style.setProperty('--font-color', systemstore.fontcolor)
     } else {
-      dom.style.setProperty("--font-color", "black")
+      dom.style.setProperty('--font-color', 'black')
     }
   }
 }
@@ -187,7 +185,7 @@ const colori = ref()
 const colorv = ref()
 const palette = function (i: number) {
   colori.value = i
-  document.getElementById("palette")?.click()
+  document.getElementById('palette')?.click()
 }
 const timer = ref()
 const selectcolor = function () {
@@ -216,19 +214,19 @@ const selectcolor = function () {
         systemstore.btnbarbackground = colorv.value
     }
     // let dom = document.getElementsByTagName("body");
-    let dom = document.getElementById("app") as HTMLElement
+    let dom = document.getElementById('app') as HTMLElement
     if (colori.value == 5) {
       console.log(systemstore.btnbackground)
       if (systemstore.btnbackground) {
-        dom.style.setProperty("--btn-background", systemstore.btnbackground)
+        dom.style.setProperty('--btn-background', systemstore.btnbackground)
       } else {
-        dom.style.setProperty("--btn-background", "transparent")
+        dom.style.setProperty('--btn-background', 'transparent')
       }
     } else if (colori.value == 6) {
       if (systemstore.fontcolor) {
-        dom.style.setProperty("--font-color", systemstore.fontcolor)
+        dom.style.setProperty('--font-color', systemstore.fontcolor)
       } else {
-        dom.style.setProperty("--font-color", "transparent")
+        dom.style.setProperty('--font-color', 'transparent')
       }
     }
   }, 50)
@@ -237,15 +235,15 @@ const selectcolor = function () {
 
 //#region  软件更新
 const helpshow = ref(false)
-const version = ref("")
-const updateversion = ref("")
-import { check } from "@tauri-apps/plugin-updater"
-import { openUrl } from "@tauri-apps/plugin-opener"
-import { getVersion } from "@tauri-apps/api/app"
+const version = ref('')
+const updateversion = ref('')
+import { check } from '@tauri-apps/plugin-updater'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { getVersion } from '@tauri-apps/api/app'
 
 const open_github = function () {
   // https://github.com/angelbests/SkyDesk2
-  openUrl("https://github.com/angelbests/SkyDesk2")
+  openUrl('https://github.com/angelbests/SkyDesk2')
 }
 
 const get_version = async function () {
@@ -260,7 +258,7 @@ const checkupdate = async function () {
 }
 
 const updatestatus = ref(false)
-const updatestr = ref("")
+const updatestr = ref('')
 const updateprogram = async function () {
   if (updatestatus.value) return
   const update = await check()
@@ -272,22 +270,22 @@ const updateprogram = async function () {
     await update.downloadAndInstall((event) => {
       updatestatus.value = true
       switch (event.event) {
-        case "Started":
+        case 'Started':
           contentLength = event.data.contentLength || 0
-          updatestr.value = "下载开始"
+          updatestr.value = '下载开始'
           break
-        case "Progress":
+        case 'Progress':
           downloaded += event.data.chunkLength
           updatestr.value = Math.trunc((downloaded / contentLength) * 100).toString()
           break
-        case "Finished":
-          updatestr.value = "下载完成"
-          console.log("下载完成")
+        case 'Finished':
+          updatestr.value = '下载完成'
+          console.log('下载完成')
           break
       }
     })
-    updatestr.value = "update installed"
-    console.log("update installed")
+    updatestr.value = 'update installed'
+    console.log('update installed')
     await relaunch()
   }
 }
@@ -302,18 +300,18 @@ new Netspeed().listen_netspeed((e) => {
 })
 const speed_r = computed(() => {
   return Math.trunc(net.value.speed_r / 1024) < 1024
-    ? Math.trunc(net.value.speed_r / 1024) + "KB/s"
-    : Math.trunc((net.value.speed_r / 1024 / 1024) * 10) / 10 + "MB/s"
+    ? Math.trunc(net.value.speed_r / 1024) + 'KB/s'
+    : Math.trunc((net.value.speed_r / 1024 / 1024) * 10) / 10 + 'MB/s'
 })
 const speed_s = computed(() => {
   return Math.trunc(net.value.speed_s / 1024) < 1024
-    ? Math.trunc(net.value.speed_s / 1024) + "KB/s"
-    : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + "MB/s"
+    ? Math.trunc(net.value.speed_s / 1024) + 'KB/s'
+    : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + 'MB/s'
 })
 //#endregion
 
 const hovertop = async function () {
-  await createWindow("hovertop", {
+  await createWindow('hovertop', {
     x: 400,
     y: 0,
     width: 400,
@@ -326,98 +324,107 @@ const hovertop = async function () {
     resizable: true,
     skipTaskbar: true,
     alwaysOnTop: true,
-    url: "/#/pages/desktop/hovertop",
-    title: "hovertop",
+    url: '/#/pages/desktop/hovertop',
+    title: 'hovertop',
   })
 }
-let wheelwindow: WebviewWindow | undefined;
-let netspeedwindow: WebviewWindow | undefined;
-window.addEventListener("storage", (e) => {
-  if (e.key == "system") {
+let wheelwindow: WebviewWindow | undefined
+let netspeedwindow: WebviewWindow | undefined
+window.addEventListener('storage', (e) => {
+  if (e.key == 'system') {
     systemstore.$hydrate()
   }
 })
 
-
-watch(systemstore, () => {
-  if (systemstore.wheel) {
-    netspeedwindow = new WebviewWindow("wheel", {
-      "x": 999999999999,
-      "y": 999999999999,
-      "width": 240,
-      "height": 240,
-      "shadow": false,
-      "decorations": false,
-      "transparent": true,
-      "alwaysOnTop": true,
-      "url": "/#/pages/desktop/wheel",
-      "title": "wheel",
-      "skipTaskbar": true,
-      "resizable": false,
-      "minimizable": false,
-      "maximizable": false,
-      "visible": false
-    })
-    invoke("wheel_status", { bool: systemstore.wheel })
-  } else {
-    invoke("wheel_status", { bool: systemstore.wheel })
-    if (netspeedwindow) {
-      netspeedwindow.destroy()
+watch(
+  systemstore,
+  () => {
+    if (systemstore.wheel) {
+      netspeedwindow = new WebviewWindow('wheel', {
+        x: 999999999999,
+        y: 999999999999,
+        width: 240,
+        height: 240,
+        shadow: false,
+        decorations: false,
+        transparent: true,
+        alwaysOnTop: true,
+        url: '/#/pages/desktop/wheel',
+        title: 'wheel',
+        skipTaskbar: true,
+        resizable: false,
+        minimizable: false,
+        maximizable: false,
+        visible: false,
+      })
+      invoke('wheel_status', { bool: systemstore.wheel })
+    } else {
+      invoke('wheel_status', { bool: systemstore.wheel })
+      if (netspeedwindow) {
+        netspeedwindow.destroy()
+      }
     }
-  }
 
-  if (systemstore.netspeed.show) {
-    wheelwindow = new WebviewWindow("netspeed", {
-      "x": 0,
-      "y": 0,
-      "width": 80,
-      "height": 45,
-      "shadow": true,
-      "decorations": false,
-      "transparent": true,
-      "alwaysOnTop": true,
-      "url": "/#/pages/desktop/netspeed",
-      "title": "netspeed",
-      "skipTaskbar": true,
-      "resizable": false,
-      "minimizable": false,
-      "maximizable": false,
-      "visible": false
-    })
-  } else {
-    if (wheelwindow) wheelwindow.close()
-  }
-},
+    if (systemstore.netspeed.show) {
+      wheelwindow = new WebviewWindow('netspeed', {
+        x: 0,
+        y: 0,
+        width: 80,
+        height: 45,
+        shadow: true,
+        decorations: false,
+        transparent: true,
+        alwaysOnTop: true,
+        url: '/#/pages/desktop/netspeed',
+        title: 'netspeed',
+        skipTaskbar: true,
+        resizable: false,
+        minimizable: false,
+        maximizable: false,
+        visible: false,
+      })
+    } else {
+      if (wheelwindow) wheelwindow.close()
+    }
+  },
   {
-    "deep": true,
-    "immediate": true
-  })
+    deep: true,
+    immediate: true,
+  },
+)
 </script>
 
 <template>
-  <v-layout :style="{
-    background: systemstore.programbcakground ? systemstore.programbcakground : 'transparent',
-    backgroundSize: 'cover',
-    color: systemstore.fontcolor,
-  }">
-    <v-app-bar :style="{
-      background: systemstore.topbackground ? systemstore.topbackground : 'transparent',
+  <v-layout
+    :style="{
+      background: systemstore.programbcakground ? systemstore.programbcakground : 'transparent',
       backgroundSize: 'cover',
-    }" :absolute="true" :height="48" id="toolbar" class="toolbar" data-tauri-drag-region>
+      color: systemstore.fontcolor,
+    }">
+    <v-app-bar
+      :style="{
+        background: systemstore.topbackground ? systemstore.topbackground : 'transparent',
+        backgroundSize: 'cover',
+      }"
+      :absolute="true"
+      :height="48"
+      id="toolbar"
+      class="toolbar"
+      data-tauri-drag-region>
       <template v-slot:title>
-        <div :style="{ color: systemstore.fontcolor }" data-tauri-drag-region>
-          SkyDesk2
-        </div>
+        <div :style="{ color: systemstore.fontcolor }" data-tauri-drag-region>SkyDesk2</div>
       </template>
       <template v-slot:prepend>
         <v-app-bar-nav-icon style="background: transparent" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
-      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
+      <div
+        :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
         data-tauri-drag-region>
         <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>
         {{ speed_r }}
       </div>
-      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
+      <div
+        :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
         data-tauri-drag-region>
         <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>
         {{ speed_s }}
@@ -447,25 +454,59 @@ watch(systemstore, () => {
     </v-app-bar>
 
     <v-main style="height: calc(100vh); overflow-y: auto; width: 100%">
-      <v-navigation-drawer :style="{
-        boxShadow: drawer ? '5px 0px 5px rgba(123,123,123,0.5)' : 'none',
-        background: systemstore.leftbackground ? systemstore.leftbackground : 'transparent',
-        backgroundSize: 'cover',
-      }" width="150" temporary v-model="drawer" :permanent="true" expand-on-hover>
+      <v-navigation-drawer
+        :style="{
+          boxShadow: drawer ? '5px 0px 5px rgba(123,123,123,0.5)' : 'none',
+          background: systemstore.leftbackground ? systemstore.leftbackground : 'transparent',
+          backgroundSize: 'cover',
+        }"
+        width="150"
+        temporary
+        v-model="drawer"
+        :permanent="true"
+        expand-on-hover>
         <v-list style="height: 100%">
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-apps" title="快捷"
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-apps"
+            title="快捷"
             :href="'/#/pages/setting/shortcut'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper"
-            title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-note-outline"
-            title="便签" :href="'/#/pages/setting/note'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline"
-            title="AI" :href="'/#/pages/setting/ollama'"></v-list-item>
-          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range"
-            title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-wallpaper"
+            title="壁纸"
+            :href="'/#/pages/setting/wallpaper'"></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-note-outline"
+            title="便签"
+            :href="'/#/pages/setting/note'"></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-robot-outline"
+            title="AI"
+            :href="'/#/pages/setting/ollama'"></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-calendar-range"
+            title="日历"
+            :href="'/#/pages/setting/datenote'"></v-list-item>
+          <v-list-item
+            draggable="false"
+            :style="{ color: systemstore.fontcolor }"
+            prepend-icon="mdi-calendar-range"
+            title="DAV"
+            :href="'/#/pages/setting/webdav'"></v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <router-view v-slot="{ Component }" :key="$route.fullPath"
+      <router-view
+        v-slot="{ Component }"
+        :key="$route.fullPath"
         style="width: auto; height: 100%; box-sizing: border-box; padding: 10px">
         <transition name="fade" mode="out-in" appear>
           <!-- <keep-alive> -->
@@ -475,9 +516,14 @@ watch(systemstore, () => {
       </router-view>
     </v-main>
     <v-dialog v-model="colorshow">
-      <div style="width: 100%; height: 100%; display: flex; justify-content: center; position: relative"
+      <div
+        style="width: 100%; height: 100%; display: flex; justify-content: center; position: relative"
         @click.self="colorshow = false">
-        <input id="palette" @input="selectcolor" v-model="colorv" style="position: absolute; left: 10; top: 10"
+        <input
+          id="palette"
+          @input="selectcolor"
+          v-model="colorv"
+          style="position: absolute; left: 10; top: 10"
           type="color" />
         <v-card style="width: 400px">
           <v-card-title>
@@ -491,7 +537,11 @@ watch(systemstore, () => {
           <v-list style="width: 400px">
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.programbcakground" variant="plain" width="280" hide-details="auto"
+                <v-text-field
+                  v-model="systemstore.programbcakground"
+                  variant="plain"
+                  width="280"
+                  hide-details="auto"
                   density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(1)" style="margin-right: 5px">
@@ -512,8 +562,13 @@ watch(systemstore, () => {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.leftbackground" variant="plain" single-line width="280"
-                  hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.leftbackground"
+                  variant="plain"
+                  single-line
+                  width="280"
+                  hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(2)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -533,7 +588,11 @@ watch(systemstore, () => {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.topbackground" variant="plain" width="280" hide-details="auto"
+                <v-text-field
+                  v-model="systemstore.topbackground"
+                  variant="plain"
+                  width="280"
+                  hide-details="auto"
                   density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(3)" style="margin-right: 5px">
@@ -554,7 +613,11 @@ watch(systemstore, () => {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.shortcutbackground" variant="plain" width="280" hide-details="auto"
+                <v-text-field
+                  v-model="systemstore.shortcutbackground"
+                  variant="plain"
+                  width="280"
+                  hide-details="auto"
                   density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(4)" style="margin-right: 5px">
@@ -575,8 +638,13 @@ watch(systemstore, () => {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.btnbackground" variant="plain" @update:model-value="changebtn(1)"
-                  width="280" hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.btnbackground"
+                  variant="plain"
+                  @update:model-value="changebtn(1)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(5)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -596,8 +664,13 @@ watch(systemstore, () => {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.btnbarbackground" variant="plain" @update:model-value="changebtn(2)"
-                  width="280" hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.btnbarbackground"
+                  variant="plain"
+                  @update:model-value="changebtn(2)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(7)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -617,8 +690,13 @@ watch(systemstore, () => {
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field v-model="systemstore.fontcolor" variant="plain" @update:model-value="changebtn(2)"
-                  width="280" hide-details="auto" density="compact">
+                <v-text-field
+                  v-model="systemstore.fontcolor"
+                  variant="plain"
+                  @update:model-value="changebtn(2)"
+                  width="280"
+                  hide-details="auto"
+                  density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="palette(6)">
                       <template v-slot:append>
@@ -657,7 +735,10 @@ watch(systemstore, () => {
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch color="info" v-model="systemstore.autostart" @update:model-value="autostartsetting"
+                  <v-switch
+                    color="info"
+                    v-model="systemstore.autostart"
+                    @update:model-value="autostartsetting"
                     hide-details></v-switch>
                 </template>
                 <v-list-item-title>开机自启</v-list-item-title>
@@ -746,11 +827,9 @@ watch(systemstore, () => {
                   </template>
                   <template v-slot:append>
                     <div v-if="!updatestatus" style="text-align: center">
-                      {{ updateversion ? version + " -> " + updateversion : version }}
+                      {{ updateversion ? version + ' -> ' + updateversion : version }}
                     </div>
-                    <div v-else style="text-align: center">
-                      {{ updatestr }}%
-                    </div>
+                    <div v-else style="text-align: center">{{ updatestr }}%</div>
                   </template>
                 </v-list-item>
               </v-list>

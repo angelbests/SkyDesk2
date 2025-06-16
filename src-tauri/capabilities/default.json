@@ -164,6 +164,11 @@
               "validator": "\\S+"
             }
           ]
+        },
+        {
+          "name": "bin/webdav/webdav",
+          "sidecar": true,
+          "args":true
         }
       ]
     },
@@ -174,10 +179,16 @@
           "name": "cmd",
           "cmd": "cmd",
           "args": true
+        },
+        {
+          "name": "bin/webdav/webdav",
+          "sidecar": true,
+          "args":true
         }
       ]
     },
     "shell:allow-stdin-write",
+    "shell:allow-kill",
     {
       "identifier": "http:default",
       "allow": [

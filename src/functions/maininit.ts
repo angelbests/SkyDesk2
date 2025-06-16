@@ -11,6 +11,7 @@ export const maininit = async function () {
   }
 
   ///#region  检查并创建文件夹
+  await mkdir("webdav", { baseDir: BaseDirectory.AppData, recursive: true })
   await mkdir("lnk", { baseDir: BaseDirectory.AppData, recursive: true })
   await mkdir("ico", { baseDir: BaseDirectory.AppData, recursive: true })
   await mkdir("window", { baseDir: BaseDirectory.AppData, recursive: true })
