@@ -8,28 +8,13 @@ import { required, ipAddress, helpers, minValue, maxValue } from '@vuelidate/val
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { appDataDir, resolve } from '@tauri-apps/api/path'
 import { open } from '@tauri-apps/plugin-dialog'
+import GridContainer from '../../components/GridContainer.vue'
 import bcrypt from 'bcryptjs'
 const webdavstore = webdavStore()
 const systemstore = systemStore()
 const dialog = ref(false)
 defineOptions({
   name: 'webdav',
-})
-const baseconfig = reactive<{
-  address: string
-  port: number
-  permissions: []
-  users: {
-    username: string
-    password: string
-    directory: string
-    permissions: string[]
-  }[]
-}>({
-  address: '0.0.0.0',
-  port: 6065,
-  permissions: [],
-  users: [],
 })
 
 const user = reactive<{
@@ -50,7 +35,7 @@ const baseconfigrules = computed(() => ({
 }))
 const checkusername = (value: string) => {
   console.log('checkusername', value)
-  let res = baseconfig.users.some((u) => u.username === value)
+  let res = webdavstore.config.users.some((u) => u.username === value)
   console.log('checkusername result', res)
   return !res
 }
@@ -61,7 +46,7 @@ const userrules = computed(() => ({
   directory: { required: helpers.withMessage('必填', required) },
 }))
 
-const vbase$ = useVuelidate(baseconfigrules, baseconfig)
+const vbase$ = useVuelidate(baseconfigrules, webdavstore.config)
 const vuser$ = useVuelidate(userrules, user)
 // 添加用户
 const adduser = function () {
@@ -69,15 +54,15 @@ const adduser = function () {
     vuser$.value.$touch()
     return
   }
-  baseconfig.users.push({
+  webdavstore.config.users.push({
     ...user,
   })
 }
 // 删除用户
 const deluser = function (user: { username: string; password: string; directory: string; permissions: string[] }) {
-  const index = baseconfig.users.indexOf(user)
+  const index = webdavstore.config.users.indexOf(user)
   if (index !== -1) {
-    baseconfig.users.splice(index, 1)
+    webdavstore.config.users.splice(index, 1)
   }
 }
 
@@ -94,13 +79,13 @@ const getdir = async function () {
 
 // 保存配置
 const saveconfig = async function () {
-  console.log('保存配置', baseconfig)
+  console.log('保存配置', webdavstore.config)
   if (vbase$.value.$invalid) {
     vbase$.value.$touch()
     return
   }
-  if (baseconfig.users.length === 0) {
-    baseconfig.users.push({
+  if (webdavstore.config.users.length === 0) {
+    webdavstore.config.users.push({
       username: 'admin',
       password: 'admin',
       directory: '/',
@@ -108,7 +93,8 @@ const saveconfig = async function () {
     })
     return
   }
-  let userconfig = baseconfig.users.map((user) => {
+
+  let userconfig = webdavstore.config.users.map((user) => {
     return {
       username: user.username,
       password: '{bcrypt}' + bcrypt.hashSync(user.password, 10), // 使用bcrypt加密密码
@@ -116,53 +102,52 @@ const saveconfig = async function () {
       permissions: user.permissions.join(''),
     }
   })
-  webdavstore.config = [
-    {
-      address: baseconfig.address,
-      port: baseconfig.port,
-      directory: '.',
-      tls: false,
-      cert: 'cert.pem',
-      key: 'key.pem',
-      prefix: '/',
-      debug: false,
-      noSniff: false,
-      behindProxy: false,
-      permissions: 'R',
-      rules: [],
-      rulesBehavior: 'overwrite',
-      log: {
-        format: 'console',
-        colors: true,
-        outputs: ['stderr'],
-      },
-      cors: {
-        enabled: true,
-        credentials: true,
-        allowed_headers: ['Depth'],
-        allowed_hosts: ['http://localhost:8080'],
-        allowed_methods: ['GET'],
-        exposed_headers: ['Content-Length', 'Content-Range'],
-      },
-      users: userconfig,
+  let json = {
+    address: webdavstore.config.address,
+    port: webdavstore.config.port,
+    directory: '.',
+    tls: false,
+    cert: 'cert.pem',
+    key: 'key.pem',
+    prefix: '/',
+    debug: false,
+    noSniff: false,
+    behindProxy: false,
+    permissions: 'R',
+    rules: [],
+    rulesBehavior: 'overwrite',
+    log: {
+      format: 'console',
+      colors: true,
+      outputs: ['stderr'],
     },
-  ]
+    cors: {
+      enabled: true,
+      credentials: true,
+      allowed_headers: ['Depth'],
+      allowed_hosts: ['http://localhost:8080'],
+      allowed_methods: ['GET'],
+      exposed_headers: ['Content-Length', 'Content-Range'],
+    },
+    users: userconfig,
+  }
   let path = await resolve(await appDataDir(), 'webdav/config.json')
-  await writeTextFile(path, JSON.stringify(webdavstore.config[0]), { create: true })
+  await writeTextFile(path, JSON.stringify(json), { create: true })
   dialog.value = false
 }
 
 // 进程控制
-const wevdavprocess = ref<Child | undefined>()
-const startwebdev = async function () {
-  let path = await resolve(await appDataDir(), 'webdav/config.json')
-  wevdavprocess.value = await Command.sidecar('bin/webdav/webdav', ['-c', path], {
-    encoding: 'GBK',
-  }).spawn()
-}
-const stopwebdav = async function () {
-  if (wevdavprocess.value) {
-    wevdavprocess.value.kill()
+const webdavprocess = ref<Child | undefined>()
+const webdevcontrol = async function () {
+  if (webdavprocess.value) {
+    webdavprocess.value.kill()
+    webdavprocess.value = undefined
+    return
+  } else {
+    let path = await resolve(await appDataDir(), 'webdav/config.json')
+    webdavprocess.value = await Command.sidecar('bin/webdav/webdav', ['-c', path], {
+      encoding: 'GBK',
+    }).spawn()
   }
 }
 </script>
@@ -177,7 +162,7 @@ const stopwebdav = async function () {
               <v-list variant="tonal">
                 <v-list-item>
                   <v-text-field
-                    v-model="baseconfig.address"
+                    v-model="webdavstore.config.address"
                     :error-messages="vbase$.address.$errors.map((e) => String(e.$message))"
                     placeholder="IP"
                     density="compact"
@@ -186,7 +171,7 @@ const stopwebdav = async function () {
                 </v-list-item>
                 <v-list-item>
                   <v-text-field
-                    v-model.number="baseconfig.port"
+                    v-model.number="webdavstore.config.port"
                     :error-messages="vbase$.port.$errors.map((e) => (typeof e.$message === 'string' ? e.$message : String(e.$message?.value ?? '')))"
                     placeholder="端口"
                     density="compact"
@@ -240,7 +225,7 @@ const stopwebdav = async function () {
             </v-col>
             <v-col :cols="6">
               <div style="height: calc(100vh - 88px - 52px); overflow: hidden; overflow-y: scroll">
-                <v-list variant="tonal" v-for="user in baseconfig.users">
+                <v-list variant="tonal" v-for="user in webdavstore.config.users">
                   <v-list-item title="用户名">
                     <template v-slot:append>
                       {{ user.username }}
@@ -287,21 +272,51 @@ const stopwebdav = async function () {
         </template>
         配置
       </v-btn>
-      <v-btn style="margin-right: 20px" @click="startwebdev">
+      <v-btn style="margin-right: 20px" @click="webdevcontrol">
         <template v-slot:prepend>
-          <v-icon>mdi-tune</v-icon>
+          <v-icon v-if="webdavprocess == undefined">mdi-play</v-icon>
+          <v-icon v-else>mdi-stop</v-icon>
         </template>
-        启动
+        {{ webdavprocess == undefined ? '启动' : '停止' }}
       </v-btn>
-      <v-btn style="margin-right: 20px" @click="stopwebdav">
-        <template v-slot:prepend>
-          <v-icon>mdi-tune</v-icon>
-        </template>
-        停止
-      </v-btn>
+      <div>{{ webdavstore.config.address }}:{{ webdavstore.config.port }}</div>
     </v-card>
     <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
-    <div style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden"></div>
+    <div style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden; padding: 10px; box-sizing: border-box">
+      <GridContainer style="width: 100%; height: 100%; min-height: 100%" v-model="webdavstore.config.users" :gridheight="260" :gridwidth="320" :padding="10">
+        <template v-slot="{ item }">
+          <v-card style="width: 100%; height: 100%; background: transparent" variant="elevated" elevation="5">
+            <v-list style="background: transparent">
+              <v-list-item title="用户名">
+                <template v-slot:append>
+                  {{ item.username }}
+                </template>
+              </v-list-item>
+              <v-list-item title="密码">
+                <template v-slot:append>
+                  {{ item.password }}
+                </template>
+              </v-list-item>
+              <v-list-item title="文件夹">
+                <template v-slot:append>
+                  <div style="width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right">
+                    {{ item.directory }}
+                  </div>
+                </template>
+              </v-list-item>
+              <v-list-item title="权限">
+                <template v-slot:append>
+                  {{ item.permissions.join('') }}
+                </template>
+              </v-list-item>
+              <v-list-item>
+                <v-btn block @click="deluser(item)">删除</v-btn>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </template>
+      </GridContainer>
+    </div>
   </div>
 </template>
 
