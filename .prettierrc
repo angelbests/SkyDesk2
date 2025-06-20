@@ -3,7 +3,7 @@
     "tabWidth": 2,
     "eslintIntegration": false,
     "singleQuote": true,
-    "printWidth": 320,
+    "printWidth": 220,
     "trailingComma": "all",
     "useTabs": false,
     "bracketSpacing": true,

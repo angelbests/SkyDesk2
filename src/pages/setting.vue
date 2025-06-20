@@ -58,14 +58,8 @@ getCurrentWebviewWindow().listen('create-note', async () => {
 //#region  //appbar控制
 const appbardraging = function () {
   // 设置窗口拖拽
-  document
-    .getElementById('toolbar')
-    ?.querySelector('.v-toolbar__content')
-    ?.setAttribute('data-tauri-drag-region', 'true')
-  document
-    .getElementById('toolbar')
-    ?.querySelector('.v-toolbar-title__placeholder')
-    ?.setAttribute('data-tauri-drag-region', 'true')
+  document.getElementById('toolbar')?.querySelector('.v-toolbar__content')?.setAttribute('data-tauri-drag-region', 'true')
+  document.getElementById('toolbar')?.querySelector('.v-toolbar-title__placeholder')?.setAttribute('data-tauri-drag-region', 'true')
   document.getElementById('toolbar')?.addEventListener('selectstart', function (e) {
     e.preventDefault()
   })
@@ -299,14 +293,10 @@ new Netspeed().listen_netspeed((e) => {
   net.value = e.payload
 })
 const speed_r = computed(() => {
-  return Math.trunc(net.value.speed_r / 1024) < 1024
-    ? Math.trunc(net.value.speed_r / 1024) + 'KB/s'
-    : Math.trunc((net.value.speed_r / 1024 / 1024) * 10) / 10 + 'MB/s'
+  return Math.trunc(net.value.speed_r / 1024) < 1024 ? Math.trunc(net.value.speed_r / 1024) + 'KB/s' : Math.trunc((net.value.speed_r / 1024 / 1024) * 10) / 10 + 'MB/s'
 })
 const speed_s = computed(() => {
-  return Math.trunc(net.value.speed_s / 1024) < 1024
-    ? Math.trunc(net.value.speed_s / 1024) + 'KB/s'
-    : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + 'MB/s'
+  return Math.trunc(net.value.speed_s / 1024) < 1024 ? Math.trunc(net.value.speed_s / 1024) + 'KB/s' : Math.trunc((net.value.speed_s / 1024 / 1024) * 10) / 10 + 'MB/s'
 })
 //#endregion
 
@@ -417,15 +407,11 @@ watch(
       <template v-slot:prepend>
         <v-app-bar-nav-icon style="background: transparent" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
-      <div
-        :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
-        data-tauri-drag-region>
+      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }" data-tauri-drag-region>
         <v-icon data-tauri-drag-region>mdi-arrow-down-thin</v-icon>
         {{ speed_r }}
       </div>
-      <div
-        :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }"
-        data-tauri-drag-region>
+      <div :style="{ width: '100px', display: 'flex', alignItems: 'center', color: systemstore.fontcolor }" data-tauri-drag-region>
         <v-icon data-tauri-drag-region>mdi-arrow-up-thin</v-icon>
         {{ speed_s }}
       </div>
@@ -466,65 +452,26 @@ watch(
         :permanent="true"
         expand-on-hover>
         <v-list style="height: 100%">
-          <v-list-item
-            draggable="false"
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-apps"
-            title="快捷"
-            :href="'/#/pages/setting/shortcut'"></v-list-item>
-          <v-list-item
-            draggable="false"
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-wallpaper"
-            title="壁纸"
-            :href="'/#/pages/setting/wallpaper'"></v-list-item>
-          <v-list-item
-            draggable="false"
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-note-outline"
-            title="便签"
-            :href="'/#/pages/setting/note'"></v-list-item>
-          <v-list-item
-            draggable="false"
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-robot-outline"
-            title="AI"
-            :href="'/#/pages/setting/ollama'"></v-list-item>
-          <v-list-item
-            draggable="false"
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-calendar-range"
-            title="日历"
-            :href="'/#/pages/setting/datenote'"></v-list-item>
-          <v-list-item
-            draggable="false"
-            :style="{ color: systemstore.fontcolor }"
-            prepend-icon="mdi-calendar-range"
-            title="DAV"
-            :href="'/#/pages/setting/webdav'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-apps" title="快捷" :href="'/#/pages/setting/shortcut'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-wallpaper" title="壁纸" :href="'/#/pages/setting/wallpaper'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-note-outline" title="便签" :href="'/#/pages/setting/note'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-calendar-range" title="日历" :href="'/#/pages/setting/datenote'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-robot-outline" title="ollama" :href="'/#/pages/setting/ollama'"></v-list-item>
+          <v-list-item draggable="false" :style="{ color: systemstore.fontcolor }" prepend-icon="mdi-server-network" title="webdav" :href="'/#/pages/setting/webdav'"></v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <router-view
-        v-slot="{ Component }"
-        :key="$route.fullPath"
-        style="width: auto; height: 100%; box-sizing: border-box; padding: 10px">
+      <!-- :key="$route.fullPath" -->
+      <router-view v-slot="{ Component }" style="width: auto; height: 100%; box-sizing: border-box; padding: 10px">
         <transition name="fade" mode="out-in" appear>
-          <!-- <keep-alive> -->
-          <component :is="Component" />
-          <!-- </keep-alive> -->
+          <keep-alive>
+            <component :is="Component" />
+          </keep-alive>
         </transition>
       </router-view>
     </v-main>
     <v-dialog v-model="colorshow">
-      <div
-        style="width: 100%; height: 100%; display: flex; justify-content: center; position: relative"
-        @click.self="colorshow = false">
-        <input
-          id="palette"
-          @input="selectcolor"
-          v-model="colorv"
-          style="position: absolute; left: 10; top: 10"
-          type="color" />
+      <div style="width: 100%; height: 100%; display: flex; justify-content: center; position: relative" @click.self="colorshow = false">
+        <input id="palette" @input="selectcolor" v-model="colorv" style="position: absolute; left: 10; top: 10" type="color" />
         <v-card style="width: 400px">
           <v-card-title>
             <div style="display: flex; flex-direction: row">
@@ -537,12 +484,7 @@ watch(
           <v-list style="width: 400px">
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.programbcakground"
-                  variant="plain"
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.programbcakground" variant="plain" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(1)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -562,13 +504,7 @@ watch(
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.leftbackground"
-                  variant="plain"
-                  single-line
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.leftbackground" variant="plain" single-line width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(2)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -588,12 +524,7 @@ watch(
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.topbackground"
-                  variant="plain"
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.topbackground" variant="plain" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(3)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -613,12 +544,7 @@ watch(
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.shortcutbackground"
-                  variant="plain"
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.shortcutbackground" variant="plain" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(4)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -638,13 +564,7 @@ watch(
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.btnbackground"
-                  variant="plain"
-                  @update:model-value="changebtn(1)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.btnbackground" variant="plain" @update:model-value="changebtn(1)" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(5)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -664,13 +584,7 @@ watch(
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.btnbarbackground"
-                  variant="plain"
-                  @update:model-value="changebtn(2)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.btnbarbackground" variant="plain" @update:model-value="changebtn(2)" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="getImage(7)" style="margin-right: 5px">
                       <template v-slot:append>
@@ -690,13 +604,7 @@ watch(
             <v-divider></v-divider>
             <v-list-item>
               <template v-slot:append>
-                <v-text-field
-                  v-model="systemstore.fontcolor"
-                  variant="plain"
-                  @update:model-value="changebtn(2)"
-                  width="280"
-                  hide-details="auto"
-                  density="compact">
+                <v-text-field v-model="systemstore.fontcolor" variant="plain" @update:model-value="changebtn(2)" width="280" hide-details="auto" density="compact">
                   <template v-slot:prepend-inner>
                     <v-btn variant="tonal" size="mini" @click="palette(6)">
                       <template v-slot:append>
@@ -735,11 +643,7 @@ watch(
               </v-list-item>
               <v-list-item>
                 <template v-slot:append>
-                  <v-switch
-                    color="info"
-                    v-model="systemstore.autostart"
-                    @update:model-value="autostartsetting"
-                    hide-details></v-switch>
+                  <v-switch color="info" v-model="systemstore.autostart" @update:model-value="autostartsetting" hide-details></v-switch>
                 </template>
                 <v-list-item-title>开机自启</v-list-item-title>
               </v-list-item>

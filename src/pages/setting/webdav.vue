@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { Child, Command } from '@tauri-apps/plugin-shell'
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { webdavStore } from '../../stores/webdav'
+import { systemStore } from '../../stores/system'
+import { useVuelidate } from '@vuelidate/core'
+import { required, ipAddress, helpers, minValue, maxValue } from '@vuelidate/validators'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { appDataDir, resolve } from '@tauri-apps/api/path'
+import { open } from '@tauri-apps/plugin-dialog'
+import bcrypt from 'bcryptjs'
 const webdavstore = webdavStore()
-
-const baseconfig = ref<{
+const systemstore = systemStore()
+const dialog = ref(false)
+defineOptions({
+  name: 'webdav',
+})
+const baseconfig = reactive<{
   address: string
   port: number
   permissions: []
@@ -21,7 +32,7 @@ const baseconfig = ref<{
   users: [],
 })
 
-const user = ref<{
+const user = reactive<{
   username: string
   password: string
   directory: string
@@ -29,20 +40,123 @@ const user = ref<{
 }>({
   username: '',
   password: '',
-  directory: '',
-  permissions: [],
+  directory: '/',
+  permissions: ['R'],
 })
 
+const baseconfigrules = computed(() => ({
+  address: { required: helpers.withMessage('必填', required), ipAddress: helpers.withMessage('错误的IP地址', ipAddress) },
+  port: { required: helpers.withMessage('必填', required), minValue: helpers.withMessage('最小值为1', minValue(1)), maxValue: helpers.withMessage('最大值为65535', maxValue(65535)) },
+}))
+const checkusername = (value: string) => {
+  console.log('checkusername', value)
+  let res = baseconfig.users.some((u) => u.username === value)
+  console.log('checkusername result', res)
+  return !res
+}
+const userrules = computed(() => ({
+  username: { required: helpers.withMessage('必填', required), checkusername: helpers.withMessage('用户名已存在', checkusername) },
+  permissions: { required: helpers.withMessage('必填', required) },
+  password: { required: helpers.withMessage('必填', required) },
+  directory: { required: helpers.withMessage('必填', required) },
+}))
+
+const vbase$ = useVuelidate(baseconfigrules, baseconfig)
+const vuser$ = useVuelidate(userrules, user)
+// 添加用户
 const adduser = function () {
-  baseconfig.value.users.push({
-    ...user.value,
+  if (vuser$.value.$invalid) {
+    vuser$.value.$touch()
+    return
+  }
+  baseconfig.users.push({
+    ...user,
   })
+}
+// 删除用户
+const deluser = function (user: { username: string; password: string; directory: string; permissions: string[] }) {
+  const index = baseconfig.users.indexOf(user)
+  if (index !== -1) {
+    baseconfig.users.splice(index, 1)
+  }
+}
+
+const getdir = async function () {
+  const path = await open({
+    directory: true,
+    multiple: false,
+    title: '选择文件夹',
+  })
+  if (path) {
+    user.directory = path as string
+  }
+}
+
+// 保存配置
+const saveconfig = async function () {
+  console.log('保存配置', baseconfig)
+  if (vbase$.value.$invalid) {
+    vbase$.value.$touch()
+    return
+  }
+  if (baseconfig.users.length === 0) {
+    baseconfig.users.push({
+      username: 'admin',
+      password: 'admin',
+      directory: '/',
+      permissions: ['C', 'U', 'R', 'D'],
+    })
+    return
+  }
+  let userconfig = baseconfig.users.map((user) => {
+    return {
+      username: user.username,
+      password: '{bcrypt}' + bcrypt.hashSync(user.password, 10), // 使用bcrypt加密密码
+      directory: user.directory,
+      permissions: user.permissions.join(''),
+    }
+  })
+  webdavstore.config = [
+    {
+      address: baseconfig.address,
+      port: baseconfig.port,
+      directory: '.',
+      tls: false,
+      cert: 'cert.pem',
+      key: 'key.pem',
+      prefix: '/',
+      debug: false,
+      noSniff: false,
+      behindProxy: false,
+      permissions: 'R',
+      rules: [],
+      rulesBehavior: 'overwrite',
+      log: {
+        format: 'console',
+        colors: true,
+        outputs: ['stderr'],
+      },
+      cors: {
+        enabled: true,
+        credentials: true,
+        allowed_headers: ['Depth'],
+        allowed_hosts: ['http://localhost:8080'],
+        allowed_methods: ['GET'],
+        exposed_headers: ['Content-Length', 'Content-Range'],
+      },
+      users: userconfig,
+    },
+  ]
+  let path = await resolve(await appDataDir(), 'webdav/config.json')
+  await writeTextFile(path, JSON.stringify(webdavstore.config[0]), { create: true })
+  dialog.value = false
 }
 
 // 进程控制
 const wevdavprocess = ref<Child | undefined>()
 const startwebdev = async function () {
-  wevdavprocess.value = await Command.sidecar('bin/webdav/webdav', [], {
+  let path = await resolve(await appDataDir(), 'webdav/config.json')
+  wevdavprocess.value = await Command.sidecar('bin/webdav/webdav', ['-c', path], {
     encoding: 'GBK',
   }).spawn()
 }
@@ -51,108 +165,143 @@ const stopwebdav = async function () {
     wevdavprocess.value.kill()
   }
 }
-const dialog = ref(true)
 </script>
 
 <template>
   <div class="window">
-    <v-dialog v-model="dialog" max-width="800">
-      <v-card style="padding: 20px">
-        <v-card-text>
+    <v-dialog v-model="dialog">
+      <v-card style="width: calc(100vw - 48px); height: calc(100vh - 48px); padding: 20px">
+        <v-card-text style="padding: 0px">
           <v-row>
-            <v-col :cols="7">
-              <v-card variant="tonal" style="margin-bottom: 20px">
-                <v-list>
-                  <v-list-item>
-                    <v-text-field v-model="baseconfig.address" placeholder="IP" density="compact" hide-details="auto" :rules="[]"></v-text-field>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-text-field v-model.number="baseconfig.port" placeholder="端口" density="compact" hide-details="auto"></v-text-field>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-combobox v-model="baseconfig.permissions" density="compact" hide-details="auto" label="权限" :items="['C', 'U', 'R', 'D']" multiple></v-combobox>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-btn block style="border-radius: 0px" variant="flat" color="grey-lighten-3">保存</v-btn>
-                  </v-list-item>
-                </v-list>
-              </v-card>
-              <v-card variant="tonal">
-                <v-list>
-                  <v-list-item>
-                    <v-text-field v-model="user.username" placeholder="用户名" density="compact" hide-details="auto"></v-text-field>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-text-field v-model="user.password" placeholder="密码" density="compact" hide-details="auto"></v-text-field>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-text-field v-model="user.directory" placeholder="路径" density="compact" hide-details="auto"></v-text-field>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-combobox v-model="user.permissions" density="compact" hide-details="auto" label="权限" :items="['C', 'U', 'R', 'D']" multiple></v-combobox>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-btn @click="adduser" block style="border-radius: 0px" variant="flat" color="grey-lighten-3">添加用户</v-btn>
-                  </v-list-item>
-                </v-list>
-              </v-card>
+            <v-col :cols="6">
+              <v-list variant="tonal">
+                <v-list-item>
+                  <v-text-field
+                    v-model="baseconfig.address"
+                    :error-messages="vbase$.address.$errors.map((e) => String(e.$message))"
+                    placeholder="IP"
+                    density="compact"
+                    @blur="vbase$.address.$touch"
+                    @input="vbase$.address.$touch"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                  <v-text-field
+                    v-model.number="baseconfig.port"
+                    :error-messages="vbase$.port.$errors.map((e) => (typeof e.$message === 'string' ? e.$message : String(e.$message?.value ?? '')))"
+                    placeholder="端口"
+                    density="compact"
+                    @blur="vbase$.port.$touch"
+                    @input="vbase$.port.$touch"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                  <v-text-field
+                    v-model="user.username"
+                    :error-messages="vuser$.username.$errors.map((e) => (typeof e.$message === 'string' ? e.$message : String(e.$message?.value ?? '')))"
+                    @blur="vuser$.username.$touch"
+                    @input="vuser$.username.$touch"
+                    placeholder="用户名"
+                    density="compact"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                  <v-text-field
+                    v-model="user.password"
+                    :error-messages="vuser$.password.$errors.map((e) => (typeof e.$message === 'string' ? e.$message : String(e.$message?.value ?? '')))"
+                    @blur="vuser$.password.$touch"
+                    @input="vuser$.password.$touch"
+                    placeholder="密码"
+                    density="compact"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                  <v-text-field
+                    v-model="user.directory"
+                    :error-messages="vuser$.directory.$errors.map((e) => (typeof e.$message === 'string' ? e.$message : String(e.$message?.value ?? '')))"
+                    @blur="vuser$.directory.$touch"
+                    @input="vuser$.directory.$touch"
+                    placeholder="路径"
+                    :readonly="true"
+                    @click="getdir"
+                    density="compact"></v-text-field>
+                </v-list-item>
+                <v-list-item>
+                  <v-combobox
+                    v-model="user.permissions"
+                    :error-messages="vuser$.permissions.$errors.map((e) => (typeof e.$message === 'string' ? e.$message : String(e.$message?.value ?? '')))"
+                    @blur="vuser$.permissions.$touch"
+                    @input="vuser$.permissions.$touch"
+                    density="compact"
+                    label="权限"
+                    :items="['C', 'U', 'R', 'D']"
+                    multiple></v-combobox>
+                </v-list-item>
+                <v-list-item>
+                  <v-btn @click="adduser" block>添加用户</v-btn>
+                </v-list-item>
+              </v-list>
             </v-col>
-            <v-col :cols="5">
-              <div style="width: 100%; height: 100%; overflow: hidden; overflow-y: scroll">
-                <v-list>
-                  <v-list-item title="IP地址">
+            <v-col :cols="6">
+              <div style="height: calc(100vh - 88px - 52px); overflow: hidden; overflow-y: scroll">
+                <v-list variant="tonal" v-for="user in baseconfig.users">
+                  <v-list-item title="用户名">
                     <template v-slot:append>
-                      {{ baseconfig.address }}
+                      {{ user.username }}
                     </template>
                   </v-list-item>
-                  <v-list-item title="端口">
+                  <v-list-item title="密码">
                     <template v-slot:append>
-                      {{ baseconfig.port }}
+                      {{ user.password }}
+                    </template>
+                  </v-list-item>
+                  <v-list-item title="文件夹">
+                    <template v-slot:append>
+                      {{ user.directory }}
                     </template>
                   </v-list-item>
                   <v-list-item title="权限">
                     <template v-slot:append>
-                      {{ baseconfig.permissions.join('') }}
+                      {{ user.permissions.join('') }}
                     </template>
                   </v-list-item>
-                  <v-list-item v-for="user in baseconfig.users">
-                    <v-card>
-                      <v-list variant="tonal">
-                        <v-list-item title="用户名">
-                          <template v-slot:append>
-                            {{ user.username }}
-                          </template>
-                        </v-list-item>
-                        <v-list-item title="密码">
-                          <template v-slot:append>
-                            {{ user.password }}
-                          </template>
-                        </v-list-item>
-                        <v-list-item title="文件夹">
-                          <template v-slot:append>
-                            {{ user.directory }}
-                          </template>
-                        </v-list-item>
-                        <v-list-item title="权限">
-                          <template v-slot:append>
-                            {{ user.permissions.join('') }}
-                          </template>
-                        </v-list-item>
-                      </v-list>
-                    </v-card>
+                  <v-list-item>
+                    <v-btn block @click="deluser(user)">删除</v-btn>
                   </v-list-item>
                 </v-list>
               </div>
-              <v-btn block>新增</v-btn>
             </v-col>
           </v-row>
         </v-card-text>
+        <v-card-actions>
+          <v-btn @click="dialog = false" color="primary">关闭</v-btn>
+          <v-btn @click="saveconfig">确定</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-card style="width: 100%; height: 100%">
-      <v-btn @click="startwebdev">启动</v-btn>
-      <v-btn @click="stopwebdav">停止</v-btn>
+    <v-card
+      :style="{
+        background: systemstore.btnbarbackground,
+        backgroundSize: 'cover',
+      }"
+      class="btnbar">
+      <v-btn style="margin-right: 20px" @click="dialog = true">
+        <template v-slot:prepend>
+          <v-icon>mdi-tune</v-icon>
+        </template>
+        配置
+      </v-btn>
+      <v-btn style="margin-right: 20px" @click="startwebdev">
+        <template v-slot:prepend>
+          <v-icon>mdi-tune</v-icon>
+        </template>
+        启动
+      </v-btn>
+      <v-btn style="margin-right: 20px" @click="stopwebdav">
+        <template v-slot:prepend>
+          <v-icon>mdi-tune</v-icon>
+        </template>
+        停止
+      </v-btn>
     </v-card>
+    <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
+    <div style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden"></div>
   </div>
 </template>
 
@@ -160,5 +309,15 @@ const dialog = ref(true)
 .window {
   width: 100%;
   height: 100%;
+}
+
+.btnbar {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 20px;
+  filter: drop-shadow(0px 2px 5px gray);
 }
 </style>

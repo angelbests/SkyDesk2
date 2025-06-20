@@ -12,27 +12,33 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: "wallpaper",
+        name: 'wallpaper',
         component: () => import("./../pages/setting/wallpaper.vue"),
       },
       {
         path: "datenote",
+        name: 'datenote',
         component: () => import("./../pages/setting/datenote.vue"),
       },
       {
         path: "shortcut",
+        name: 'shortcut',
         component: () => import("./../pages/setting/shortcut.vue"),
       },
       {
         path: "note",
+        name: 'note',
         component: () => import("./../pages/setting/note.vue"),
       },
       {
         path: "ollama",
+        name: 'ollama',
         component: () => import("./../pages/setting/ollama.vue"),
       },
       {
-        path:"webdav",
-        component:()=>import("./../pages/setting/webdav.vue")
+        path: "webdav",
+        name: 'webdav',
+        component: () => import("./../pages/setting/webdav.vue")
       }
     ],
   },
