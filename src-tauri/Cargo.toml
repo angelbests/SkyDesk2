@@ -17,7 +17,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = ["protocol-asset", "tray-icon", "image-png", "image-ico" , "devtools"] }
 tauri-plugin-shell = "2"
 tauri-plugin-process = "2"
-tauri-plugin-fs = "2"
+tauri-plugin-fs = { version = "2.0.0", features = ["watch"] }
 tauri-plugin-dialog = "2"
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-http = { version = "2", features = [] }
@@ -70,5 +70,5 @@ features = [
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
 tauri-plugin-global-shortcut = "2"
-tauri-plugin-single-instance = "2"
+tauri-plugin-single-instance = "2.3.0"
 tauri-plugin-updater = "2"

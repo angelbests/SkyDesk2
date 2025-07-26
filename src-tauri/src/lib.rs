@@ -22,6 +22,11 @@ pub fn run() {
     let local: DateTime<Local> = Local::now();
     let t = local.format("%Y-%m-%d");
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let main = app.get_webview_window("main").unwrap();
+            let _ = main.show();
+            let _ = main.set_focus();
+        }))
         .plugin(tauri_plugin_upload::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())

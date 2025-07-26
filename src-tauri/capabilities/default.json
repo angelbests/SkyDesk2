@@ -129,6 +129,14 @@
         }
       ]
     },
+    {
+      "identifier": "fs:allow-watch",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
     "dialog:allow-open",
     {
       "identifier": "shell:allow-execute",
@@ -168,7 +176,7 @@
         {
           "name": "bin/webdav/webdav",
           "sidecar": true,
-          "args":true
+          "args": true
         }
       ]
     },
@@ -183,7 +191,7 @@
         {
           "name": "bin/webdav/webdav",
           "sidecar": true,
-          "args":true
+          "args": true
         }
       ]
     },
