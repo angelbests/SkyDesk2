@@ -90,6 +90,7 @@ pub fn run() {
             shell::get_localized_display_name,
             shell::get_uwp,
             clipboard::copyfile,
+            test,
             check_path_type,
             open_devtool
         ])
@@ -121,4 +122,11 @@ fn check_path_type(path: String) -> String {
         }
         Err(_) => "invalid".into(),
     }
+}
+
+#[tauri::command]
+fn test(window: Window, bool: bool) {
+    use window_vibrancy::apply_mica;
+    #[cfg(target_os = "windows")]
+    let _ = apply_mica(&window, Some(bool));
 }

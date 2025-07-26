@@ -5175,6 +5175,7 @@ dependencies = [
  "tauri-plugin-upload",
  "tiny_http",
  "wasapi",
+ "window-vibrancy",
  "windows 0.61.3",
 ]
 

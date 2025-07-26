@@ -51,6 +51,7 @@ onMounted(async () => {
     }
   })
 
+  // 监听程序文件夹，若有变动则更新快捷列表
   let dirs = [(await homeDir()) + '\\desktop', 'C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs', (await homeDir()) + '\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs']
   watchImmediate(dirs, async () => {
     await watchScanProgram()
