@@ -1,4 +1,4 @@
-import { SolarDay } from "tyme4ts"
+import { SolarDay } from 'tyme4ts'
 
 export type DayInfo = {
   constellation: string | null | undefined
@@ -19,16 +19,16 @@ export const today = function (year: number, month: number, day: number) {
   let festival = null
   if (solar.getFestival()) {
     festival = solar.getFestival()?.getName()
-    if (festival == "五一劳动节") {
-      festival = festival.replace("五一", "")
-    } else if (festival == "五四青年节") {
-      festival = festival.replace("五四", "")
-    } else if (festival == "八一建军节") {
-      festival = festival.replace("八一", "")
-    } else if (festival == "六一儿童节") {
-      festival = festival.replace("六一", "")
-    } else if (festival == "三八妇女节") {
-      festival = festival.replace("三八", "")
+    if (festival == '五一劳动节') {
+      festival = festival.replace('五一', '')
+    } else if (festival == '五四青年节') {
+      festival = festival.replace('五四', '')
+    } else if (festival == '八一建军节') {
+      festival = festival.replace('八一', '')
+    } else if (festival == '六一儿童节') {
+      festival = festival.replace('六一', '')
+    } else if (festival == '三八妇女节') {
+      festival = festival.replace('三八', '')
     }
   }
   // 冬月 11月  腊月 12月
@@ -54,10 +54,10 @@ export const today = function (year: number, month: number, day: number) {
   // } else if (lunar_month == "十月") {
   //   lunar_month = "孟冬"
   // } else
-  if (lunar_month == "十一月") {
-    lunar_month = "冬月"
-  } else if (lunar_month == "十二月") {
-    lunar_month = "腊月"
+  if (lunar_month == '十一月') {
+    lunar_month = '冬月'
+  } else if (lunar_month == '十二月') {
+    lunar_month = '腊月'
   }
   let today: DayInfo = {
     constellation: solar.getConstellation().toString(),
@@ -89,16 +89,16 @@ export const get_all_festival = function (year: number, month: number, day: numb
   for (let i = 0; i < 366; i++) {
     if (solar.getFestival()) {
       let festival = solar.getFestival()?.getName()
-      if (festival == "五一劳动节") {
-        festival = festival.replace("五一", "")
-      } else if (festival == "五四青年节") {
-        festival = festival.replace("五四", "")
-      } else if (festival == "八一建军节") {
-        festival = festival.replace("八一", "")
-      } else if (festival == "六一儿童节") {
-        festival = festival.replace("六一", "")
-      } else if (festival == "三八妇女节") {
-        festival = festival.replace("三八", "")
+      if (festival == '五一劳动节') {
+        festival = festival.replace('五一', '')
+      } else if (festival == '五四青年节') {
+        festival = festival.replace('五四', '')
+      } else if (festival == '八一建军节') {
+        festival = festival.replace('八一', '')
+      } else if (festival == '六一儿童节') {
+        festival = festival.replace('六一', '')
+      } else if (festival == '三八妇女节') {
+        festival = festival.replace('三八', '')
       }
       festivals.push({
         until: i,
@@ -113,8 +113,7 @@ export const get_all_festival = function (year: number, month: number, day: numb
   solar = SolarDay.fromYmd(year, month, day)
   for (let i = 0; i < 366; i++) {
     if (solar.getLunarDay().getFestival()) {
-      let festival = solar.getFestival()?.getName()
-
+      let festival = solar.getLunarDay().getFestival()?.getName()
       festivals.push({
         until: i,
         festival,

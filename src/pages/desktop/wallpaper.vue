@@ -1,60 +1,57 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
-import { convertFileSrc } from "@tauri-apps/api/core";
-import { wallpaperStore } from "../../stores/wallpaper";
-import {  Event } from "@tauri-apps/api/event";
-import { currentMonitor, Monitor } from "@tauri-apps/api/window";
-import MusicDisk from "../../components/wallpaper/MusicDisk.vue";
-import MusicVinyl from "../../components/wallpaper/MusicVinyl.vue";
-import MusicTape from "../../components/wallpaper/MusicTape.vue";
-import Weather from "../../components/wallpaper/Weather.vue";
-import WeatherD7 from "../../components/wallpaper/WeatherD7.vue";
-import Date from "../../components/wallpaper/Date.vue";
-import Calendar from "../../components/wallpaper/Calendar.vue";
-import { MouseAction, MouseEvent } from "../../types/desktopType"
-import { startSakura, stopp } from "../../functions/sakura";
-import { systemStore } from "../../stores/system";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-// import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-// import { invoke } from "@tauri-apps/api/core";
-// invoke("open_devtool", { label: getCurrentWebviewWindow().label })
-const wallpaperstore = wallpaperStore();
-const systemstore = systemStore();
-const index = ref<number>(0);
-const route = useRoute();
-const path = ref();
-const type = ref();
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { wallpaperStore } from '../../stores/wallpaper'
+import { Event } from '@tauri-apps/api/event'
+import { currentMonitor, Monitor } from '@tauri-apps/api/window'
+import MusicDisk from '../../components/wallpaper/MusicDisk.vue'
+import MusicVinyl from '../../components/wallpaper/MusicVinyl.vue'
+import MusicTape from '../../components/wallpaper/MusicTape.vue'
+import Weather from '../../components/wallpaper/Weather.vue'
+import WeatherD7 from '../../components/wallpaper/WeatherD7.vue'
+import Date from '../../components/wallpaper/Date.vue'
+import Calendar from '../../components/wallpaper/Calendar.vue'
+import { MouseAction, MouseEvent } from '../../types/desktopType'
+import { startSakura, stopp } from '../../functions/sakura'
+import { systemStore } from '../../stores/system'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+// import { invoke } from '@tauri-apps/api/core'
+// invoke('open_devtool', { label: getCurrentWebviewWindow().label })
+const wallpaperstore = wallpaperStore()
+const systemstore = systemStore()
+const index = ref<number>(0)
+const route = useRoute()
+const path = ref()
+const type = ref()
 const dom = ref<any>()
 const monitor = ref<Monitor>()
 const unlisten = ref<any>()
 onMounted(async () => {
-  document.title = "skydesk2-wallpaper"
-  path.value = route.query.path;
-  type.value = route.query.type;
+  document.title = 'skydesk2-wallpaper'
+  path.value = route.query.path
+  type.value = route.query.type
   await init()
-});
+})
 
 const init = async function () {
-  monitor.value = await currentMonitor() as Monitor
-  index.value = wallpaperstore.wallpaperConfig.findIndex(
-    (item) => item.monitor == monitor.value?.name
-  );
+  monitor.value = (await currentMonitor()) as Monitor
+  index.value = wallpaperstore.wallpaperConfig.findIndex((item) => item.monitor == monitor.value?.name)
   if (type.value == 'image') {
-    dom.value = document.getElementById("wallpaperimg")
+    dom.value = document.getElementById('wallpaperimg')
   } else if (type.value == 'video') {
-    dom.value = document.getElementById("wallpapervideo")
-    dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+    dom.value = document.getElementById('wallpapervideo')
+    dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
   }
-  if (wallpaperstore.wallpaperConfig[index.value].config.sakura) startSakura();
-  if (wallpaperstore.wallpaperConfig[index.value].config.action) listen_desktop();
-  window.addEventListener("storage", (e) => {
-    if (e.key == "system") {
+  if (wallpaperstore.wallpaperConfig[index.value].config.sakura) startSakura()
+  if (wallpaperstore.wallpaperConfig[index.value].config.action) listen_desktop()
+  window.addEventListener('storage', (e) => {
+    if (e.key == 'system') {
       systemstore.$hydrate()
-    }else if (e.key == "wallpaper") {
-      wallpaperstore.$hydrate();
+    } else if (e.key == 'wallpaper') {
+      wallpaperstore.$hydrate()
       if (type.value == 'video') {
-        dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100;
+        dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
       }
       if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
         startSakura()
@@ -70,41 +67,41 @@ const init = async function () {
         }
       }
     }
-  });
+  })
 }
 
 // 鼠标跟随 //////////////////////////////////////////
 const listen_desktop = async function () {
-  let rx: number = 0;
-  let ry: number = 0;
-  let tx: number = 0;
-  let ty: number = 0;
-  unlisten.value = await getCurrentWebviewWindow().listen("desktop", async (e: Event<MouseEvent>) => {
+  let rx: number = 0
+  let ry: number = 0
+  let tx: number = 0
+  let ty: number = 0
+  unlisten.value = await getCurrentWebviewWindow().listen('desktop', async (e: Event<MouseEvent>) => {
     if (monitor.value?.name !== e.payload.monitor.name) return
     if (e.payload.mouse == MouseAction.Move) {
       let { x, y } = e.payload
       x = (x - monitor.value.position.x) / monitor.value.scaleFactor
       y = (y - monitor.value.position.y) / monitor.value.scaleFactor
-      let poix = x / window.innerWidth - 0.5; // -0.5 ~ 0.5
-      let poiy = y / window.innerHeight - 0.5;
-      rx = (poiy * 5);
-      ry = (-poix * 5);
-      tx = (x / window.innerWidth - 0.5) * 100;  // [-15px, 15px]
-      ty = (y / window.innerHeight - 0.5) * 100;
+      let poix = x / window.innerWidth - 0.5 // -0.5 ~ 0.5
+      let poiy = y / window.innerHeight - 0.5
+      rx = poiy * 5
+      ry = -poix * 5
+      tx = (x / window.innerWidth - 0.5) * 100 // [-15px, 15px]
+      ty = (y / window.innerHeight - 0.5) * 100
     }
   })
   function animate() {
     if (wallpaperstore.wallpaperConfig[index.value].config.action) {
-      dom.value.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      dom.value.style.transform = `translate3d(${tx}px, ${ty}px,0) rotateX(${rx}deg) rotateY(${ry}deg)`
     } else {
-      dom.value.style.transform = `translate3d(0px, 0px,0) rotateX(0deg) rotateY(0deg)`;
+      dom.value.style.transform = `translate3d(0px, 0px,0) rotateX(0deg) rotateY(0deg)`
     }
-    requestAnimationFrame(animate);
+    requestAnimationFrame(animate)
   }
   animate()
 }
 
-getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
+getCurrentWebviewWindow().listen('desktop-volume', (e: Event<boolean>) => {
   if (!systemstore.muted) {
     dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
     return
@@ -127,28 +124,39 @@ getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
 // })
 // const festivals = get_all_festival(today.value.year, today.value.month, today.value.day)
 
+// import Festival from '../../components/wallpaper/Festival.vue'
 </script>
 
 <template>
   <div class="window">
     <!-- snow -->
-    <div style="width: 100%;height: 100%;position: absolute;z-index: 500;">
-
-    </div>
+    <div style="width: 100%; height: 100%; position: absolute; z-index: 500"></div>
+    <!-- festival -->
+    <!-- <Festival></Festival> -->
     <!-- wallpaper -->
-    <img id="wallpaperimg" v-if="type == 'image'" :src="convertFileSrc(path)" :class="{
-      image: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action
-    }" />
-    <video id="wallpapervideo" v-if="type == 'video'"
+    <img
+      id="wallpaperimg"
+      v-if="type == 'image'"
+      :src="convertFileSrc(path)"
+      :class="{
+        image: true,
+        action: wallpaperstore.wallpaperConfig[index].config.action,
+        unaction: !wallpaperstore.wallpaperConfig[index].config.action,
+      }" />
+    <video
+      id="wallpapervideo"
+      v-if="type == 'video'"
       :class="{ video: true, action: wallpaperstore.wallpaperConfig[index].config.action, unaction: !wallpaperstore.wallpaperConfig[index].config.action }"
-      :src="convertFileSrc(path)" autoplay="true" loop="true"></video>
+      :src="convertFileSrc(path)"
+      autoplay="true"
+      loop="true"></video>
     <!-- music1 -->
     <MusicVinyl
       v-if="wallpaperstore.wallpaperConfig[index].config.musictype == 1 && wallpaperstore.wallpaperConfig[index].config.music"
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-        filter: wallpaperstore.wallpaperConfig[index].config.musicshadow ? 'drop-shadow(0px 0px 10px black)' : ''
+        filter: wallpaperstore.wallpaperConfig[index].config.musicshadow ? 'drop-shadow(0px 0px 10px black)' : '',
       }"></MusicVinyl>
     <!-- music2-->
     <MusicDisk
@@ -156,7 +164,7 @@ getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-        filter: wallpaperstore.wallpaperConfig[index].config.musicshadow ? 'drop-shadow(0px 0px 10px black)' : ''
+        filter: wallpaperstore.wallpaperConfig[index].config.musicshadow ? 'drop-shadow(0px 0px 10px black)' : '',
       }"></MusicDisk>
     <!-- music3 -->
     <MusicTape
@@ -164,41 +172,42 @@ getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.musicx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.musicy}%`,
-      }">
-    </MusicTape>
+      }"></MusicTape>
     <!-- weather -->
     <Weather
-      v-if="(wallpaperstore.wallpaperConfig[index].config.weather && wallpaperstore.wallpaperConfig[index].config.weatherd7 == 1)"
+      v-if="wallpaperstore.wallpaperConfig[index].config.weather && wallpaperstore.wallpaperConfig[index].config.weatherd7 == 1"
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
         textShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
         boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
-      }">
-    </Weather>
+      }"></Weather>
     <WeatherD7
-      v-if="(wallpaperstore.wallpaperConfig[index].config.weather && wallpaperstore.wallpaperConfig[index].config.weatherd7 == 7)"
+      v-if="wallpaperstore.wallpaperConfig[index].config.weather && wallpaperstore.wallpaperConfig[index].config.weatherd7 == 7"
       :style="{
         left: `${wallpaperstore.wallpaperConfig[index].config.weatherx}%`,
         top: `${wallpaperstore.wallpaperConfig[index].config.weathery}%`,
         boxShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
         textShadow: wallpaperstore.wallpaperConfig[index].config.weathershadow ? '0px 0px 10px black' : '',
-      }">
-    </WeatherD7> <!-- date -->
-    <Date v-if="wallpaperstore.wallpaperConfig[index].config.date" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
-      color: `${wallpaperstore.wallpaperConfig[index].config.datecolor}`,
-      textShadow: wallpaperstore.wallpaperConfig[index].config.dateshadow ? '0px 0px 10px black' : '',
-
-    }"></Date>
-    <calendar v-if="wallpaperstore.wallpaperConfig[index].config.calendar" :style="{
-      left: `${wallpaperstore.wallpaperConfig[index].config.calendarx}%`,
-      top: `${wallpaperstore.wallpaperConfig[index].config.calendary}%`,
-      color: `${wallpaperstore.wallpaperConfig[index].config.calendarcolor}`,
-      boxShadow: wallpaperstore.wallpaperConfig[index].config.calendarshadow ? '0px 0px 10px black' : '',
-      textShadow: wallpaperstore.wallpaperConfig[index].config.calendarshadow ? '0px 0px 10px black' : ''
-    }"></calendar>
+      }"></WeatherD7>
+    <!-- date -->
+    <Date
+      v-if="wallpaperstore.wallpaperConfig[index].config.date"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.datex}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.datey}%`,
+        color: `${wallpaperstore.wallpaperConfig[index].config.datecolor}`,
+        textShadow: wallpaperstore.wallpaperConfig[index].config.dateshadow ? '0px 0px 10px black' : '',
+      }"></Date>
+    <calendar
+      v-if="wallpaperstore.wallpaperConfig[index].config.calendar"
+      :style="{
+        left: `${wallpaperstore.wallpaperConfig[index].config.calendarx}%`,
+        top: `${wallpaperstore.wallpaperConfig[index].config.calendary}%`,
+        color: `${wallpaperstore.wallpaperConfig[index].config.calendarcolor}`,
+        boxShadow: wallpaperstore.wallpaperConfig[index].config.calendarshadow ? '0px 0px 10px black' : '',
+        textShadow: wallpaperstore.wallpaperConfig[index].config.calendarshadow ? '0px 0px 10px black' : '',
+      }"></calendar>
     <!-- <div :style="{
       left: '20px',
       top: '400px',
@@ -224,10 +233,9 @@ getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
   /* background: white; */
 }
 
-
 @font-face {
-  font-family: "Quicksand";
-  src: url("/font/Quicksand-Light.ttf") format(woff);
+  font-family: 'Quicksand';
+  src: url('/font/Quicksand-Light.ttf') format(woff);
   font-weight: normal;
   font-style: normal;
 }
@@ -289,7 +297,6 @@ getCurrentWebviewWindow().listen("desktop-volume", (e: Event<boolean>) => {
   align-items: flex-start;
   color: rgba(223, 223, 223, 0.5);
 }
-
 
 .cpu {
   position: absolute;

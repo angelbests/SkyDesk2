@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
-import vMonth from "../../components/Month.vue"
-import { systemStore } from "../../stores/system"
+import { computed, ref } from 'vue'
+import vMonth from '../../components/Month.vue'
+import { systemStore } from '../../stores/system'
 const systemstore = systemStore()
-window.addEventListener("storage", (e) => {
-  if (e.key == "system") {
+window.addEventListener('storage', (e) => {
+  if (e.key == 'system') {
     systemstore.$hydrate()
   }
 })
@@ -22,13 +22,12 @@ const today = ref<{
 }>({
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,
-  day: new Date().getDate()
+  day: new Date().getDate(),
 })
 
 const showmonth = computed(() => {
-  return date.value.month < 10 ? "0" + date.value.month : date.value.month
+  return date.value.month < 10 ? '0' + date.value.month : date.value.month
 })
-
 
 const wheelyear = function (e: WheelEvent) {
   if (e.deltaY == -100) {
@@ -65,23 +64,23 @@ const wheelmonth = function (e: WheelEvent) {
 }
 
 const repeat = [
-  { title: "不重复", value: 0 },
-  { title: "每天", value: 1 },
-  { title: "每周", value: 2 },
-  { title: "每月", value: 3 },
-  { title: "每年", value: 4 },
+  { title: '不重复', value: 0 },
+  { title: '每天', value: 1 },
+  { title: '每周', value: 2 },
+  { title: '每月', value: 3 },
+  { title: '每年', value: 4 },
 ]
 const reminder = [
-  { title: "不提醒", value: 0 },
-  { title: "准时", value: 1 },
-  { title: "15 分钟前", value: 2 },
-  { title: "30 分钟前", value: 3 },
-  { title: "1 小时前", value: 4 },
-  { title: "2 小时前", value: 5 },
-  { title: "12 小时前", value: 6 },
-  { title: "1 天前", value: 6 },
-  { title: "2 天前", value: 7 },
-  { title: "1 周前", value: 8 },
+  { title: '不提醒', value: 0 },
+  { title: '准时', value: 1 },
+  { title: '15 分钟前', value: 2 },
+  { title: '30 分钟前', value: 3 },
+  { title: '1 小时前', value: 4 },
+  { title: '2 小时前', value: 5 },
+  { title: '12 小时前', value: 6 },
+  { title: '1 天前', value: 6 },
+  { title: '2 天前', value: 7 },
+  { title: '1 周前', value: 8 },
 ]
 // const weekday = [
 //   { title: "周一", value: 1 },
@@ -98,7 +97,7 @@ const tab = ref(1)
 
 <template>
   <div class="window">
-    <v-dialog v-model="dialog" style="width: 500px;">
+    <v-dialog v-model="dialog" style="width: 500px">
       <v-card>
         <v-card-text>
           <v-tabs v-model="tab" density="compact">
@@ -111,12 +110,10 @@ const tab = ref(1)
                 <v-text-field label="标题" hide-details density="compact"></v-text-field>
               </v-list-item>
               <v-list-item>
-                <v-date-input label="开始" hide-details density="compact" prepend-icon="" hide-actions
-                  show-adjacent-months></v-date-input>
+                <v-date-input label="开始" hide-details density="compact" prepend-icon="" hide-actions show-adjacent-months></v-date-input>
               </v-list-item>
               <v-list-item>
-                <v-date-input label="结束" hide-details density="compact" prepend-icon="" hide-actions
-                  show-adjacent-months></v-date-input>
+                <v-date-input label="结束" hide-details density="compact" prepend-icon="" hide-actions show-adjacent-months></v-date-input>
               </v-list-item>
               <v-list-item>
                 <v-select :items="reminder" label="提醒" hide-details density="compact"></v-select>
@@ -134,9 +131,7 @@ const tab = ref(1)
                   <v-text-field label="标题" hide-details density="compact"></v-text-field>
                 </v-list-item>
                 <v-list-item>
-                  <v-date-input label="日期" hide-details density="compact" prepend-icon="" hide-actions
-                    show-adjacent-months>
-                  </v-date-input>
+                  <v-date-input label="日期" hide-details density="compact" prepend-icon="" hide-actions show-adjacent-months></v-date-input>
                 </v-list-item>
                 <v-list-item>
                   <v-select label="重复" hide-details density="compact" :items="['不重复', '每月', '每年']"></v-select>
@@ -154,55 +149,48 @@ const tab = ref(1)
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-card @wheel.self="wheelmonth" :style="{
-      background: systemstore.btnbarbackground,
-      backgroundSize: 'cover',
-    }" class="btnbar">
-      <div style="
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          font-size: 20px;
-          height: 100%;
-          margin-right: 20px;
-          width: 150px;
-        ">
-        <div @wheel="wheelyear" style="height: 100%; line-height: 300%">
-          {{ date.year }} 年
-        </div>
-        <div @wheel="wheelmonth" style="height: 100%; line-height: 300%">
-          {{ showmonth }} 月
-        </div>
+    <v-card
+      @wheel.self="wheelmonth"
+      :style="{
+        background: systemstore.btnbarbackground,
+        backgroundSize: 'cover',
+      }"
+      class="btnbar">
+      <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; font-size: 20px; height: 100%; margin-right: 20px; width: 150px">
+        <div @wheel="wheelyear" style="height: 100%; line-height: 300%">{{ date.year }} 年</div>
+        <div @wheel="wheelmonth" style="height: 100%; line-height: 300%">{{ showmonth }} 月</div>
       </div>
       <!-- <v-btn style="margin-right: 20px" @click="dialog = true">
         <template v-slot:prepend>
           <v-icon>mdi-calendar-range</v-icon>
         </template>
-日程
-</v-btn> -->
+        日程
+      </v-btn>
+      <v-btn style="margin-right: 20px">
+        <template v-slot:prepend>
+          <v-icon>mdi-calendar-range</v-icon>
+        </template>
+        节日预览
+      </v-btn> -->
     </v-card>
     <v-progress-linear color="black" :indeterminate="false"></v-progress-linear>
 
     <div @wheel="wheelmonth" style="width: 100%; height: calc(100% - 64px); display: flex; overflow: hidden">
       <v-month v-model:date="date">
         <template v-slot:default="{ day }">
-          <div :style="{
-            background:
-              today.year == day.solar_year &&
-                today.month == day.solar_month &&
-                today.day == day.solar_day
-                ? 'rgba(133,133,133,0.5)'
-                : '',
-          }" class="day">
-            <div style="font-size: 17px;">
+          <div
+            :style="{
+              background: today.year == day.solar_year && today.month == day.solar_month && today.day == day.solar_day ? 'rgba(133,133,133,0.5)' : '',
+            }"
+            class="day">
+            <div style="font-size: 17px">
               {{ day.solar_day }}
             </div>
             <div>
               <span v-if="day.solar_festival">{{ day.solar_festival }}</span>
               <span v-else-if="day.lunar_festival">{{ day.lunar_festival }}</span>
               <span v-else-if="day.lunar_term">{{ day.lunar_term }}</span>
-              <span v-else> {{ day.lunar_day == '初一' ? day.lunar_month : day.lunar_day }}</span>
+              <span v-else>{{ day.lunar_day == '初一' ? day.lunar_month : day.lunar_day }}</span>
             </div>
           </div>
         </template>
