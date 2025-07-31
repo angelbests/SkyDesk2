@@ -26,7 +26,8 @@
         "alwaysOnTop": false,
         "visible": false,
         "windowClassname": "skydesk2",
-        "allowLinkPreview": false
+        "allowLinkPreview": false,
+        "backgroundThrottling": "disabled"
       },
       {
         "x": 99999999999,
@@ -67,7 +68,12 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": ["$APPDATA/**", "$RESOURCE/**", "$VIDEO/**", "$PICTURE/**"]
+        "scope": [
+          "$APPDATA/**",
+          "$RESOURCE/**",
+          "$VIDEO/**",
+          "$PICTURE/**"
+        ]
       }
     },
     "withGlobalTauri": true
@@ -75,20 +81,38 @@
   "bundle": {
     "publisher": "angelbests1314@live.com",
     "active": true,
-    "targets": ["msi", "nsis"],
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-    "externalBin": ["bin/webdav/webdav"],
-    "resources": ["icons/icon.ico", "resources/*"],
+    "targets": [
+      "msi",
+      "nsis"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "bin/webdav/webdav"
+    ],
+    "resources": [
+      "icons/icon.ico",
+      "resources/*"
+    ],
     "fileAssociations": [
       {
-        "ext": ["png"]
+        "ext": [
+          "png"
+        ]
       }
     ],
     "windows": {
       "nsis": {
         "installerIcon": "./icons/icon.ico",
         "displayLanguageSelector": true,
-        "languages": ["SimpChinese"]
+        "languages": [
+          "SimpChinese"
+        ]
       },
       "wix": {
         "language": "zh-CN",
@@ -109,7 +133,9 @@
         "installMode": "passive"
       },
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDExNjEwMjdGQ0VFOUY5MDUKUldRRitlbk9md0poRVkySklaaGdiaXQ0MURGMXZ5ZjhPblFUWWY0RW54Qm8yQ0NoWHR0alRKV1YK",
-      "endpoints": ["https://github.com/angelbests/SkyDesk2/releases/latest/download/latest.json"]
+      "endpoints": [
+        "https://github.com/angelbests/SkyDesk2/releases/latest/download/latest.json"
+      ]
     }
   }
 }
