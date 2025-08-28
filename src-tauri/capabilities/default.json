@@ -40,6 +40,7 @@
     "core:window:allow-set-size",
     "core:window:allow-set-resizable",
     "core:window:allow-set-maximizable",
+    "core:window:allow-set-fullscreen",
     "core:event:allow-listen",
     "core:event:allow-emit",
     "core:event:allow-emit-to",

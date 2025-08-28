@@ -40,49 +40,12 @@ onMounted(async () => {
   image.value = convertFileSrc((await resourceDir()) + '\\resources\\image.png')
   html.value = convertFileSrc((await resourceDir()) + '\\resources\\html.png')
   monitors.value = await availableMonitors()
-
-  if (wallpapers.wallpaperConfig.length == 0) {
-    for (let i = 0; i < monitors.value.length; i++) {
-      wallpapers.wallpaperConfig.push({
-        label: '',
-        monitor: monitors.value[i].name as string,
-        config: {
-          action: false,
-          sakura: false,
-          audio: 0,
-          date: false,
-          datex: 0,
-          datey: 0,
-          datecolor: 'white',
-          dateshadow: false,
-          weather: false,
-          weatherx: 0,
-          weathery: 0,
-          weatherd7: 1,
-          weathershadow: false,
-          music: false,
-          musictype: 1,
-          musicx: 0,
-          musicy: 0,
-          musicapp: 'QQMusic.exe',
-          musicshadow: false,
-          festivalcountdown: false,
-          festivalcountdownx: 0,
-          festivalcountdowny: 0,
-          festivals: [],
-          calendar: false,
-          calendarx: 0,
-          calendary: 0,
-          calendarcolor: 'white',
-          calendarshadow: false,
-        },
-      })
-    }
-  }
 })
 
 // 设置壁纸
 const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
+  monitors.value = await availableMonitors()
+  monitor = (await availableMonitors()).filter((item) => monitor.name == item.name)[0]
   // 配置url
   let label = 'wallpaper-' + uuid()
   let url = ''
@@ -90,6 +53,53 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
     url = 'http://127.0.0.1:12345/' + item.path.replace((await appDataDir()) + '\\wallpapers\\html\\', '')
   } else {
     url = '/#/pages/desktop/wallpaper?type=' + item.type + '&path=' + item.path
+  }
+  //
+  let i = wallpapers.wallpaperConfig.findIndex((item) => item.monitor == monitor.name)
+  if (i >= 0) {
+    console.log('关闭已有壁纸')
+    let all = await getAllWebviewWindows()
+    all.filter((item) => {
+      if (item.label == wallpapers.wallpaperConfig[i].label) {
+        item.close()
+      }
+    })
+  } else {
+    wallpapers.wallpaperConfig.push({
+      label: label,
+      monitor: monitor.name as string,
+      config: {
+        action: false,
+        sakura: false,
+        audio: 0,
+        date: false,
+        datex: 0,
+        datey: 0,
+        datecolor: 'white',
+        dateshadow: false,
+        weather: false,
+        weatherx: 0,
+        weathery: 0,
+        weatherd7: 1,
+        weathershadow: false,
+        music: false,
+        musictype: 1,
+        musicx: 0,
+        musicy: 0,
+        musicapp: 'QQMusic.exe',
+        musicshadow: false,
+        festivalcountdown: false,
+        festivalcountdownx: 0,
+        festivalcountdowny: 0,
+        festivals: [],
+        calendar: false,
+        calendarx: 0,
+        calendary: 0,
+        calendarcolor: 'white',
+        calendarshadow: false,
+      },
+    })
+    i = wallpapers.wallpaperConfig.findIndex((item) => item.monitor == monitor.name)
   }
   // 创建窗口到壁纸层
   let w = await createWindow(
@@ -99,10 +109,9 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
       y: monitor.position.y,
       width: monitor.size.width,
       height: monitor.size.height,
-      decorations: true,
+      decorations: false,
       transparent: true,
-      fullscreen: true,
-      dragDropEnabled: true,
+      dragDropEnabled: false,
       shadow: false,
       alwaysOnBottom: true,
       skipTaskbar: true,
@@ -122,15 +131,6 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
 
   w?.setSize(new LogicalSize(100, 100))
   await setWindowToMonitor(label, monitor.position.x as number, monitor.position.y as number, monitor.size.width as number, monitor.size.height as number)
-  let i = wallpapers.wallpaperConfig.findIndex((item) => item.monitor == monitor.name)
-  if (i >= 0) {
-    let all = await getAllWebviewWindows()
-    all.filter((item) => {
-      if (item.label == wallpapers.wallpaperConfig[i].label) {
-        item.close()
-      }
-    })
-  }
   wallpapers.wallpaperConfig[i].label = label
 }
 

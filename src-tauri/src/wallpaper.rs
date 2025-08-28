@@ -18,7 +18,10 @@ pub fn setwallpaper(app: AppHandle, label: String, x: i32, y: i32, w: i32, h: i3
         let webview = app.get_webview_window(&label);
         match webview {
             Some(webview) => match webview.hwnd() {
-                Ok(hwnd) => attach(hwnd, x, y, w, h, z),
+                Ok(hwnd) => {
+                    disable_round_corner(hwnd);
+                    attach(hwnd, x, y, w, h, z);
+                }
                 Err(e) => println!("Failed to get hwnd: {:?}", e),
             },
             None => {
@@ -78,7 +81,7 @@ extern "system" fn enum_window(window: HWND, ref_worker_w: LPARAM) -> BOOL {
         return false.into();
     }
 }
-
+use windows::Win32::Graphics::Gdi::{CreateRectRgn, SetWindowRgn};
 fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
     unsafe {
         let progman = WindowsAndMessaging::FindWindowA(s!("Progman"), None).unwrap();
@@ -124,14 +127,17 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             h,
             SWP_HIDEWINDOW,
         );
+
         // 该窗口是一个分层窗口。 如果窗口的 类样式 为 CS_OWNDC 或 CS_CLASSDC，则不能使用此样式。Windows 8：顶级窗口和子窗口支持WS_EX_LAYERED样式。 以前的 Windows 版本仅支持 顶级窗口WS_EX_LAYERED 。
         WindowsAndMessaging::SetWindowLongPtrA(
             hwnd,
             GWL_EXSTYLE,
             WindowsAndMessaging::GetWindowLongPtrA(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED.0 as isize,
         );
+
         let _ = SetLayeredWindowAttributes(hwnd, COLORREF(0), 255, LWA_ALPHA);
         let _ = WindowsAndMessaging::SetParent(hwnd, Some(worker_w));
+
         if z == 1 {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,
@@ -154,11 +160,18 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             );
         };
         let shell_dll_def_view =
-            WindowsAndMessaging::FindWindowExA(Some(progman), None, s!("SHELLDLL_DefView"), None)
-                .unwrap();
-        let _ = WindowsAndMessaging::ShowWindow(shell_dll_def_view, SW_HIDE);
-        thread::sleep(Duration::from_millis(0));
-        let _ = WindowsAndMessaging::ShowWindow(shell_dll_def_view, SW_SHOWNORMAL);
+            WindowsAndMessaging::FindWindowExA(Some(progman), None, s!("SHELLDLL_DefView"), None);
+        match shell_dll_def_view {
+            Ok(s) => {
+                let _ = WindowsAndMessaging::ShowWindow(s, SW_HIDE);
+                thread::sleep(Duration::from_millis(0));
+                let _ = WindowsAndMessaging::ShowWindow(s, SW_SHOWNORMAL);
+            }
+            Err(_e) => {}
+        }
+        // 直接裁剪 去掉圆角
+        let rgn = CreateRectRgn(0, 0, w, h);
+        SetWindowRgn(hwnd, Some(rgn), true);
     };
 }
 
@@ -180,4 +193,19 @@ fn detach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
             SWP_SHOWWINDOW,
         );
     };
+}
+
+use windows::Win32::Graphics::Dwm::{
+    DwmSetWindowAttribute, DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_DONOTROUND,
+};
+pub fn disable_round_corner(hwnd: HWND) {
+    unsafe {
+        let preference: u32 = DWMWCP_DONOTROUND.0 as u32;
+        let _ = DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_WINDOW_CORNER_PREFERENCE,
+            &preference as *const _ as _,
+            std::mem::size_of_val(&preference) as u32,
+        );
+    }
 }
