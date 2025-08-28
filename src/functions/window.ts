@@ -1,13 +1,13 @@
-import { WebviewWindow, getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow"
-import { WindowOptions } from "@tauri-apps/api/window"
-import { WebviewOptions } from "@tauri-apps/api/webview"
-import { windowStore } from "../stores/window"
-import { Monitor } from "@tauri-apps/api/window"
-import { setWindowToMonitor } from "../functions/monitor"
-import { UnlistenFn } from "@tauri-apps/api/event"
+import { WebviewWindow, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { availableMonitors, WindowOptions } from '@tauri-apps/api/window'
+import { WebviewOptions } from '@tauri-apps/api/webview'
+import { windowStore } from '../stores/window'
+import { Monitor } from '@tauri-apps/api/window'
+import { setWindowToMonitor } from '../functions/monitor'
+import { UnlistenFn } from '@tauri-apps/api/event'
 export const createWindow = async function (
   label: string,
-  option: Omit<WebviewOptions, "x" | "y" | "width" | "height"> & WindowOptions,
+  option: Omit<WebviewOptions, 'x' | 'y' | 'width' | 'height'> & WindowOptions,
   wallpaper = {
     x: 0,
     y: 0,
@@ -29,7 +29,7 @@ export const createWindow = async function (
       wallpaper,
     })
     const w = new WebviewWindow(label, option)
-    if (w.label.indexOf("wallpaper-") < 0) {
+    if (w.label.indexOf('wallpaper-') < 0) {
       let unlisten1 = await listenMove(w)
       let unlisten2 = await listenSize(w)
       listenClose(w, unlisten1, unlisten2)
@@ -45,17 +45,23 @@ export const createWindow = async function (
 
 export const initWindow = async function () {
   const windowstore = windowStore()
-  for(let i=0;i<windowstore.windows.length;i++){
-    let { option,label,wallpaper } = windowstore.windows[i];
-    let w = new WebviewWindow(label, {
-      ...option,
-    })
+  for (let i = 0; i < windowstore.windows.length; i++) {
+    let { option, label, wallpaper } = windowstore.windows[i]
+    let monitor = (await availableMonitors()).filter((item) => item.name == wallpaper.monitor?.name)
     if (wallpaper.status) {
-      await listenClose(w)
-      setTimeout(()=>{
-        setWindowToMonitor(label, wallpaper.x, wallpaper.y, wallpaper.w, wallpaper.h, wallpaper.z)
-      },20);
-    }else{
+      if (monitor.length == 1) {
+        let w = new WebviewWindow(label, {
+          ...option,
+        })
+        await listenClose(w)
+        setTimeout(() => {
+          setWindowToMonitor(label, monitor[0].position.x, monitor[0].position.y, monitor[0].size.width, monitor[0].size.height, wallpaper.z)
+        }, 20)
+      }
+    } else {
+      let w = new WebviewWindow(label, {
+        ...option,
+      })
       let unlisten1 = await listenMove(w)
       let unlisten2 = await listenSize(w)
       await listenClose(w, unlisten1, unlisten2)
@@ -66,7 +72,7 @@ export const initWindow = async function () {
 const listenMove = async function (w: WebviewWindow) {
   let label = w.label
   const factor = await getCurrentWebviewWindow().scaleFactor()
-  let unlisten = await w.listen("tauri://move", function (event: any) {
+  let unlisten = await w.listen('tauri://move', function (event: any) {
     const windowstore = windowStore()
     let index = windowstore.windows.findIndex((item) => {
       return item.label === label
@@ -79,7 +85,7 @@ const listenMove = async function (w: WebviewWindow) {
 
 const listenClose = async function (w: WebviewWindow, unlisten1?: UnlistenFn, unlisten2?: UnlistenFn) {
   let label = w.label
-  let unlisten = await w.listen("tauri://close-requested", () => {
+  let unlisten = await w.listen('tauri://close-requested', () => {
     const windowstore = windowStore()
     let index = windowstore.windows.findIndex((item) => {
       return item.label === label
@@ -95,7 +101,7 @@ const listenClose = async function (w: WebviewWindow, unlisten1?: UnlistenFn, un
 const listenSize = async function (w: WebviewWindow) {
   let label = w.label
   const factor = await getCurrentWebviewWindow().scaleFactor()
-  let unlisten = await w.listen("tauri://resize", (event: any) => {
+  let unlisten = await w.listen('tauri://resize', (event: any) => {
     const windowstore = windowStore()
     let index = windowstore.windows.findIndex((item) => {
       return item.label === label

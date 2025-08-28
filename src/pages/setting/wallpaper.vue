@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, toRefs, onMounted } from 'vue'
+import { ref, watch, toRefs, onMounted, onActivated } from 'vue'
 import { weatherStore } from '../../stores/weather'
 import { systemStore } from '../../stores/system'
 import { wallpaperStore } from '../../stores/wallpaper'
@@ -22,6 +22,11 @@ const systemstore = systemStore()
 const video = ref()
 const image = ref()
 const html = ref()
+
+onActivated(async () => {
+  monitors.value = await availableMonitors()
+  console.log('屏幕：', monitors.value)
+})
 onMounted(async () => {
   window.addEventListener('storage', (e) => {
     if (e.key == 'system') {
@@ -35,6 +40,7 @@ onMounted(async () => {
   image.value = convertFileSrc((await resourceDir()) + '\\resources\\image.png')
   html.value = convertFileSrc((await resourceDir()) + '\\resources\\html.png')
   monitors.value = await availableMonitors()
+
   if (wallpapers.wallpaperConfig.length == 0) {
     for (let i = 0; i < monitors.value.length; i++) {
       wallpapers.wallpaperConfig.push({
@@ -117,7 +123,7 @@ const setmonitorwallpaper = async function (item: any, monitor: Monitor) {
   w?.setSize(new LogicalSize(100, 100))
   await setWindowToMonitor(label, monitor.position.x as number, monitor.position.y as number, monitor.size.width as number, monitor.size.height as number)
   let i = wallpapers.wallpaperConfig.findIndex((item) => item.monitor == monitor.name)
-  if (wallpapers.wallpaperConfig[i].label) {
+  if (i >= 0) {
     let all = await getAllWebviewWindows()
     all.filter((item) => {
       if (item.label == wallpapers.wallpaperConfig[i].label) {
