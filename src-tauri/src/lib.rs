@@ -14,6 +14,7 @@ mod desktop;
 mod dropfile;
 mod hovertop;
 mod lockscreen;
+mod monitor;
 mod search;
 mod shell;
 mod smtc;
@@ -38,6 +39,12 @@ pub fn run() {
             server::open_server(path.to_str().unwrap().to_string(), 12345);
             desktop::desktop_mouse_listen(app.handle().clone());
             desktop::focus_desktop(app.handle().clone());
+            monitor::init_window_hook(app.handle().clone());
+            let main = app.get_webview_window("main").unwrap();
+            // webview2禁用节能模式
+            main.with_webview(|webview| {
+                let _controller = webview.controller();
+            })?;
             Ok(())
         })
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {

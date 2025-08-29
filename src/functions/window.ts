@@ -69,7 +69,7 @@ export const initWindow = async function () {
   }
 }
 
-const listenMove = async function (w: WebviewWindow) {
+export const listenMove = async function (w: WebviewWindow) {
   let label = w.label
   const factor = await getCurrentWebviewWindow().scaleFactor()
   let unlisten = await w.listen('tauri://move', function (event: any) {
@@ -83,7 +83,7 @@ const listenMove = async function (w: WebviewWindow) {
   return unlisten
 }
 
-const listenClose = async function (w: WebviewWindow, unlisten1?: UnlistenFn, unlisten2?: UnlistenFn) {
+export const listenClose = async function (w: WebviewWindow, unlisten1?: UnlistenFn, unlisten2?: UnlistenFn) {
   let label = w.label
   let unlisten = await w.listen('tauri://close-requested', () => {
     const windowstore = windowStore()
@@ -98,7 +98,7 @@ const listenClose = async function (w: WebviewWindow, unlisten1?: UnlistenFn, un
   })
 }
 
-const listenSize = async function (w: WebviewWindow) {
+export const listenSize = async function (w: WebviewWindow) {
   let label = w.label
   const factor = await getCurrentWebviewWindow().scaleFactor()
   let unlisten = await w.listen('tauri://resize', (event: any) => {

@@ -16,7 +16,7 @@ import { copyFile } from '@tauri-apps/plugin-fs'
 import { Netspeed, NetSpeed } from '../functions/sysinfo'
 import { uuid } from '../functions'
 import { appDataDir, resolve } from '@tauri-apps/api/path'
-import { createWindow } from '../functions/window'
+import { createWindow, listenClose } from '../functions/window'
 const systemstore = systemStore()
 const drawer = ref(true)
 const colorshow = ref(false)
@@ -34,6 +34,29 @@ window.addEventListener('drop', (e) => {
 
 window.addEventListener('dragover', (e) => {
   e.preventDefault()
+})
+
+// 监听显示插拔变化，重新创建壁纸
+getCurrentWebviewWindow().listen('DISPLAY_CHANGE', async (e) => {
+  console.log(e)
+  if (e.payload == 1) {
+    const windowstore = windowStore()
+    for (let i = 0; i < windowstore.windows.length; i++) {
+      let { option, label, wallpaper } = windowstore.windows[i]
+      let monitor = (await availableMonitors()).filter((item) => item.name == wallpaper.monitor?.name)
+      if (wallpaper.status) {
+        if (monitor.length == 1) {
+          let w = new WebviewWindow(label, {
+            ...option,
+          })
+          await listenClose(w)
+          setTimeout(() => {
+            setWindowToMonitor(label, monitor[0].position.x, monitor[0].position.y, monitor[0].size.width, monitor[0].size.height, wallpaper.z)
+          }, 20)
+        }
+      }
+    }
+  }
 })
 
 getCurrentWebviewWindow().listen('create-note', async () => {
@@ -234,6 +257,8 @@ const updateversion = ref('')
 import { check } from '@tauri-apps/plugin-updater'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { getVersion } from '@tauri-apps/api/app'
+import { availableMonitors } from '@tauri-apps/api/window'
+import { setWindowToMonitor } from '../functions/monitor'
 
 const open_github = function () {
   // https://github.com/angelbests/SkyDesk2
