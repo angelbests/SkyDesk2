@@ -137,7 +137,9 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
 
         let _ = SetLayeredWindowAttributes(hwnd, COLORREF(0), 255, LWA_ALPHA);
         let _ = WindowsAndMessaging::SetParent(hwnd, Some(worker_w));
-
+        // 直接裁剪 去掉圆角
+        let rgn = CreateRectRgn(0, 0, w, h);
+        SetWindowRgn(hwnd, Some(rgn), true);
         if z == 1 {
             let _ = WindowsAndMessaging::SetWindowPos(
                 hwnd,
@@ -169,9 +171,6 @@ fn attach(hwnd: HWND, x: i32, y: i32, w: i32, h: i32, z: i32) {
             }
             Err(_e) => {}
         }
-        // 直接裁剪 去掉圆角
-        let rgn = CreateRectRgn(0, 0, w, h);
-        SetWindowRgn(hwnd, Some(rgn), true);
     };
 }
 

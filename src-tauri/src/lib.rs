@@ -40,11 +40,11 @@ pub fn run() {
             desktop::desktop_mouse_listen(app.handle().clone());
             desktop::focus_desktop(app.handle().clone());
             monitor::init_window_hook(app.handle().clone());
-            let main = app.get_webview_window("main").unwrap();
+            // let main = app.get_webview_window("main").unwrap();
             // webview2禁用节能模式
-            main.with_webview(|webview| {
-                let _controller = webview.controller();
-            })?;
+            // main.with_webview(|webview| {
+            //     let _controller = webview.controller();
+            // })?;
             Ok(())
         })
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
@@ -98,7 +98,6 @@ pub fn run() {
             shell::get_localized_display_name,
             shell::get_uwp,
             clipboard::copyfile,
-            test,
             check_path_type,
             open_devtool
         ])
@@ -130,11 +129,4 @@ fn check_path_type(path: String) -> String {
         }
         Err(_) => "invalid".into(),
     }
-}
-
-#[tauri::command]
-fn test(window: Window, bool: bool) {
-    use window_vibrancy::apply_mica;
-    #[cfg(target_os = "windows")]
-    let _ = apply_mica(&window, Some(bool));
 }
