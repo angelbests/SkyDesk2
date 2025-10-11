@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import vMonth from '../../components/Month.vue'
-import { systemStore } from '../../stores/system'
 import { DayInfo, today as gettoday } from '../../functions/calendar'
-const systemstore = systemStore()
-window.addEventListener('storage', (e) => {
-  if (e.key == 'system') {
-    systemstore.$hydrate()
-  }
-})
 const date = ref<{
   year: number
   month: number

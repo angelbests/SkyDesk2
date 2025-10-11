@@ -1,13 +1,13 @@
-import { defineStore } from "pinia"
-import { ShortCut } from "../types/storeType"
+import { defineStore } from 'pinia'
+import { ShortCut } from '../types/storeType'
 
-export const shortcutStore = defineStore("shortcut", {
+export const shortcutStore = defineStore('shortcut', {
   state: function () {
     return {
       shortcutsTemp: [] as ShortCut[],
       shortcuts: [
         {
-          title: "开始",
+          title: '开始',
           index: 0,
           shortcut: [],
         },
@@ -19,5 +19,4 @@ export const shortcutStore = defineStore("shortcut", {
       wheels: [] as ShortCut[],
     }
   },
-  persist: true,
 })

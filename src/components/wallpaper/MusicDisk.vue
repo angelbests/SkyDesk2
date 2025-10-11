@@ -17,11 +17,6 @@ let smtc = new Smtc_Control()
 onMounted(async () => {
   const monitor = await currentMonitor()
   index.value = wallpaperstore.wallpaperConfig.findIndex((item) => item.monitor == monitor?.name)
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'wallpaper') {
-      wallpaperstore.$hydrate()
-    }
-  })
   cancel_listen_desktop = await desktopMouseControl('music_disk', index.value)
 })
 

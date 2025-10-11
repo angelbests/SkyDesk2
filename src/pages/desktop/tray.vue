@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { LogicalSize } from "@tauri-apps/api/dpi";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { exit, relaunch } from "@tauri-apps/plugin-process";
-import { uuid } from "../../functions";
-import { createWindow } from "../../functions/window";
-getCurrentWebviewWindow().setSize(new LogicalSize(100, 110));
+import { LogicalSize } from '@tauri-apps/api/dpi'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { exit, relaunch } from '@tauri-apps/plugin-process'
+import { uuid } from '../../functions'
+import { createWindow } from '../../functions/window'
+getCurrentWebviewWindow().setSize(new LogicalSize(100, 110))
 const createnote = async function () {
-  let label = "note-" + uuid();
+  let label = 'note-' + uuid()
   let w = await createWindow(label, {
     x: 200,
     y: 200,
@@ -18,14 +18,14 @@ const createnote = async function () {
     decorations: false,
     transparent: true,
     skipTaskbar: true,
-    url: "/#/pages/desktop/note",
-    title: "note"
-  });
+    url: '/#/pages/desktop/note',
+    title: 'note',
+  })
   w?.center()
-};
+}
 
-getCurrentWebviewWindow().listen("tauri://blur", () => {
-  getCurrentWebviewWindow().destroy()
+getCurrentWebviewWindow().listen('tauri://blur', () => {
+  getCurrentWebviewWindow().hide()
 })
 </script>
 

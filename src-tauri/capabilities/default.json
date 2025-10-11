@@ -62,6 +62,7 @@
     "clipboard-manager:allow-write-image",
     "clipboard-manager:allow-write-text",
     "log:default",
+    "pinia:default",
     {
       "identifier": "fs:allow-remove",
       "allow": [

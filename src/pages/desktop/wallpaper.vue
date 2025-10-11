@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { wallpaperStore } from '../../stores/wallpaper'
@@ -45,30 +45,25 @@ const init = async function () {
   }
   if (wallpaperstore.wallpaperConfig[index.value].config.sakura) startSakura()
   if (wallpaperstore.wallpaperConfig[index.value].config.action) listen_desktop()
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'system') {
-      systemstore.$hydrate()
-    } else if (e.key == 'wallpaper') {
-      wallpaperstore.$hydrate()
-      if (type.value == 'video') {
-        dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
-      }
-      if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
-        startSakura()
-      } else {
-        stopp()
-      }
-
-      if (wallpaperstore.wallpaperConfig[index.value].config.action) {
-        listen_desktop()
-      } else {
-        if (unlisten.value) {
-          unlisten.value()
-        }
-      }
-    }
-  })
 }
+watch(wallpaperstore, () => {
+  if (type.value == 'video') {
+    dom.value.volume = wallpaperstore.wallpaperConfig[index.value].config.audio / 100
+  }
+  if (wallpaperstore.wallpaperConfig[index.value].config.sakura) {
+    startSakura()
+  } else {
+    stopp()
+  }
+
+  if (wallpaperstore.wallpaperConfig[index.value].config.action) {
+    listen_desktop()
+  } else {
+    if (unlisten.value) {
+      unlisten.value()
+    }
+  }
+})
 
 // 鼠标跟随 //////////////////////////////////////////
 const listen_desktop = async function () {

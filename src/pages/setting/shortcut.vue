@@ -42,14 +42,6 @@ onMounted(async () => {
   if (shortcutstore.shortcutsTemp.length == 0) {
     scanProgram()
   }
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'system') {
-      systemstore.$hydrate()
-    }
-    if (e.key == 'shortcut') {
-      shortcutstore.$hydrate()
-    }
-  })
 
   // 监听程序文件夹，若有变动则更新快捷列表
   let dirs = [(await homeDir()) + '\\desktop', 'C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs', (await homeDir()) + '\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs']

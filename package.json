@@ -1,7 +1,7 @@
 {
   "name": "skydesk2",
   "private": true,
-  "version": "1.3.8",
+  "version": "1.3.9",
   "type": "module",
   "scripts": {
     "tauri dev": "tauri dev",
@@ -25,6 +25,7 @@
     "@tauri-apps/plugin-shell": "^2.3.0",
     "@tauri-apps/plugin-updater": "^2.9.0",
     "@tauri-apps/plugin-upload": "^2.3.1",
+    "@tauri-store/pinia": "^4.1.0",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
     "@wangeditor-next/editor-for-vue": "^5.1.12",
@@ -39,8 +40,7 @@
     "npm": "^10.9.0",
     "ollama": "^0.5.14",
     "pcm-player": "^0.0.18",
-    "pinia": "^2.2.2",
-    "pinia-plugin-persistedstate": "^3.2.2",
+    "pinia": "^3.0.3",
     "qweather-icons": "^1.6.0",
     "sortablejs": "^1.15.4",
     "tyme4ts": "^1.3.3",

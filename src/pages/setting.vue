@@ -131,7 +131,6 @@ const autostartsetting = function (e: any) {
 //#region
 // 清除用户信息
 const refresh = function () {
-  localStorage.clear()
   systemStore().$reset()
   windowStore().$reset()
   noteStore().$reset()
@@ -345,11 +344,6 @@ const hovertop = async function () {
 }
 let wheelwindow: WebviewWindow | undefined
 let netspeedwindow: WebviewWindow | undefined
-window.addEventListener('storage', (e) => {
-  if (e.key == 'system') {
-    systemstore.$hydrate()
-  }
-})
 
 watch(
   systemstore,

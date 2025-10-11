@@ -48,11 +48,6 @@ onMounted(async () => {
     message.value = '你好！'
     sendmessage()
   }
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'system') {
-      systemstore.$hydrate()
-    }
-  })
 })
 
 const checkollama = async function () {

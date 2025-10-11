@@ -28,14 +28,6 @@ onActivated(async () => {
   console.log('屏幕：', monitors.value)
 })
 onMounted(async () => {
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'system') {
-      systemstore.$hydrate()
-    }
-    if (e.key == 'wallpaper') {
-      wallpapers.$hydrate()
-    }
-  })
   video.value = convertFileSrc((await resourceDir()) + '\\resources\\video.png')
   image.value = convertFileSrc((await resourceDir()) + '\\resources\\image.png')
   html.value = convertFileSrc((await resourceDir()) + '\\resources\\html.png')

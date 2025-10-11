@@ -25,11 +25,6 @@ getCurrentWebviewWindow().listen('tauri://move', async (event: any) => {
 //#endregion
 
 onMounted(() => {
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'system') {
-      systemstore.$hydrate()
-    }
-  })
   document.addEventListener('selectstart', (e) => {
     e.preventDefault()
   })

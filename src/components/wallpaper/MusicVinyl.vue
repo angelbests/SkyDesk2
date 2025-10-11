@@ -16,11 +16,6 @@ let cancel_listen_audio_chunk: any
 onMounted(async () => {
   const monitor = await currentMonitor()
   index.value = wallpaperstore.wallpaperConfig.findIndex((item) => item.monitor == monitor?.name)
-  window.addEventListener('storage', (e) => {
-    if (e.key == 'wallpaper') {
-      wallpaperstore.$hydrate()
-    }
-  })
   cancel_listen_desktop = await desktopMouseControl('music_img', index.value)
   draw()
 })
@@ -34,7 +29,7 @@ const player = new PCMPlayer({
 })
 
 listen('audio_chunk', (e: { payload: number[] }) => {
-  player.feed(new Uint8Array(e.payload))
+  player.feed(new Uint8Array(e.payload).buffer)
   // console.log(e.payload)
 })
 player.volume(0)

@@ -32,13 +32,6 @@ const focusindex = ref(-1)
 let timer: string | number | NodeJS.Timeout | undefined
 let isPressed = false
 
-// 监听缓存shortcut变化
-window.addEventListener('storage', (e) => {
-  if (e.key == 'shortcut') {
-    shortcutstore.$hydrate()
-  }
-})
-
 type SettingBottomItem = {
   path: string
   cmd: string

@@ -14,16 +14,9 @@ import { noteStore } from '../../stores/note'
 import { windowStore } from '../../stores/window'
 import { listen } from '@tauri-apps/api/event'
 getCurrentWebviewWindow().hide()
+const notestore = noteStore()
 let label = getCurrentWebviewWindow().label
 // 监听storage事件
-window.addEventListener('storage', (e) => {
-  if (e.key === 'note') {
-    noteStore().$hydrate()
-  }
-  if (e.key === 'window') {
-    windowStore().$hydrate()
-  }
-})
 //#region vue
 const editorData = reactive({
   value: '',
@@ -109,8 +102,15 @@ const setconfig = async function () {
   localStorage.setItem(label, JSON.stringify({ ...editorData }))
   if (timer != undefined) clearTimeout(timer)
   timer = setTimeout(() => {
-    getCurrentWebviewWindow().emitTo('main', 'note', { ...editorData })
-    console.log(1)
+    let index = notestore.note.findIndex((item) => {
+      return item.label == editorData.label
+    })
+
+    if (index >= 0) {
+      notestore.note[index] = editorData
+    } else {
+      notestore.note.push(editorData)
+    }
   }, 50)
 }
 //#endregion
@@ -157,7 +157,14 @@ const onChange = function () {
   clearTimeout(onChangeTime.value)
   onChangeTime.value = setTimeout(function () {
     localStorage.setItem(label, JSON.stringify(editorData))
-    getCurrentWebviewWindow().emit('note', editorData)
+    let index = notestore.note.findIndex((item) => {
+      return item.label == editorData.label
+    })
+    if (index >= 0) {
+      notestore.note[index] = editorData
+    } else {
+      notestore.note.push(editorData)
+    }
   }, 100)
 }
 

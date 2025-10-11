@@ -1,94 +1,82 @@
 <script setup lang="ts">
-import { PhysicalPosition } from "@tauri-apps/api/dpi";
-import { listen } from "@tauri-apps/api/event";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { onMounted, reactive, ref } from "vue";
-import { convertFileSrc } from "@tauri-apps/api/core";
-import { shortcutStore } from "../../stores/shortcut";
-import { ShortCut } from "../../types/storeType";
-const shortcutstore = shortcutStore();
-const wheel = ref<ShortCut[]>([]);
-const app = getCurrentWebviewWindow();
-app.setShadow(false);
+import { PhysicalPosition } from '@tauri-apps/api/dpi'
+import { listen } from '@tauri-apps/api/event'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { shortcutStore } from '../../stores/shortcut'
+import { ShortCut } from '../../types/storeType'
+const shortcutstore = shortcutStore()
+const wheel = ref<ShortCut[]>([])
+const app = getCurrentWebviewWindow()
+app.setShadow(false)
 const position = reactive({
   x: 0,
   y: 0,
-});
+})
 onMounted(async () => {
-  updatewheel();
-  window.addEventListener("storage", (e) => {
-    console.log(e);
-    if (e.key == "shortcut") {
-      shortcutstore.$hydrate();
-      updatewheel();
-    }
-  });
-});
+  updatewheel()
+})
+
+watch(shortcutstore, () => {
+  updatewheel()
+})
 
 const updatewheel = () => {
-  wheel.value.splice(0);
+  wheel.value.splice(0)
   for (let i = 0; i < 8; i++) {
     if (shortcutstore.wheels[i] != undefined) {
-      wheel.value.push(shortcutstore.wheels[i]);
+      wheel.value.push(shortcutstore.wheels[i])
     } else {
       wheel.value.push({
-        type: "openPath",
-        targetPath: "",
-        lnkPath: "",
-        icoPath: "",
-        name: "",
-      });
+        type: 'openPath',
+        targetPath: '',
+        lnkPath: '',
+        icoPath: '',
+        name: '',
+      })
     }
   }
-};
+}
 
-listen("wheel-click", async (e: { payload: string }) => {
-  let scaleFactor = await getCurrentWebviewWindow().scaleFactor();
-  if (e.payload == "ButtonRelease(Middle)") {
-    await app.hide();
-  } else if (e.payload == "ButtonPress(Middle)") {
-    await app.setFocus();
-    await app.setPosition(
-      new PhysicalPosition(
-        Math.trunc(position.x - 120 * scaleFactor),
-        Math.trunc(position.y - 120 * scaleFactor)
-      )
-    );
-    await app.show();
+listen('wheel-click', async (e: { payload: string }) => {
+  let scaleFactor = await getCurrentWebviewWindow().scaleFactor()
+  if (e.payload == 'ButtonRelease(Middle)') {
+    await app.hide()
+  } else if (e.payload == 'ButtonPress(Middle)') {
+    await app.setFocus()
+    await app.setPosition(new PhysicalPosition(Math.trunc(position.x - 120 * scaleFactor), Math.trunc(position.y - 120 * scaleFactor)))
+    await app.show()
   }
-});
+})
 
-listen("mouse-move", (e: { payload: { x: number, y: number } }) => {
-  position.x = e.payload.x;
-  position.y = e.payload.y;
-});
+listen('mouse-move', (e: { payload: { x: number; y: number } }) => {
+  position.x = e.payload.x
+  position.y = e.payload.y
+})
 
-const index = ref(-2);
-import { exec as execopen } from "../../functions/open";
+const index = ref(-2)
+import { exec as execopen } from '../../functions/open'
 const exec = async function (item: ShortCut, i: number) {
-  index.value = i;
+  index.value = i
   if (item.name) {
     execopen(item)
-    app.hide();
+    app.hide()
   }
-  index.value = -2;
-};
+  index.value = -2
+}
 </script>
 
 <template>
-  <svg style="" width="240" height="240" viewBox="-120 -120 240 240" xmlns="http://www.w3.org/2000/svg"
-    transform="rotate(22.5)">
+  <svg style="" width="240" height="240" viewBox="-120 -120 240 240" xmlns="http://www.w3.org/2000/svg" transform="rotate(22.5)">
     <g @mouseenter="exec(item, i)" v-for="(item, i) in wheel" :transform="'rotate(' + 45 * (1 + i) + ')'">
-      <path d="M 0 0 L 120 0 A 120 120 0 0 1 85 85 Z"
-        :fill="index == i ? 'rgba(123,123,123,0)' : 'rgba(123,123,123,0.1)'" />
+      <path d="M 0 0 L 120 0 A 120 120 0 0 1 85 85 Z" :fill="index == i ? 'rgba(123,123,123,0)' : 'rgba(123,123,123,0.1)'" />
     </g>
     <circle cx="0px" cy="0px" r="30px" fill="white" fill-opacity="1"></circle>
   </svg>
   <div class="container">
-    <div v-for="(item, i) in wheel" @mouseenter="exec(item, i)" class="img-container"
-      :style="{ transform: `rotate(${45 * i + 135}deg) translate(80px)` }">
-      <img v-if="item.icoPath ? true : false" class="img" :style="{ transform: `rotate(${-(90 + 45 * i)}deg)` }"
-        :src="convertFileSrc(item.icoPath)" />
+    <div v-for="(item, i) in wheel" @mouseenter="exec(item, i)" class="img-container" :style="{ transform: `rotate(${45 * i + 135}deg) translate(80px)` }">
+      <img v-if="item.icoPath ? true : false" class="img" :style="{ transform: `rotate(${-(90 + 45 * i)}deg)` }" :src="convertFileSrc(item.icoPath)" />
     </div>
   </div>
 </template>

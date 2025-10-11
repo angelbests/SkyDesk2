@@ -23,15 +23,18 @@ mod smtc;
 pub fn run() {
     let local: DateTime<Local> = Local::now();
     let t = local.format("%Y-%m-%d");
+    let mut config_path = dirs::data_dir().unwrap();
+    config_path.push("com.skydesk2.app");
+    config_path.push("config");
     tauri::Builder::default()
         .setup(move |app| {
-            let apphandle = app.handle();
-            wheel::wheelclick(apphandle.clone());
-            sysinfo::netspeed(apphandle.clone());
-            sysinfo::system(apphandle.clone());
-            taskbar::listentaskbar(apphandle.clone());
-            smtc::smtc_listen(apphandle.clone());
-            audio::default_audio_capture(apphandle.clone());
+            let handle = app.handle();
+            wheel::wheelclick(handle.clone());
+            sysinfo::netspeed(handle.clone());
+            sysinfo::system(handle.clone());
+            taskbar::listentaskbar(handle.clone());
+            smtc::smtc_listen(handle.clone());
+            audio::default_audio_capture(handle.clone());
             let path = app
                 .path()
                 .resolve("wallpapers\\html", BaseDirectory::AppData)
@@ -40,11 +43,6 @@ pub fn run() {
             desktop::desktop_mouse_listen(app.handle().clone());
             desktop::focus_desktop(app.handle().clone());
             monitor::init_window_hook(app.handle().clone());
-            // let main = app.get_webview_window("main").unwrap();
-            // webview2禁用节能模式
-            // main.with_webview(|webview| {
-            //     let _controller = webview.controller();
-            // })?;
             Ok(())
         })
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
@@ -76,11 +74,7 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            let main = app.get_webview_window("main").unwrap();
-            let _ = main.show();
-            let _ = main.set_focus();
-        }))
+        .plugin(tauri_plugin_pinia::Builder::new().path(config_path).build())
         .invoke_handler(tauri::generate_handler![
             wallpaper::setwallpaper,
             wallpaper::cancelwallpaper,
