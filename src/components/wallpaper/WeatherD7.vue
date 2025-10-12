@@ -141,7 +141,7 @@ const getWindIcon = function (id: number) {
     <div class="weatherD7_future">
       <div v-for="(item, index) in ws.daily" v-show="index != 0">
         <div>{{ item.week }}</div>
-        <img :src="item.iconsrc" />
+        <img class="weatherD7_future-img" :src="item.iconsrc" />
         <div>{{ item.textDay }}</div>
         <div>{{ item.tempMin }}°-{{ item.tempMax }}°</div>
       </div>
@@ -197,5 +197,8 @@ const getWindIcon = function (id: number) {
   width: 100%;
   height: calc(100% - 100px);
   text-align: center;
+}
+.weatherD7_future-img {
+  width: 45px;
 }
 </style>
