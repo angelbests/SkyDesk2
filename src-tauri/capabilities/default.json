@@ -203,13 +203,13 @@
       "identifier": "http:default",
       "allow": [
         {
-          "url": "https://www.skymiao.info"
+          "url": "https://www.skydesk.cn"
         },
         {
-          "url": "https://w.skymiao.info"
+          "url": "https://w.skydesk.cn"
         },
         {
-          "url": "https://th.skymiao.info"
+          "url": "https://th.skydesk.cn"
         },
         {
           "url": "https://www.wallhaven.cc"
