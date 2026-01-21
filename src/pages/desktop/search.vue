@@ -29,7 +29,7 @@ const inputvalue = ref('')
 const searchresult = ref<searchResult[]>([])
 const searchshortcut = ref<ShortCut[]>([])
 const focusindex = ref(-1)
-let timer: string | number | NodeJS.Timeout | undefined
+let timer: any
 let isPressed = false
 
 type SettingBottomItem = {
