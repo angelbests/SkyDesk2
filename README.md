@@ -1,3 +1,5 @@
+
+
 # SkyDesk2 - 一个简单易用的本地工具
 
 ![Static Badge](https://img.shields.io/badge/Tauri-2.5.1-green?logo=tauri)
@@ -14,7 +16,7 @@
 此项目需要安装 rust 环境
 
 ```
-// npm pkg install
+# 安装依赖
 npm install
 // dev
 npm run tauri dev
